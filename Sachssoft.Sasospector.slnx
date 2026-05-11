@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Avalonia/">
+    <Project Path="Avalonia/Sachssoft.Sasospector.Avalonia.Examples/Sachssoft.Sasospector.Avalonia.Examples.csproj" />
+    <Project Path="Avalonia/Sachssoft.Sasospector.Avalonia.Fluent/Sachssoft.Sasospector.Avalonia.Theme.Fluent.csproj" />
+    <Project Path="Avalonia/Sachssoft.Sasospector.Avalonia/Sachssoft.Sasospector.Avalonia.csproj" />
+  </Folder>
+  <Folder Name="/Base/">
+    <Project Path="Base/Sachssoft.Sasospector.Shared/Sachssoft.Sasospector.Shared.shproj" Id="d4f06760-d94e-4fa4-bc5d-cdf461d30a63" />
+    <Project Path="Base/Sachssoft.Sasospector/Sachssoft.Sasospector.csproj" />
+  </Folder>
+  <Folder Name="/Info/">
+    <File Path="CHANGELOG.md" />
+    <File Path="LICENSE.md" />
+    <File Path="nuget-upload.md" />
+  </Folder>
+  <Folder Name="/WPF/" />
+</Solution>

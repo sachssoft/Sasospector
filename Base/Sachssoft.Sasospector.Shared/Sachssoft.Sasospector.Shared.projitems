@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>d4f06760-d94e-4fa4-bc5d-cdf461d30a63</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Sachssoft.Sasospector.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Adapters\InspectorPropertyAdapterBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Adapters\MultipleValuePropertyAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Adapters\BoundedValue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Adapters\StringPropertyAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constraints\EnumConstraint_T.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constraints\EnumField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constraints\IInspectorConstraint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constraints\InspectorConstraintBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constraints\RangeConstraint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constraints\RegexConstraint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constraints\SectionConstraint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constraints\StringConstraint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)\IInspectorPropertyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InspectorPropertyEditorKinds.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Schemas\IInspectorSchema.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Schemas\IInspectorSchemaProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InspectorPropertyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InspectorPropertyChangedEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InspectorPropertyChangingEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)\InspectorPropertyInfoMetadata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InspectorPropertyInfo_T.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Schemas\InspectorSchema.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Schemas\InspectorSchemaBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Schemas\InspectorSchemaBuilder_T.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Schemas\InspectorSchema_T.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InspectorValueKind.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ValidationResult.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Schemas\" />
+  </ItemGroup>
+</Project>

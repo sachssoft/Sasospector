@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceInclude Source="../Controls/InspectorControl.axaml" />
+		<ResourceInclude Source="../Controls/InspectorContentItem.axaml" />
+		<ResourceInclude Source="../Controls/InspectorItemView.axaml" />
+		<ResourceInclude Source="../Controls/InspectorPropertyView.axaml" />
+		<ResourceInclude Source="../Controls/InspectorSectionView.axaml" />
+		<ResourceInclude Source="../Controls/ToggleableInspectorSectionView.axaml" />
+	</ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

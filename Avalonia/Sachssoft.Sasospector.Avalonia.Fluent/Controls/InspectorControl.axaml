@@ -1,0 +1,33 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System"
+					xmlns:views="using:Sachssoft.Sasospector.Views"
+					x:ClassModifier="internal">
+
+	<ControlTheme x:Key="{x:Type views:InspectorControl}" 
+				  TargetType="views:InspectorControl">
+		
+		<Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+		<Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
+		<Setter Property="Padding" Value="10"/>
+		<Setter Property="PropertySpacing" Value="{StaticResource InspectorPropertySpacing}"/>
+		<Setter Property="SectionSpacing" Value="{StaticResource InspectorSectionSpacing}"/>
+		<Setter Property="HeaderWidth" Value="{StaticResource InspectorPropertyHeaderWidth}"/>
+		<Setter Property="Template">
+			<ControlTemplate TargetType="views:InspectorControl">
+				<ScrollViewer>
+					<ItemsControl x:Name="PART_PropertyGrid"
+								  ItemsSource="{Binding $parent[views:InspectorControl].Items}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel Orientation="Vertical"
+											Spacing="{Binding $parent[views:InspectorControl].SectionSpacing}"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+					</ItemsControl>
+				</ScrollViewer>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+
+</ResourceDictionary>
