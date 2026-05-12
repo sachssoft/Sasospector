@@ -9,7 +9,8 @@
 		<Setter Property="Template">
 			<ControlTemplate TargetType="editors:StringEditor">
 				<Grid>
-					<TextBox x:Name="PART_TextBox"/>
+					<TextBox x:Name="PART_TextBox"
+							 Height="{StaticResource InspectorPropertyEditorHeight}"/>
 				</Grid>
 			</ControlTemplate>
 		</Setter>

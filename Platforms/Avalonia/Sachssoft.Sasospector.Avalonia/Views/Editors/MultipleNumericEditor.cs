@@ -31,13 +31,13 @@ namespace Sachssoft.Sasospector.Views.Editors
         public static readonly StyledProperty<int?> DecimalPlacesProperty =
             AvaloniaProperty.Register<ItemsControl, int?>(nameof(DecimalPlaces));
 
-        protected override Type StyleKeyOverride { get; } = typeof(BooleanSwitchEditor);
+        protected override Type StyleKeyOverride { get; } = typeof(BooleanEditor);
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             base.OnApplyTemplate(e);
 
-            _partSwitch = e.NameScope.Get<ToggleSwitch>(PART_Switch);
+            //_partSwitch = e.NameScope.Get<ToggleSwitch>(PART_Switch);
         }
 
         public InspectorPropertyAdapterBase<BoundedValue<double>[]>? Adapter

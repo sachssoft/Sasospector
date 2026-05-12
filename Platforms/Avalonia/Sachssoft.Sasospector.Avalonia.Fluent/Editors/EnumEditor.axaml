@@ -4,13 +4,13 @@
 					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
 					x:ClassModifier="internal">
 	
-	<ControlTheme x:Key="{x:Type editors:BooleanSwitchEditor}"
-				  TargetType="editors:BooleanSwitchEditor">
+	<ControlTheme x:Key="{x:Type editors:EnumEditor}"
+			      TargetType="editors:EnumEditor">
 		<Setter Property="Template">
-			<ControlTemplate TargetType="editors:BooleanSwitchEditor">
-				<Grid>
-					<ToggleSwitch x:Name="PART_Switch"/>
-				</Grid>
+			<ControlTemplate TargetType="editors:EnumEditor">
+				<ComboBox x:Name="PART_EnumFields"
+						  HorizontalAlignment="Stretch"
+						  Height="{StaticResource InspectorPropertyEditorHeight}"/>
 			</ControlTemplate>
 		</Setter>
 	</ControlTheme>

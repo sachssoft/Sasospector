@@ -8,6 +8,7 @@ using Sachssoft.Sasospector.Registries;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 
 namespace Sachssoft.Sasospector.Views
 {
@@ -26,8 +27,8 @@ namespace Sachssoft.Sasospector.Views
                 o => o.EditorRegistry,
                 (o, v) => o.EditorRegistry = v);
 
-        public static readonly StyledProperty<IEnumerable<IInspectorPropertyEditorModule>?> EditorModulesProperty =
-            AvaloniaProperty.Register<ItemsControl, IEnumerable<IInspectorPropertyEditorModule>?>(nameof(EditorModules));
+        public static readonly StyledProperty<InspectorPropertyEditorModuleCollection?> EditorModulesProperty =
+            AvaloniaProperty.Register<ItemsControl, InspectorPropertyEditorModuleCollection?>(nameof(EditorModules));
 
         //public static readonly StyledProperty<IEnumerable?> PropertiesSourceProperty =
         //    AvaloniaProperty.Register<InspectorControl, IEnumerable?>(nameof(PropertiesSource));
@@ -80,7 +81,7 @@ namespace Sachssoft.Sasospector.Views
                 value ?? AvaloniaPropertyEditorRegistry.Default);
         }
 
-        public IEnumerable<IInspectorPropertyEditorModule>? EditorModules
+        public InspectorPropertyEditorModuleCollection? EditorModules
         {
             get => GetValue(EditorModulesProperty);
             set => SetValue(EditorModulesProperty, value);
@@ -164,6 +165,16 @@ namespace Sachssoft.Sasospector.Views
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
+
+            if (change.Property == EditorModulesProperty || 
+                change.Property == EditorRegistryProperty)
+            {
+                if (EditorRegistry != null && EditorModules != null)
+                {
+                    foreach (var module in EditorModules)
+                        EditorRegistry.TryAddModule(module);
+                }
+            }
 
             //if (change.Property == SourceProperty /*||*/
             ////change.Property == PropertiesSourceProperty ||

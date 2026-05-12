@@ -16,15 +16,21 @@ namespace Sachssoft.Sasospector.Registries
             RegisterCommonTypes(registry);
             RegisterDataTimeTypes(registry);
             RegisterNumericMathTypes(registry);
+            RegisterRules(registry);
         }
 
         private void RegisterRules(InspectorPropertyEditorRegistryBase registry)
         {
-            //// ENUM
-            //RegisterRule(
-            //    type => type.IsEnum,
-            //    info => new EnumPropertyEditor(),
-            //    priority: 1000);
+            // Enum
+            registry.Register(
+                type => type.IsEnum && !type.IsDefined(typeof(FlagsAttribute), false),
+                (pi, f) => f.CreateEnumEditor(selectionMode: EnumSelectionMode.Single),
+                priority: 0);
+
+            registry.Register(
+                type => type.IsEnum && type.IsDefined(typeof(FlagsAttribute), false),
+                (pi, f) => f.CreateEnumEditor(selectionMode: EnumSelectionMode.Multiple),
+                priority: 0);
 
             //// NULLABLE
             //RegisterRule(
@@ -50,7 +56,7 @@ namespace Sachssoft.Sasospector.Registries
         private void RegisterPrimitiveTypes(InspectorPropertyEditorRegistryBase registry)
         {
             registry.Register(typeof(bool),
-                (f) => f.CreateEditor(typeof(IBooleanSwitchEditor)),
+                (f) => f.CreateEditor(typeof(IBooleanEditor)),
                 priority: 0);
 
             registry.Register(typeof(sbyte),

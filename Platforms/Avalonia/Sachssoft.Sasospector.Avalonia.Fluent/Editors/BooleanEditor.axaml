@@ -1,0 +1,64 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:views="using:Sachssoft.Sasospector.Views"
+					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
+					x:ClassModifier="internal">
+	
+	<ControlTheme x:Key="{x:Type editors:BooleanEditor}"
+				  TargetType="editors:BooleanEditor">
+		<Setter Property="Template">
+			<ControlTemplate TargetType="editors:BooleanEditor">
+				<ToggleSwitch IsChecked="{TemplateBinding Value}" />
+			</ControlTemplate>
+		</Setter>
+		<Style Selector="^[VariantKind=CheckBox]">
+			<Setter Property="Template">
+				<ControlTemplate TargetType="editors:BooleanEditor">
+					<CheckBox IsChecked="{TemplateBinding Value}" />
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="^[VariantKind=Toggle]">
+			<Setter Property="Template">
+				<ControlTemplate TargetType="editors:BooleanEditor">
+					<ToggleButton IsChecked="{TemplateBinding Value}" />
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="^[VariantKind=Dropdown]">
+			<Setter Property="Template">
+				<ControlTemplate TargetType="editors:BooleanEditor">
+					<ComboBox SelectedIndex="{TemplateBinding Value}">
+						<ComboBoxItem>False</ComboBoxItem>
+						<ComboBoxItem>True</ComboBoxItem>
+					</ComboBox>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="^[VariantKind=Radio]">
+			<Setter Property="Template">
+				<ControlTemplate TargetType="editors:BooleanEditor">
+					<WrapPanel>
+						<!--<RadioButton Group="Boolean"
+									 IsChecked="{TemplateBinding Value}"/>
+						<RadioButton Group="Boolean"
+									 IsChecked="{!TemplateBinding Value}"/>-->
+					</WrapPanel>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="^[VariantKind=Segment]">
+			<Setter Property="Template">
+				<ControlTemplate TargetType="editors:BooleanEditor">
+					<WrapPanel>
+						<!--<ToggleButton Group="Boolean"
+									 IsChecked="{TemplateBinding Value}"/>
+						<ToggleButton Group="Boolean"
+									 IsChecked="{!TemplateBinding Value}"/>-->
+					</WrapPanel>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+	</ControlTheme>
+	
+</ResourceDictionary>

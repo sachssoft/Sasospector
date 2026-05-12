@@ -14,8 +14,8 @@
 				<Grid ColumnDefinitions="Auto,*,Auto">
 					<Border Grid.Column="0"
 							HorizontalAlignment="Stretch"
-							Width="32"
-							Height="32"
+							Width="{StaticResource InspectorPropertyEditorWidth}"
+							Height="{StaticResource InspectorPropertyEditorHeight}"
 							Classes="colorBox">
 						<Border.Background>
 							<SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=editors:ColorEditor}, Mode=TwoWay}" />
@@ -27,9 +27,14 @@
 					<Button Grid.Column="2"
 							HorizontalAlignment="Stretch"
 							HorizontalContentAlignment="Center"
-							Width="24"
-							Height="24">
-						<PathIcon Data="{StaticResource BrowseIcon}"/>
+							Width="{StaticResource InspectorPropertyEditorWidth}"
+							Height="{StaticResource InspectorPropertyEditorHeight}">
+						<Viewbox Width="{StaticResource IconViewboxWidth}"
+								 Height="{StaticResource IconViewboxHeight}"
+								 HorizontalAlignment="Center"
+								 VerticalAlignment="Center">
+							<PathIcon Data="{StaticResource BrowseIcon}"/>
+						</Viewbox>
 					</Button>
 				</Grid>
 			</ControlTemplate>

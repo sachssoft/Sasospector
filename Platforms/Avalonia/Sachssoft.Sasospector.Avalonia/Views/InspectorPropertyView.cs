@@ -4,7 +4,9 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Registries;
+using Sachssoft.Sasospector.Views.Editors;
 using System;
+using System.Reflection;
 
 namespace Sachssoft.Sasospector.Views
 {
@@ -104,9 +106,9 @@ namespace Sachssoft.Sasospector.Views
 
             var editor = _editorRegistry.Create(Property);
 
-            if (editor != null)
+            if (editor is InspectorPropertyEditorBase inspectorPropertyEditor)
             {
-                //editor.Source = Source;
+                inspectorPropertyEditor.Source = Property;
             }
 
             _partEditorContent.Content = editor;

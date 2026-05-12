@@ -55,8 +55,9 @@ namespace Sachssoft.Sasospector.Registries
         protected virtual void RegisterDefaultEditors()
         {
             Register(typeof(BigIntegerEditor), () => new BigIntegerEditor());
-            Register(typeof(BooleanSwitchEditor), () => new BooleanSwitchEditor());
+            Register(typeof(BooleanEditor), () => new BooleanEditor());
             Register(typeof(ColorEditor), () => new ColorEditor());
+            Register(typeof(EnumEditor), () => new EnumEditor());
             Register(typeof(GuidEditor), () => new GuidEditor());
             Register(typeof(MultipleNumericEditor), () => new MultipleNumericEditor());
             //Register(typeof(NumberSliderPropertyEditor), () => new NumberSliderPropertyEditor());

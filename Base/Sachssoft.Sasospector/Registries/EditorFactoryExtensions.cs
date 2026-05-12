@@ -7,6 +7,17 @@ namespace Sachssoft.Sasospector.Registries
 {
     public static class EditorFactoryExtensions
     {
+        public static IPropertyEditor CreateEnumEditor(
+            this IInspectorEditorPlatformFactory f,
+            EnumSelectionMode selectionMode)
+        {
+            var editor = ((IEnumEditor)f.CreateEditor(typeof(IEnumEditor)));
+
+            editor.SelectionMode = selectionMode;
+
+            return editor;
+        }
+
         public static IPropertyEditor CreateColorEditor(
             this IInspectorEditorPlatformFactory f,
             bool includeAlpha,

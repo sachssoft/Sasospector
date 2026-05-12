@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace Sachssoft.Sasospector.Views.Converters
 {
-    class ColorToHexConverter : IValueConverter
+    public class ColorToHexConverter : IValueConverter
     {
         public static readonly ColorToHexConverter Instance = new();
 

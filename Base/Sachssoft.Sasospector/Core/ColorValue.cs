@@ -1,4 +1,4 @@
-﻿namespace Sachssoft.Sasospector.Adapters
+﻿namespace Sachssoft.Sasospector
 {
     public readonly struct ColorValue
     {

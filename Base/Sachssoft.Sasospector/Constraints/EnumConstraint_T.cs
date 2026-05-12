@@ -10,15 +10,16 @@ namespace Sachssoft.Sasospector.Constraints
         public IReadOnlyList<EnumField<TEnum>> Values { get; init; }
             = Array.Empty<EnumField<TEnum>>();
 
-        public bool IsFlags => typeof(TEnum)
-            .IsDefined(typeof(FlagsAttribute), false);
+        public EnumSelectionMode SelectionMode { get; init; }
 
         public override ValidationResult Validate(TEnum value)
         {
+            // Wenn keine Werte definiert sind, gilt alles als gültig
             if (Values.Count == 0)
                 return ValidationResult.Success();
 
-            if (!IsFlags)
+            // Einzelauswahl-Modus: exakt ein definierter Enum-Wert ist erlaubt
+            if (SelectionMode != EnumSelectionMode.Multiple)
             {
                 if (!Values.Any(v =>
                     EqualityComparer<TEnum>.Default.Equals(v.Value, value)))
@@ -31,14 +32,17 @@ namespace Sachssoft.Sasospector.Constraints
                 return ValidationResult.Success();
             }
 
-            // FLAGS MODE
+            // Mehrfachauswahl-Modus (Bitmask-Logik)
             ulong allowedBits = 0;
 
+            // Alle erlaubten Flags zu einer Bitmaske zusammenfassen
             foreach (var v in Values)
                 allowedBits |= Convert.ToUInt64(v.Value);
 
+            // Aktuellen Wert als Bitmaske interpretieren
             ulong actual = Convert.ToUInt64(value);
 
+            // Prüfen ob unerlaubte Bits gesetzt sind
             if ((actual & ~allowedBits) != 0)
             {
                 return ValidationResult.Fail(

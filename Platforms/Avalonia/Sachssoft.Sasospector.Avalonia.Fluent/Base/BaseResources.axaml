@@ -5,10 +5,16 @@
 					xmlns:converters="using:Sachssoft.Sasosual.Avalonia.Converters"
 					x:ClassModifier="internal">
 
+	<sys:Double x:Key="InspectorPropertyEditorWidth">30</sys:Double>
+	<sys:Double x:Key="InspectorPropertyEditorHeight">30</sys:Double>
+	
+	<sys:Double x:Key="IconViewboxWidth">12</sys:Double>
+	<sys:Double x:Key="IconViewboxHeight">12</sys:Double>
+
 	<sys:Double x:Key="InspectorSectionSpacing">5</sys:Double>
 	<sys:Double x:Key="InspectorPropertySpacing">5</sys:Double>
 	<sys:Double x:Key="InspectorPropertyHeaderWidth">150</sys:Double>
 
-	<PathIcon x:Key="BrowseIcon"></PathIcon>
+	<StreamGeometry x:Key="BrowseIcon">M10,17L15,12L10,7V17Z</StreamGeometry>
 	
 </ResourceDictionary>

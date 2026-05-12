@@ -53,18 +53,25 @@ namespace Sachssoft.Sasospector.Registries
             _rules.Add(new RuleEntry(match, factory, priority));
         }
 
-        public void AddModule(IInspectorPropertyEditorModule module)
+        public bool TryAddModule(IInspectorPropertyEditorModule module)
         {
             if (module is null)
                 throw new ArgumentNullException(nameof(module));
 
             if (!_registeredModules.Add(module))
+                return false;
+
+            module.Register(this);
+            return true;
+        }
+
+        public void AddModule(IInspectorPropertyEditorModule module)
+        {
+            if (!TryAddModule(module))
             {
                 throw new InvalidOperationException(
                     $"Inspector module '{module.GetType().FullName}' is already registered.");
             }
-
-            module.Register(this);
         }
 
         public IPropertyEditor? Create(IInspectorPropertyInfo info)

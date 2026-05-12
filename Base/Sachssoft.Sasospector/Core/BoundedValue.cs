@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Sachssoft.Sasospector.Adapters
+namespace Sachssoft.Sasospector
 {
     public readonly struct BoundedValue<T>
         where T : struct, IMinMaxValue<T>, INumber<T>
