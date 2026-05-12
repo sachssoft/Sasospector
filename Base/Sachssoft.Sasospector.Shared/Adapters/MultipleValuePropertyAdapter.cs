@@ -7,19 +7,23 @@ using System.Numerics;
 namespace Sachssoft.Sasospector.Adapters
 {
     // Manche andere UI (Spiele) nur Float, andere UI Double
-    public class MultipleValuePropertyAdapter<T> : InspectorPropertyAdapterBase<BoundedValue<T>[]>
-        where T : struct, IMinMaxValue<T>, INumber<T>
+    public class MultipleValuePropertyAdapter<TField, TTarget> : InspectorPropertyAdapterBase<BoundedValue<TField>[]>
+        where TField : struct, IMinMaxValue<TField>, INumber<TField>
+        where TTarget : struct
     {
         private InspectorPropertyInfo? _propertyInfo;
         private readonly List<Entry> _supportedTypeEntries = new();
 
         private record Entry(
             Func<InspectorPropertyInfo, bool> CanHandle,
-            Func<InspectorPropertyInfo, BoundedValue<T>[]> Getter,
-            Action<InspectorPropertyInfo, BoundedValue<T>[]> Setter
+            Func<InspectorPropertyInfo, BoundedValue<TField>[]> Getter,
+            Action<InspectorPropertyInfo, BoundedValue<TField>[]> Setter
         );
 
-        public MultipleValuePropertyAdapter()
+        public MultipleValuePropertyAdapter(
+            Func<TTarget, BoundedValue<TField>[]> toValues,
+            Func<TField[], TTarget> fromValues
+        )
         {
             RegisterTypes();
         }
@@ -30,30 +34,30 @@ namespace Sachssoft.Sasospector.Adapters
                    _supportedTypeEntries.Any(x => x.CanHandle(_propertyInfo));
         }
 
-        protected override BoundedValue<T>[] OnGetValue()
+        protected override BoundedValue<TField>[] OnGetValue()
         {
             var entry = GetEntry(_propertyInfo!);
             return entry.Getter(_propertyInfo!);
         }
 
-        protected override void OnSetValue(BoundedValue<T>[] value)
+        protected override void OnSetValue(BoundedValue<TField>[] value)
         {
             var entry = GetEntry(_propertyInfo!);
             entry.Setter(_propertyInfo!, value);
         }
 
-        protected void RegisterType<TValue>(
-            Func<InspectorPropertyInfo, bool> canHandle,
-            Func<TValue, T[]> toValues,
-            Func<BoundedValue<T>[], TValue> fromValues)
-            where TValue : struct
-        {
-            _supportedTypeEntries.Add(new Entry(
-                canHandle,
-                pi => TransformTo(pi, toValues),
-                (pi, values) => TransformBack(pi, values, fromValues)
-            ));
-        }
+        //protected void RegisterType<TValue>(
+        //    Func<InspectorPropertyInfo, bool> canHandle,
+        //    Func<TValue, T[]> toValues,
+        //    Func<BoundedValue<T>[], TValue> fromValues)
+        //    where TValue : struct
+        //{
+        //    _supportedTypeEntries.Add(new Entry(
+        //        canHandle,
+        //        pi => TransformTo(pi, toValues),
+        //        (pi, values) => TransformBack(pi, values, fromValues)
+        //    ));
+        //}
 
         private Entry GetEntry(InspectorPropertyInfo propertyInfo)
         {
@@ -67,9 +71,9 @@ namespace Sachssoft.Sasospector.Adapters
             return entry;
         }
 
-        private BoundedValue<T>[] TransformTo<TValue>(
+        private BoundedValue<TField>[] TransformTo<TValue>(
             InspectorPropertyInfo pi,
-            Func<TValue, T[]> output)
+            Func<TValue, TField[]> output)
             where TValue : struct
         {
             var value = (TValue?)pi.GetValue() ?? default;
@@ -84,39 +88,39 @@ namespace Sachssoft.Sasospector.Adapters
 
         private void TransformBack<TValue>(
             InspectorPropertyInfo pi,
-            BoundedValue<T>[] values,
-            Func<BoundedValue<T>[], TValue> output)
+            BoundedValue<TField>[] values,
+            Func<BoundedValue<TField>[], TValue> output)
             where TValue : struct
         {
             var result = output(values);
             pi.SetValue(result);
         }
 
-        private BoundedValue<T>[] GetOutputs(
+        private BoundedValue<TField>[] GetOutputs(
             InspectorPropertyInfoMetadata metadata,
-            IEnumerable<T> values)
+            IEnumerable<TField> values)
         {
             var (min, max) = GetRange(metadata);
 
             return values
-                .Select(v => new BoundedValue<T>(v, min, max))
+                .Select(v => new BoundedValue<TField>(v, min, max))
                 .ToArray();
         }
 
-        private (T Min, T Max) GetRange(
+        private (TField Min, TField Max) GetRange(
             InspectorPropertyInfoMetadata metadata)
         {
             var constraints = metadata.Constraints;
 
             if (constraints == null || constraints.Count == 0)
-                return (T.MinValue, T.MaxValue);
+                return (TField.MinValue, TField.MaxValue);
 
-            T min = T.MinValue;
-            T max = T.MaxValue;
+            TField min = TField.MinValue;
+            TField max = TField.MaxValue;
 
             foreach (var c in constraints)
             {
-                if (c is RangeConstraint<T> r)
+                if (c is RangeConstraint<TField> r)
                 {
                     if (r.MinValue > min)
                         min = r.MinValue;
