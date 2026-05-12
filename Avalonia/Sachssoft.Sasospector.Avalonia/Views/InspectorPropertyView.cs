@@ -107,7 +107,7 @@ namespace Sachssoft.Sasospector.Views
             {
                 //editor.Source = Source;
             }
-                
+
             _partEditorContent.Content = editor;
         }
     }

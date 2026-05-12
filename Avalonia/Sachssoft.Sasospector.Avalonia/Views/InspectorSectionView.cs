@@ -2,7 +2,6 @@
 using Avalonia.Collections;
 using Avalonia.Metadata;
 using System;
-using System.Collections.Generic;
 
 namespace Sachssoft.Sasospector.Views
 {
@@ -19,8 +18,8 @@ namespace Sachssoft.Sasospector.Views
         //public static readonly StyledProperty<IEnumerable<InspectorPropertyView>?> ItemsSourceProperty =
         //    AvaloniaProperty.Register<InspectorSectionView, IEnumerable<InspectorPropertyView>?>(nameof(ItemsSource));
 
-        protected override Type StyleKeyOverride { get; } = typeof(InspectorSectionView); 
-        
+        protected override Type StyleKeyOverride { get; } = typeof(InspectorSectionView);
+
         [Content]
         public AvaloniaList<InspectorItem> Items => _items;
 

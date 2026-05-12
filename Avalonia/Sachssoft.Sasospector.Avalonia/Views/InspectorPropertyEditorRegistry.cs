@@ -1,126 +1,82 @@
-﻿using Sachssoft.Sasospector.Info;
-using Sachssoft.Sasospector.Views.Editors;
+﻿using Sachssoft.Sasospector.Views.Editors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Sachssoft.Sasospector.Views
 {
-    public class InspectorPropertyEditorRegistry
+    public partial class InspectorPropertyEditorRegistry
     {
         private readonly Dictionary<Type, List<Entry>> _entries = new();
+        private readonly List<RuleEntry> _rules = new();
+
+        private sealed record Entry(
+            Func<InspectorPropertyEditorBase> Factory,
+            int Priority
+        );
+
+        private sealed record RuleEntry(
+            Func<Type, bool> Match,
+            Func<IInspectorPropertyInfo, InspectorPropertyEditorBase> Factory,
+            int Priority
+        );
 
         public static InspectorPropertyEditorRegistry Default { get; }
             = new InspectorPropertyEditorRegistry();
 
-        private sealed record Entry(
-            Func<InspectorPropertyEditorBase> Factory,
-            string[]? Kinds,
-            int Priority
-        );
-
         public InspectorPropertyEditorRegistry()
         {
-            RegisterDefaultEditors();
+            RegisterPrimitiveTypes();
+            RegisterPlatformDependencyTypes();
+            RegisterCommonTypes();
+            RegisterDataTimeTypes();
+            RegisterNumericMathTypes();
+            RegisterAvaloniaTypes();
+
+            RegisterRules();
         }
 
         public void Register(
-            Type propertyType,
+            Type type,
             Func<InspectorPropertyEditorBase> factory,
-            string[]? kinds = null,
             int priority = 0)
         {
-            var list = GetOrCreateList(propertyType);
-            list.Add(new Entry(factory, kinds, priority));
+            var list = GetOrCreateList(type);
+            list.Add(new Entry(factory, priority));
         }
 
-        public void Replace(
-            Type propertyType,
-            Type existingEditorType,
-            Func<InspectorPropertyEditorBase> newFactory)
+        public void Register(
+            Func<Type, bool> match,
+            Func<IInspectorPropertyInfo, InspectorPropertyEditorBase> factory,
+            int priority = 0)
         {
-            if (!_entries.TryGetValue(propertyType, out var list))
-                throw new InvalidOperationException("Property type not registered.");
-
-            var index = list.FindIndex(x =>
-                x.Factory.Method.DeclaringType == existingEditorType);
-
-            if (index < 0)
-            {
-                throw new InvalidOperationException(
-                    $"Editor '{existingEditorType.Name}' not found for '{propertyType.Name}'.");
-            }
-
-            list[index] = list[index] with { Factory = newFactory };
+            _rules.Add(new RuleEntry(match, factory, priority));
         }
 
-        public InspectorPropertyEditorBase? Create(
-            IInspectorPropertyInfo propertyInfo,
-            Type? variantEditorType = null)
+        public InspectorPropertyEditorBase? Create(IInspectorPropertyInfo info)
         {
-            var propertyType = propertyInfo.Type;
+            var type = info.Type;
 
-            // Meta-Kinds aus der Property-Definition (z. B. "Switch", "Text", etc.)
-            var metaKinds = propertyInfo.Metadata?.EditorKinds;
+            // 1. RULE SYSTEM (Semantik: Enum, Nullable, etc.)
 
-            // Alle möglichen Editor-Kandidaten für diesen Property-Type sammeln
+            var rule = _rules
+                .Where(r => r.Match(type))
+                .OrderByDescending(r => r.Priority)
+                .FirstOrDefault();
+
+            if (rule != null)
+                return rule.Factory(info);
+
+            // 2. REGISTRY SYSTEM (konkrete Typen)
+
             var candidates = _entries
-                .Where(x => x.Key.IsAssignableFrom(propertyType))
+                .Where(x => x.Key.IsAssignableFrom(type))
                 .SelectMany(x => x.Value)
                 .ToList();
 
             if (candidates.Count == 0)
                 return null;
 
-            // ------------------------------------------------------------
-            // 1. HARTE OVERRIDE-LOGIK (Callsite gewinnt immer)
-            // ------------------------------------------------------------
-            // Wenn der Entwickler explizit einen Editor-Type angibt,
-            // wird dieser zwingend verwendet (sofern registriert).
-            if (variantEditorType != null)
-            {
-                var match = candidates.FirstOrDefault(x =>
-                    x.Factory.Method.DeclaringType == variantEditorType);
-
-                if (match == null)
-                {
-                    throw new InvalidOperationException(
-                        $"Editor variant '{variantEditorType.Name}' " +
-                        $"is not registered for '{propertyType.Name}'.");
-                }
-
-                return match.Factory();
-            }
-
-            // ------------------------------------------------------------
-            // 2. META-BASED FILTER (EditorKinds aus Property-Metadaten)
-            // ------------------------------------------------------------
-            // Wenn die Property bestimmte Kinds definiert (z. B. "Switch"),
-            // werden nur passende Editor berücksichtigt.
-            if (metaKinds is { Count: > 0 })
-            {
-                var filtered = candidates
-                    .Where(e =>
-                        e.Kinds != null &&
-                        e.Kinds.Intersect(metaKinds, StringComparer.OrdinalIgnoreCase).Any())
-                    .ToList();
-
-                // Wenn passende Kandidaten gefunden wurden,
-                // gewinnt der beste davon.
-                if (filtered.Count > 0)
-                {
-                    return filtered
-                        .OrderByDescending(x => x.Priority)
-                        .First()
-                        .Factory();
-                }
-            }
-
-            // ------------------------------------------------------------
-            // 3. DEFAULT-SELECTION (Fallback über Priority)
-            // ------------------------------------------------------------
-            // Wenn weder Override noch Meta-Kinds greifen,
-            // wird einfach der Editor mit der höchsten Priority genommen.
             return candidates
                 .OrderByDescending(x => x.Priority)
                 .First()
@@ -136,26 +92,6 @@ namespace Sachssoft.Sasospector.Views
             }
 
             return list;
-        }
-
-        private void RegisterDefaultEditors()
-        {
-            // bool default editor
-            Register(typeof(bool),
-                () => new BooleanSwitchPropertyEditor(),
-                kinds: [InspectorPropertyEditorKinds.Switch],
-                priority: 0);
-
-            // bool alternative editor (higher priority)
-            //Register(typeof(bool),
-            //    () => new BooleanComboEditor(),
-            //    priority: 10);
-
-            // string editor
-            Register(typeof(string),
-                () => new TextPropertyEditor(),
-                kinds: [InspectorPropertyEditorKinds.Text],
-                priority: 0);
         }
     }
 }
