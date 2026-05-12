@@ -1,11 +1,42 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<RootNamespace>Sachssoft.Sasospector</RootNamespace>
+	</PropertyGroup>
 
-  <Import Project="..\Sachssoft.Sasospector.Shared\Sachssoft.Sasospector.Shared.projitems" Label="Shared" />
+	<!-- Assembly / NuGet Metadata -->
+	<PropertyGroup>
+		<Title>Sachssoft Sasospector</Title>
+		<Authors>Tobias Sachs</Authors>
+		<Company>Tobias Sachs / Sachssoft</Company>
+		<Product>Sasospector</Product>
+		<AssemblyName>Sachssoft.Sasospector</AssemblyName>
+		<Description>Inspector Base Tool Library</Description>
+		<Copyright>© 2026 Tobias Sachs / Sachssoft</Copyright>
+
+		<!-- Versionierung -->
+		<Version>0.0.0-alpha.1</Version>
+		<AssemblyVersion>0.0.1.0</AssemblyVersion>
+		<FileVersion>0.0.1.0</FileVersion>
+
+		<!-- NuGet -->
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/sachssoft/Sasospector</PackageProjectUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">True</GeneratePackageOnBuild>
+
+		<!-- GitHub Repository -->
+		<RepositoryUrl>https://github.com/sachssoft/Sasospector.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+
+		<!-- Trimming / AOT -->
+		<IsTrimmable>True</IsTrimmable>
+		<IsAotCompatible>True</IsAotCompatible>
+	</PropertyGroup>
 
 </Project>
+
