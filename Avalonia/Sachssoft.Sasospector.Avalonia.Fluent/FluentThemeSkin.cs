@@ -1,9 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Media;
-using Avalonia.Styling;
-using Avalonia.Themes.Fluent;
-using Sachssoft.Sasosual.Avalonia.Controls;
-using AvaloniaFluentTheme = Avalonia.Themes.Fluent.FluentTheme;
 
 namespace Sachssoft.Sasospector.Views.Themes
 {
