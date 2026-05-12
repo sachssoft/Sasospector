@@ -4,6 +4,6 @@
     {
         IInspectorPropertyInfo Source { get; }
 
-        string? VariantKind { get; set; }
+        string? PreferredKind { get; set; }
     }
 }

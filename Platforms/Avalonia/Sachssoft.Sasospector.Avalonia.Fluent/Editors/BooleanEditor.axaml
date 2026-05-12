@@ -11,21 +11,21 @@
 				<ToggleSwitch IsChecked="{TemplateBinding Value}" />
 			</ControlTemplate>
 		</Setter>
-		<Style Selector="^[VariantKind=CheckBox]">
+		<Style Selector="^[PreferredKind=CheckBox]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
 					<CheckBox IsChecked="{TemplateBinding Value}" />
 				</ControlTemplate>
 			</Setter>
 		</Style>
-		<Style Selector="^[VariantKind=Toggle]">
+		<Style Selector="^[PreferredKind=Toggle]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
 					<ToggleButton IsChecked="{TemplateBinding Value}" />
 				</ControlTemplate>
 			</Setter>
 		</Style>
-		<Style Selector="^[VariantKind=Dropdown]">
+		<Style Selector="^[PreferredKind=Dropdown]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
 					<ComboBox SelectedIndex="{TemplateBinding Value}">
@@ -35,7 +35,7 @@
 				</ControlTemplate>
 			</Setter>
 		</Style>
-		<Style Selector="^[VariantKind=Radio]">
+		<Style Selector="^[PreferredKind=Radio]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
 					<WrapPanel>
@@ -47,7 +47,7 @@
 				</ControlTemplate>
 			</Setter>
 		</Style>
-		<Style Selector="^[VariantKind=Segment]">
+		<Style Selector="^[PreferredKind=Segment]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
 					<WrapPanel>

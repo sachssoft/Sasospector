@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Markup.Xaml.Templates;
 using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Registries;
 using Sachssoft.Sasospector.Views.Editors;
@@ -28,6 +29,13 @@ namespace Sachssoft.Sasospector.Views
             AvaloniaProperty.RegisterDirect<InspectorPropertyView, IInspectorPropertyInfo?>(
                 nameof(Property),
                 o => o.Property);
+
+        public static readonly StyledProperty<string?> PreferredEditorKindProperty =
+            AvaloniaProperty.Register<InspectorPropertyView, string?>(nameof(PreferredEditorKind));
+
+        public static readonly StyledProperty<InspectorPropertyEditorBase?> CustomEditorProperty =
+            AvaloniaProperty.Register<InspectorPropertyView, InspectorPropertyEditorBase?>(nameof(CustomEditor));
+
         public InspectorPropertyView() { }
 
         protected override Type StyleKeyOverride { get; } = typeof(InspectorPropertyView);
@@ -36,6 +44,20 @@ namespace Sachssoft.Sasospector.Views
         {
             get => GetValue(PropertyNameProperty);
             set => SetValue(PropertyNameProperty, value);
+        }
+
+        // Gewünschte alternative eingebaute Editor Art, wenn VariantEditor = null
+        public string? PreferredEditorKind
+        {
+            get => GetValue(PreferredEditorKindProperty);
+            set => SetValue(PreferredEditorKindProperty, value);
+        }
+
+        // Gewünschte alternative Editor
+        public InspectorPropertyEditorBase? CustomEditor
+        {
+            get => GetValue(CustomEditorProperty);
+            set => SetValue(CustomEditorProperty, value);
         }
 
         // Nur ReadOnly wichtig für Bindings
@@ -104,14 +126,25 @@ namespace Sachssoft.Sasospector.Views
             if (Property == null)
                 return;
 
-            var editor = _editorRegistry.Create(Property);
+            // 1. VariantEditor (hard override instance)
+            // 2. VariantEditorKind (template selector)
+            // 3. Registry (default)
 
-            if (editor is InspectorPropertyEditorBase inspectorPropertyEditor)
+            if (CustomEditor == null)
             {
-                inspectorPropertyEditor.Source = Property;
-            }
+                var editor = _editorRegistry.Create(Property, PreferredEditorKind);
 
-            _partEditorContent.Content = editor;
+                if (editor is InspectorPropertyEditorBase inspectorPropertyEditor)
+                {
+                    inspectorPropertyEditor.Source = Property;
+                }
+
+                _partEditorContent.Content = editor;
+            }
+            else
+            {
+                _partEditorContent.Content = CustomEditor;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sachssoft.Sasospector.Constraints;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,6 +40,7 @@ namespace Sachssoft.Sasospector.Registries
         public void Register(
             Type type,
             Func<IInspectorEditorPlatformFactory, IPropertyEditor> factory,
+            Func<IEnumerable<IInspectorConstraint>, bool>? constraintMatch = null,
             int priority = 0)
         {
             var list = GetOrCreateList(type);
@@ -48,6 +50,7 @@ namespace Sachssoft.Sasospector.Registries
         public void Register(
             Func<Type, bool> match,
             Func<IInspectorPropertyInfo, IInspectorEditorPlatformFactory, IPropertyEditor> factory,
+            Func<IEnumerable<IInspectorConstraint>, bool>? constraintMatch = null,
             int priority = 0)
         {
             _rules.Add(new RuleEntry(match, factory, priority));
@@ -74,8 +77,11 @@ namespace Sachssoft.Sasospector.Registries
             }
         }
 
-        public IPropertyEditor? Create(IInspectorPropertyInfo info)
+        // info: Eigenschaft
+        // preferredEditorKind: gewünschter Editor-Typ, falls vorhanden
+        public IPropertyEditor? Create(IInspectorPropertyInfo info, string? preferredEditorKind = null)
         {
+            IPropertyEditor? result = null;
             var type = info.Type;
 
             // 1. RULE SYSTEM (Semantik: Enum, Nullable, spezielle Fälle)
@@ -85,21 +91,28 @@ namespace Sachssoft.Sasospector.Registries
                 .FirstOrDefault();
 
             if (rule != null)
-                return rule.Factory(info, _platformFactory);
+            {
+                result = rule.Factory(info, _platformFactory);
+            }
+            else
+            {
+                // 2. REGISTRY SYSTEM (konkrete Typen)
+                var candidates = _entries
+                    .Where(x => x.Key.IsAssignableFrom(type))
+                    .SelectMany(x => x.Value)
+                    .ToList();
 
-            // 2. REGISTRY SYSTEM (konkrete Typen)
-            var candidates = _entries
-                .Where(x => x.Key.IsAssignableFrom(type))
-                .SelectMany(x => x.Value)
-                .ToList();
+                if (candidates.Count == 0)
+                    return null;
 
-            if (candidates.Count == 0)
-                return null;
+                result = candidates
+                    .OrderByDescending(x => x.Priority)
+                    .First()
+                    .Factory(_platformFactory);
+            }
 
-            return candidates
-                .OrderByDescending(x => x.Priority)
-                .First()
-                .Factory(_platformFactory);
+            result.PreferredKind = preferredEditorKind;
+            return result;
         }
 
         protected abstract IInspectorEditorPlatformFactory CreatePlatformFactory();

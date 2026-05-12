@@ -19,8 +19,8 @@ namespace Sachssoft.Sasospector.Views.Editors
         public static readonly StyledProperty<ICommand?> BrowseCommandProperty =
             AvaloniaProperty.Register<InspectorPropertyEditorBase, ICommand?>(nameof(BrowseCommand));
 
-        public static readonly StyledProperty<string?> VariantKindProperty =
-            AvaloniaProperty.Register<InspectorPropertyEditorBase, string?>(nameof(VariantKind));
+        public static readonly StyledProperty<string?> PreferredKindProperty =
+            AvaloniaProperty.Register<InspectorPropertyEditorBase, string?>(nameof(PreferredKind));
 
         public static readonly DirectProperty<InspectorPropertyEditorBase, IInspectorPropertyInfo?> SourceProperty =
             AvaloniaProperty.RegisterDirect<InspectorPropertyEditorBase, IInspectorPropertyInfo?>(
@@ -43,10 +43,10 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         // Null ist standardiert, mit Wert alternative Steuerung sofern vorhanden
         // Z.B. BooleanEditor: Switch ist Standard, Alternativ auch CheckBox möglich
-        public string? VariantKind
+        public string? PreferredKind
         {
-            get => GetValue(VariantKindProperty);
-            set => SetValue(VariantKindProperty, value);
+            get => GetValue(PreferredKindProperty);
+            set => SetValue(PreferredKindProperty, value);
         }
 
         public CultureInfo EffectiveCulture => _effectiveCulture;

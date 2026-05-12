@@ -73,11 +73,11 @@ namespace Sachssoft.Sasospector.Views.Editors
                 SetupEditorKindSelector();
                 Build();
             }
-            else if(change.Property == VariantKindProperty && !_kindSyncing)
+            else if(change.Property == PreferredKindProperty && !_kindSyncing)
             {
                 _kindSyncing = true;
 
-                EditorKindSelector.Value = VariantKind;
+                EditorKindSelector.Value = PreferredKind;
                 Build();
 
                 _kindSyncing = false;
@@ -122,7 +122,7 @@ namespace Sachssoft.Sasospector.Views.Editors
                         return;
 
                     _kindSyncing = true;
-                    VariantKind = v;
+                    PreferredKind = v;
                     Build();
                     _kindSyncing = false;
                 },

@@ -1,6 +1,8 @@
 ﻿using Sachssoft.Sasospector.Adapters;
+using Sachssoft.Sasospector.Constraints;
 using Sachssoft.Sasospector.Editors;
 using System;
+using System.Linq;
 
 namespace Sachssoft.Sasospector.Registries
 {
@@ -211,6 +213,20 @@ namespace Sachssoft.Sasospector.Registries
         {
             registry.Register(typeof(string),
                 (f) => f.CreateStringEditor(),
+                priority: 0);
+
+            registry.Register(typeof(string),
+                (f) => f.CreateFileSystemEditor(),
+                (c) => c.Any(x => x is FileSystemConstraint),
+                priority: 0);
+
+            registry.Register(typeof(string),
+                (f) => f.CreateUriEditor(),
+                (c) => c.Any(x => x is UriConstraint),
+                priority: 0);
+
+            registry.Register(typeof(Uri),
+                (f) => f.CreateUriEditor(),
                 priority: 0);
 
             registry.Register(typeof(char),

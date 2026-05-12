@@ -54,6 +54,22 @@ namespace Sachssoft.Sasospector.Registries
             return editor;
         }
 
+        public static IPropertyEditor CreateFileSystemEditor(
+            this IInspectorEditorPlatformFactory f)
+        {
+            var editor = ((IFileSystemEditor)f.CreateEditor(typeof(IFileSystemEditor)));
+
+            return editor;
+        }
+
+        public static IPropertyEditor CreateUriEditor(
+            this IInspectorEditorPlatformFactory f)
+        {
+            var editor = ((IUriEditor)f.CreateEditor(typeof(IUriEditor)));
+
+            return editor;
+        }
+
         public static IPropertyEditor CreateVersionEditor(
             this IInspectorEditorPlatformFactory f)
         {
