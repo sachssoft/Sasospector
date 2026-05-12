@@ -1,0 +1,39 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:views="using:Sachssoft.Sasospector.Views"
+					xmlns:converters="using:Sachssoft.Sasospector.Views.Converters"
+					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
+					x:ClassModifier="internal">
+
+	<converters:ColorToHexConverter x:Key="ColorToHexConverter" />
+	
+	<ControlTheme x:Key="{x:Type editors:ColorEditor}"
+					  TargetType="editors:ColorEditor">
+		<Setter Property="Template">
+			<ControlTemplate TargetType="editors:ColorEditor">
+				<Grid ColumnDefinitions="Auto,*,Auto">
+					<Border Grid.Column="0"
+							HorizontalAlignment="Stretch"
+							Width="32"
+							Height="32"
+							Classes="colorBox">
+						<Border.Background>
+							<SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=editors:ColorEditor}, Mode=TwoWay}" />
+						</Border.Background>
+					</Border>
+					<TextBox Text="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=editors:ColorEditor}, Converter={StaticResource ColorToHexConverter}, Mode=TwoWay}"
+							 HorizontalAlignment="Stretch"
+							 Grid.Column="1"/>
+					<Button Grid.Column="2"
+							HorizontalAlignment="Stretch"
+							HorizontalContentAlignment="Center"
+							Width="24"
+							Height="24">
+						<PathIcon Data="{StaticResource BrowseIcon}"/>
+					</Button>
+				</Grid>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+	
+</ResourceDictionary>
