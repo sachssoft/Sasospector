@@ -5,7 +5,7 @@ namespace Sachssoft.Sasospector.Editors
 {
     public interface IDateTimeEditor : IPropertyEditor
     {
-        InspectorPropertyAdapterBase<DateTime> Adapter { get; set; }
+        DateTimePropertyAdapter Adapter { get; set; }
 
         DateTimeEditorParts Parts { get; set; }
     }

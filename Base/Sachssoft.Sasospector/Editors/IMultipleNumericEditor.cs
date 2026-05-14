@@ -1,14 +1,15 @@
 ﻿using Sachssoft.Sasospector.Adapters;
+using System;
 using System.Collections.Generic;
 
 namespace Sachssoft.Sasospector.Editors
 {
     public interface IMultipleNumericEditor : IPropertyEditor
     {
-        InspectorPropertyAdapterBase<BoundedValue<double>[]>? Adapter { get; set; }
+        IIndexedPropertyAdapter? Adapter { get; set; }
 
-        int? DecimalPlaces { get; set; }
+        IReadOnlyList<IMultipleNumericEditorField>? Fields { get; set; }
 
-        IReadOnlyList<EditorField>? Fields { get; set; }
+        IMultipleNumericEditorField CreateField(Type valueType);
     }
 }

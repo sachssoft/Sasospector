@@ -1,0 +1,104 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:views="using:Sachssoft.Sasospector.Views"
+					xmlns:converters="using:Sachssoft.Sasospector.Views.Converters"
+					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
+					x:ClassModifier="internal">
+
+	<converters:DoubleToDecimalConverter x:Key="DoubleToDecimalConverter" />
+
+	<ControlTheme x:Key="{x:Type editors:NumericEditorField}"
+					  TargetType="editors:NumericEditorField">
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<!--<Style Selector="^[PreferredKind=Spinner], ^[DecimalMode=False]">-->
+		<Setter Property="Template">
+			<ControlTemplate TargetType="editors:NumericEditorField">
+				<Grid ColumnDefinitions="Auto,*">
+					<Label Grid.Column="0"
+						   Content="{TemplateBinding Header}"/>
+					<NumericUpDown Grid.Column="1"
+								   HorizontalAlignment="Stretch"
+								   Height="{StaticResource InspectorPropertyEditorHeight}"
+								   Value="{TemplateBinding Value, Mode=TwoWay, Converter={StaticResource DoubleToDecimalConverter}}"
+								   TextAlignment="Left" />
+				</Grid>
+			</ControlTemplate>
+		</Setter>
+		<!--</Style>-->
+		<Style Selector="^[PreferredKind=Slider]">
+			<Setter Property="Template">
+				<ControlTemplate TargetType="editors:NumericEditorField">
+					<Grid ColumnDefinitions="Auto,*">
+						<Label Grid.Column="0"
+							   Content="{TemplateBinding Header}"/>
+						<Grid ColumnDefinitions="*,Auto"
+							  ColumnSpacing="{StaticResource PropertyEditorGridSpacing}"
+							  Grid.Column="1">
+							<Slider Grid.Column="0"
+									HorizontalAlignment="Stretch"
+									Height="{StaticResource InspectorPropertyEditorHeight}"
+									Padding="0"
+								    Margin="0"
+								    Minimum="{TemplateBinding Minimum}"
+								    Maximum="{TemplateBinding Maximum}"
+								    Value="{TemplateBinding Value, Mode=TwoWay}" />
+							<NumericUpDown Grid.Column="1"
+										   HorizontalAlignment="Stretch"
+										   Height="{StaticResource InspectorPropertyEditorHeight}"
+										   Width="{StaticResource NumericSliderValueWidth}"
+										   Value="{TemplateBinding Value, Mode=TwoWay, Converter={StaticResource DoubleToDecimalConverter}}"
+										   TextAlignment="Left"
+										   ShowButtonSpinner="False" />
+						</Grid>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<!--<Style Selector="^[PreferredKind=TextBox]">
+			<Setter Property="Template">
+				<ControlTemplate TargetType="editors:NumericEditorField">
+					<Grid ColumnDefinitions="Auto,*">
+						<Label Grid.Column="0"
+							   Content="{TemplateBinding Header}"/>
+						<TextBox Grid.Column="1"
+								 HorizontalAlignment="Stretch"
+								 Height="{StaticResource InspectorPropertyEditorHeight}"/>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="^[PreferredKind=Dropdown]">
+			<Setter Property="Template">
+				<ControlTemplate TargetType="editors:NumericEditorField">
+					<Grid ColumnDefinitions="Auto,*">
+						<Label Grid.Column="0"
+							   Content="{TemplateBinding Header}"/>
+						<ComboBox Grid.Column="1"
+								  SelectedIndex="{TemplateBinding Value}"
+								  Height="{StaticResource InspectorPropertyEditorHeight}">
+						</ComboBox>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>-->
+	</ControlTheme>
+
+	<ControlTheme x:Key="{x:Type editors:MultipleNumericEditor}"
+				  TargetType="editors:MultipleNumericEditor">
+		<Setter Property="Template">
+			<ControlTemplate TargetType="editors:MultipleNumericEditor">
+				<ItemsControl ItemsSource="{TemplateBinding Fields}"
+							  Margin="0"
+							  Padding="0">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel Orientation="Vertical"
+										Spacing="0"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+
+</ResourceDictionary>

@@ -1,8 +1,9 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
 namespace Sachssoft.Sasospector
 {
-    public readonly struct BoundedValue<T>
+    public readonly struct BoundedValue<T> : IRangedValue
         where T : struct, IMinMaxValue<T>, INumber<T>
     {
         public BoundedValue(T value, T min, T max)
@@ -15,21 +16,19 @@ namespace Sachssoft.Sasospector
 
         public T Value { get; }
 
+        object IRangedValue.Value => Value;
+
         public T MinValue { get; }
+
+        object IRangedValue.MinValue => MinValue;
 
         public T MaxValue { get; }
 
-        public T ClampedValue => Clamp(Value, MinValue, MaxValue);
+        object IRangedValue.MaxValue => MaxValue;
 
-        public bool IsMinimum => Value <= MinValue;
+        Type IRangedValue.ValueType { get; } = typeof(T);
 
-        public bool IsMaximum => Value >= MaxValue;
-
-        public BoundedValue<T> WithValue(T value)
-            => new BoundedValue<T>(value, MinValue, MaxValue);
-
-        public BoundedValue<T> WithRange(T min, T max)
-            => new BoundedValue<T>(Value, min, max);
+        public bool IsBounded { get; } = true;
 
         private static T Clamp(T value, T min, T max)
         {

@@ -1,178 +1,141 @@
-﻿using Sachssoft.Sasospector.Constraints;
+﻿using Microsoft.VisualBasic.FileIO;
+using Sachssoft.Sasospector.Constraints;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 
 namespace Sachssoft.Sasospector.Adapters
 {
-    // Manche andere UI (Spiele) nur Float, andere UI Double
-    public class MultipleValuePropertyAdapter<TField, TTarget> : InspectorPropertyAdapterBase<BoundedValue<TField>[]>
-        where TField : struct, IMinMaxValue<TField>, INumber<TField>
-        where TTarget : struct
+    // Indexed field access for homogeneous numeric structures
+    public sealed class IndexedFieldPropertyAdapter<TSource> : IIndexedPropertyAdapter
     {
-        private InspectorPropertyInfo? _propertyInfo;
-        private readonly List<Entry> _supportedTypeEntries = new();
+        private readonly int _fieldCount;
+        private readonly Func<TSource, IRangedValue[]> _castTo;
+        private readonly Func<object[], TSource> _castFrom;
+        private readonly Type[] _types;
+        private readonly object[] _buffer;
 
-        private record Entry(
-            Func<InspectorPropertyInfo, bool> CanHandle,
-            Func<InspectorPropertyInfo, BoundedValue<TField>[]> Getter,
-            Action<InspectorPropertyInfo, BoundedValue<TField>[]> Setter
-        );
-
-        public MultipleValuePropertyAdapter(
-            Func<TTarget, BoundedValue<TField>[]> toValues,
-            Func<TField[], TTarget> fromValues
-        )
+        public IndexedFieldPropertyAdapter(
+            Type singleFieldType,
+            Func<TSource, IRangedValue[]> castTo,
+            Func<object[], TSource> castFrom)
+            : this([singleFieldType], castTo, castFrom)
         {
-            RegisterTypes();
         }
 
-        protected override bool OnCanHandle()
+        public IndexedFieldPropertyAdapter(
+            Type uniformFieldType,
+            int fieldCount,
+            Func<TSource, IRangedValue[]> castTo,
+            Func<object[], TSource> castFrom)
         {
-            return _propertyInfo != null &&
-                   _supportedTypeEntries.Any(x => x.CanHandle(_propertyInfo));
+            if (fieldCount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(fieldCount));
+
+            if (uniformFieldType == null)
+                throw new ArgumentNullException(nameof(uniformFieldType));
+
+            _fieldCount = fieldCount;
+            _castTo = castTo ?? throw new ArgumentNullException(nameof(castTo));
+            _castFrom = castFrom ?? throw new ArgumentNullException(nameof(castFrom));
+
+            _types = Enumerable.Repeat(uniformFieldType, fieldCount).ToArray();
+            _buffer = new object[_fieldCount];
         }
 
-        protected override BoundedValue<TField>[] OnGetValue()
+        public IndexedFieldPropertyAdapter(
+            Type[] fieldTypes,
+            Func<TSource, IRangedValue[]> castTo,
+            Func<object[], TSource> castFrom)
         {
-            var entry = GetEntry(_propertyInfo!);
-            return entry.Getter(_propertyInfo!);
+            if (fieldTypes == null)
+                throw new ArgumentNullException(nameof(fieldTypes));
+
+            if (fieldTypes.Length == 0)
+                throw new ArgumentOutOfRangeException(nameof(fieldTypes));
+
+            _fieldCount = fieldTypes.Length;
+            _castTo = castTo ?? throw new ArgumentNullException(nameof(castTo));
+            _castFrom = castFrom ?? throw new ArgumentNullException(nameof(castFrom));
+
+            _types = fieldTypes;
+            _buffer = new object[_fieldCount];
         }
 
-        protected override void OnSetValue(BoundedValue<TField>[] value)
+        public int FieldCount => _fieldCount;
+
+        public bool SupportsField(Type targetType) => true;
+
+        public object[] CastTo(TSource sourceValue)
         {
-            var entry = GetEntry(_propertyInfo!);
-            entry.Setter(_propertyInfo!, value);
-        }
+            var boundedValues = _castTo(sourceValue);
 
-        //protected void RegisterType<TValue>(
-        //    Func<InspectorPropertyInfo, bool> canHandle,
-        //    Func<TValue, T[]> toValues,
-        //    Func<BoundedValue<T>[], TValue> fromValues)
-        //    where TValue : struct
-        //{
-        //    _supportedTypeEntries.Add(new Entry(
-        //        canHandle,
-        //        pi => TransformTo(pi, toValues),
-        //        (pi, values) => TransformBack(pi, values, fromValues)
-        //    ));
-        //}
+            ValidateFieldCount(boundedValues.Length);
 
-        private Entry GetEntry(InspectorPropertyInfo propertyInfo)
-        {
-            var entry = _supportedTypeEntries
-                .FirstOrDefault(x => x.CanHandle(propertyInfo));
-
-            if (entry == null)
-                throw new NotSupportedException(
-                    $"Type '{propertyInfo.Type}' is not supported.");
-
-            return entry;
-        }
-
-        private BoundedValue<TField>[] TransformTo<TValue>(
-            InspectorPropertyInfo pi,
-            Func<TValue, TField[]> output)
-            where TValue : struct
-        {
-            var value = (TValue?)pi.GetValue() ?? default;
-
-            var values = output(value);
-
-            return GetOutputs(
-                pi.Metadata,
-                values
-            );
-        }
-
-        private void TransformBack<TValue>(
-            InspectorPropertyInfo pi,
-            BoundedValue<TField>[] values,
-            Func<BoundedValue<TField>[], TValue> output)
-            where TValue : struct
-        {
-            var result = output(values);
-            pi.SetValue(result);
-        }
-
-        private BoundedValue<TField>[] GetOutputs(
-            InspectorPropertyInfoMetadata metadata,
-            IEnumerable<TField> values)
-        {
-            var (min, max) = GetRange(metadata);
-
-            return values
-                .Select(v => new BoundedValue<TField>(v, min, max))
-                .ToArray();
-        }
-
-        private (TField Min, TField Max) GetRange(
-            InspectorPropertyInfoMetadata metadata)
-        {
-            var constraints = metadata.Constraints;
-
-            if (constraints == null || constraints.Count == 0)
-                return (TField.MinValue, TField.MaxValue);
-
-            TField min = TField.MinValue;
-            TField max = TField.MaxValue;
-
-            foreach (var c in constraints)
+            for (int i = 0; i < boundedValues.Length; i++)
             {
-                if (c is RangeConstraint<TField> r)
-                {
-                    if (r.MinValue > min)
-                        min = r.MinValue;
+                var v = boundedValues[i];
 
-                    if (r.MaxValue < max)
-                        max = r.MaxValue;
-                }
+                // UI value only (no generic math here!)
+                _buffer[i] = v.Value;
             }
 
-            if (min > max)
-                (min, max) = (max, min);
-
-            return (min, max);
+            return _buffer;
         }
 
-        private void RegisterTypes()
+        public TSource CastFrom(object[] values)
         {
-            //RegisterType<byte>(pi => pi.Type == typeof(byte), v => [v], v => (byte)v[0].Value);
-            //RegisterType<sbyte>(pi => pi.Type == typeof(sbyte), v => [v], v => (sbyte)v[0].Value);
+            ArgumentNullException.ThrowIfNull(values);
+            ValidateFieldCount(values.Length);
 
-            //RegisterType<short>(pi => pi.Type == typeof(short), v => [v], v => (short)v[0].Value);
-            //RegisterType<ushort>(pi => pi.Type == typeof(ushort), v => [v], v => (ushort)v[0].Value);
+            return _castFrom(values);
+        }
 
-            //RegisterType<int>(pi => pi.Type == typeof(int), v => [v], v => (int)v[0].Value);
-            //RegisterType<uint>(pi => pi.Type == typeof(uint), v => [v], v => (uint)v[0].Value);
+        object? IInspectorPropertyAdapter.ToField(object? sourceValue)
+        {
+            if (sourceValue is not TSource typed)
+                throw new InvalidCastException($"Expected {typeof(TSource).Name}");
 
-            //RegisterType<long>(pi => pi.Type == typeof(long), v => [v], v => (long)v[0].Value);
-            //RegisterType<ulong>(pi => pi.Type == typeof(ulong), v => [v], v => (ulong)v[0].Value);
+            return CastTo(typed);
+        }
 
-            //RegisterType<nint>(pi => pi.Type == typeof(nint), v => [v], v => (nint)v[0].Value);
-            //RegisterType<nuint>(pi => pi.Type == typeof(nuint), v => [v], v => (nuint)v[0].Value);
+        object? IInspectorPropertyAdapter.ToSource(object? adapterValue)
+        {
+            if (adapterValue is not object[] typed)
+                throw new InvalidCastException("Expected object[]");
 
-            //RegisterType<float>(pi => pi.Type == typeof(float), v => [v], v => (float)v[0].Value);
-            //RegisterType<double>(pi => pi.Type == typeof(double), v => [v], v => v[0].Value);
-            //RegisterType<decimal>(pi => pi.Type == typeof(decimal), v => [(double)v], v => (decimal)v[0].Value);
+            return CastFrom(typed);
+        }
 
-            //RegisterType<Half>(pi => pi.Type == typeof(Half), v => [(double)v], v => (Half)v[0].Value);
+        public Type GetValueType(int fieldIndex)
+        {
+            if ((uint)fieldIndex >= (uint)_fieldCount)
+                throw new ArgumentOutOfRangeException(nameof(fieldIndex));
 
-            //RegisterType<PixelPoint>(pi => pi.Type == typeof(PixelPoint), v => [v.X, v.Y], v => new PixelPoint((int)v[0].Value, (int)v[1].Value));
-            //RegisterType<Point>(pi => pi.Type == typeof(Point), v => [v.X, v.Y], v => new Point(v[0].Value, v[1].Value));
+            return _types[fieldIndex];
+        }
 
-            //RegisterType<PixelSize>(pi => pi.Type == typeof(PixelSize), v => [v.Width, v.Height], v => new PixelSize((int)v[0].Value, (int)v[1].Value));
-            //RegisterType<Size>(pi => pi.Type == typeof(Size), v => [v.Width, v.Height], v => new Size(v[0].Value, v[1].Value));
+        public object? GetValue(int fieldIndex)
+        {
+            if ((uint)fieldIndex >= (uint)_fieldCount)
+                throw new ArgumentOutOfRangeException(nameof(fieldIndex));
 
-            //RegisterType<Vector>(pi => pi.Type == typeof(Vector), v => [v.X, v.Y], v => new Vector(v[0].Value, v[1].Value));
-            //RegisterType<Vector3D>(pi => pi.Type == typeof(Vector3D), v => [v.X, v.Y, v.Z], v => new Vector3D(v[0].Value, v[1].Value, v[2].Value));
+            return _buffer[fieldIndex];
+        }
 
-            //RegisterType<Thickness>(pi => pi.Type == typeof(Thickness), v => [v.Left, v.Top, v.Right, v.Bottom], v => new Thickness(v[0].Value, v[1].Value, v[2].Value, v[3].Value));
+        public void SetValue(int fieldIndex, object? value)
+        {
+            if ((uint)fieldIndex >= (uint)_fieldCount)
+                throw new ArgumentOutOfRangeException(nameof(fieldIndex));
 
-            //RegisterType<CornerRadius>(pi => pi.Type == typeof(CornerRadius), v => [v.TopLeft, v.TopRight, v.BottomRight, v.BottomLeft], v => new CornerRadius(v[0].Value, v[1].Value, v[2].Value, v[3].Value));
+            _buffer[fieldIndex] = value;
+        }
 
-            //RegisterType<GridLength>(pi => pi.Type == typeof(GridLength), v => [v.Value], v => new GridLength(v[0].Value, GridUnitType.Pixel));
+        private void ValidateFieldCount(int actual)
+        {
+            if (actual != _fieldCount)
+                throw new ArgumentOutOfRangeException(
+                    nameof(actual),
+                    $"Expected {_fieldCount} fields.");
         }
     }
 }

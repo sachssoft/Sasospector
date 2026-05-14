@@ -2,6 +2,9 @@
 using Sachssoft.Sasospector.Editors;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Sachssoft.Sasospector.Registries
 {
@@ -21,7 +24,7 @@ namespace Sachssoft.Sasospector.Registries
         public static IPropertyEditor CreateColorEditor(
             this IInspectorEditorPlatformFactory f,
             bool includeAlpha,
-            InspectorPropertyAdapterBase<ColorValue> adapter)
+            ColorPropertyAdapter adapter)
         {
             var editor = ((IColorEditor)f.CreateEditor(typeof(IColorEditor)));
 
@@ -33,15 +36,36 @@ namespace Sachssoft.Sasospector.Registries
 
         public static IPropertyEditor CreateMultipleValueEditor(
             this IInspectorEditorPlatformFactory f,
-            int? decimalPlaces,
-            InspectorPropertyAdapterBase<BoundedValue<double>[]> adapter,
-            IReadOnlyList<EditorField>? fields = null)
+            int? defaultDecimalPlaces,
+            IIndexedPropertyAdapter adapter,
+            IReadOnlyList<string?>? fieldNames = null,
+            Action<IMultipleNumericEditorField>? fieldSetups = null)
         {
-            var editor = ((IMultipleNumericEditor)f.CreateEditor(typeof(IMultipleNumericEditor)));
+            var editor = (IMultipleNumericEditor)f.CreateEditor(typeof(IMultipleNumericEditor));
 
-            editor.DecimalPlaces = decimalPlaces;
+            if (fieldNames != null && fieldNames.Count != adapter.FieldCount)
+                throw new ArgumentException(
+                    "The number of field names must match the adapter field count.",
+                    nameof(fieldNames));
+
+            fieldNames ??= Enumerable.Repeat<string?>(null, adapter.FieldCount)
+                                     .ToList()
+                                     .AsReadOnly();
+
             editor.Adapter = adapter;
-            editor.Fields = fields;
+            editor.Fields = Enumerable.Range(0, adapter.FieldCount)
+                .Select(i =>
+                {
+                    var field = editor.CreateField(adapter.GetValueType(i));
+
+                    field.Name = fieldNames[i];
+                    field.DecimalPlaces = defaultDecimalPlaces;
+                    fieldSetups?.Invoke(field);
+
+                    return field;
+                })
+                .ToList()
+                .AsReadOnly();
 
             return editor;
         }
@@ -86,18 +110,10 @@ namespace Sachssoft.Sasospector.Registries
             return editor;
         }
 
-        public static IPropertyEditor CreateBigIntegerEditor(
-            this IInspectorEditorPlatformFactory f)
-        {
-            var editor = ((IBigIntegerEditor)f.CreateEditor(typeof(IBigIntegerEditor)));
-
-            return editor;
-        }
-
         public static IPropertyEditor CreateDateTimeEditor(
             this IInspectorEditorPlatformFactory f,
             DateTimeEditorParts parts,
-            InspectorPropertyAdapterBase<DateTime> adapter)
+            DateTimePropertyAdapter adapter)
         {
             var editor = ((IDateTimeEditor)f.CreateEditor(typeof(IDateTimeEditor)));
 

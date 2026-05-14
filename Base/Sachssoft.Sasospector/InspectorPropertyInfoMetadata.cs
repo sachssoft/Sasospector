@@ -19,11 +19,11 @@ namespace Sachssoft.Sasospector
 
         public bool IsReadOnly { get; internal init; }
 
-        public Type? CustomEditorType { get; internal init; }
+        public Type? CustomEditorType { get; init; }
 
-        public IReadOnlyList<string>? EditorKinds { get; internal init; }
+        public string? EditorKind { get; init; }
 
-        public IReadOnlyList<IInspectorConstraint>? Constraints { get; internal init; }
+        public IReadOnlyList<IInspectorConstraint>? Constraints { get; init; }
 
         public string? CategoryName { get; init; }
 

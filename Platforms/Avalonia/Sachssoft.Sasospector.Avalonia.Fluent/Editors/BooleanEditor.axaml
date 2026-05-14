@@ -8,41 +8,41 @@
 				  TargetType="editors:BooleanEditor">
 		<Setter Property="Template">
 			<ControlTemplate TargetType="editors:BooleanEditor">
-				<ToggleSwitch IsChecked="{TemplateBinding Value}" />
+				<ToggleSwitch IsChecked="{TemplateBinding Value, Mode=TwoWay}" />
 			</ControlTemplate>
 		</Setter>
 		<Style Selector="^[PreferredKind=CheckBox]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
-					<CheckBox IsChecked="{TemplateBinding Value}" />
+					<CheckBox IsChecked="{TemplateBinding Value, Mode=TwoWay}" />
 				</ControlTemplate>
 			</Setter>
 		</Style>
 		<Style Selector="^[PreferredKind=Toggle]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
-					<ToggleButton IsChecked="{TemplateBinding Value}" />
+					<ToggleButton IsChecked="{TemplateBinding Value, Mode=TwoWay}" />
 				</ControlTemplate>
 			</Setter>
 		</Style>
-		<Style Selector="^[PreferredKind=Dropdown]">
+		<!--<Style Selector="^[PreferredKind=Dropdown]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
-					<ComboBox SelectedIndex="{TemplateBinding Value}">
+					<ComboBox SelectedIndex="{TemplateBinding Value, Mode=TwoWay}">
 						<ComboBoxItem>False</ComboBoxItem>
 						<ComboBoxItem>True</ComboBoxItem>
 					</ComboBox>
 				</ControlTemplate>
 			</Setter>
-		</Style>
-		<Style Selector="^[PreferredKind=Radio]">
+		</Style>-->
+		<!--<Style Selector="^[PreferredKind=Radio]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
 					<WrapPanel>
-						<!--<RadioButton Group="Boolean"
+						--><!--<RadioButton Group="Boolean"
 									 IsChecked="{TemplateBinding Value}"/>
 						<RadioButton Group="Boolean"
-									 IsChecked="{!TemplateBinding Value}"/>-->
+									 IsChecked="{!TemplateBinding Value}"/>--><!--
 					</WrapPanel>
 				</ControlTemplate>
 			</Setter>
@@ -51,14 +51,14 @@
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
 					<WrapPanel>
-						<!--<ToggleButton Group="Boolean"
+						--><!--<ToggleButton Group="Boolean"
 									 IsChecked="{TemplateBinding Value}"/>
 						<ToggleButton Group="Boolean"
-									 IsChecked="{!TemplateBinding Value}"/>-->
+									 IsChecked="{!TemplateBinding Value}"/>--><!--
 					</WrapPanel>
 				</ControlTemplate>
 			</Setter>
-		</Style>
+		</Style>-->
 	</ControlTheme>
 	
 </ResourceDictionary>

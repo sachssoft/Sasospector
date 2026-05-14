@@ -93,5 +93,10 @@ namespace Sachssoft.Sasospector
 
         protected virtual void OnChanged(InspectorPropertyChangedEventArgs e)
             => Changed?.Invoke(Schema, e);
+
+        public override string ToString()
+        {
+            return $"{Name} ({GetValue()})";
+        }
     }
 }

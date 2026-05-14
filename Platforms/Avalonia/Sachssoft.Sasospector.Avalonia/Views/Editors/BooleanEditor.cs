@@ -4,6 +4,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Sachssoft.Sasospector.Editors;
 using System;
+using System.Diagnostics;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
@@ -34,7 +35,9 @@ namespace Sachssoft.Sasospector.Views.Editors
                     BooleanEditorKinds.Switch,
                     BooleanEditorKinds.CheckBox,
                     BooleanEditorKinds.Toggle,
-                    BooleanEditorKinds.Dropdown
+                    //BooleanEditorKinds.Dropdown,
+                    //BooleanEditorKinds.Radio,
+                    //BooleanEditorKinds.Segment
                 }
             );
         }
@@ -70,7 +73,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             else if (change.Property == ValueProperty && !_sourceSyncing)
             {
                 _sourceSyncing = true;
-
+                
                 Source?.SetValue(Value);
 
                 _sourceSyncing = false;

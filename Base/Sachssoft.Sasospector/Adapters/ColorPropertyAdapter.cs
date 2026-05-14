@@ -2,19 +2,19 @@
 
 namespace Sachssoft.Sasospector.Adapters
 {
-    public class ColorPropertyAdapter : InspectorPropertyAdapterBase<ColorValue>
+    public class ColorPropertyAdapter : IInspectorPropertyAdapter
     {
-        protected override bool OnCanHandle()
+        public bool SupportsField(Type type)
         {
             throw new NotImplementedException();
         }
 
-        protected override ColorValue OnGetValue()
+        object? IInspectorPropertyAdapter.ToSource(object? adapterValue)
         {
             throw new NotImplementedException();
         }
 
-        protected override void OnSetValue(ColorValue value)
+        object? IInspectorPropertyAdapter.ToField(object? sourceValue)
         {
             throw new NotImplementedException();
         }

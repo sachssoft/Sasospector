@@ -2,19 +2,19 @@
 
 namespace Sachssoft.Sasospector.Adapters
 {
-    public class DateTimePropertyAdapter : InspectorPropertyAdapterBase<DateTime>
+    public class DateTimePropertyAdapter : IInspectorPropertyAdapter
     {
-        protected override bool OnCanHandle()
+        public bool SupportsField(Type type)
         {
             throw new NotImplementedException();
         }
 
-        protected override DateTime OnGetValue()
+        object? IInspectorPropertyAdapter.ToSource(object? adapterValue)
         {
             throw new NotImplementedException();
         }
 
-        protected override void OnSetValue(DateTime value)
+        object? IInspectorPropertyAdapter.ToField(object? sourceValue)
         {
             throw new NotImplementedException();
         }

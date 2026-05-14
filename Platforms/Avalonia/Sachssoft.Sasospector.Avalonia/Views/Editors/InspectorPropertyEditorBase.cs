@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Sachssoft.Sasospector.Registries;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Input;
 
@@ -57,7 +58,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             internal set
             {
                 SetAndRaise(SourceProperty, ref _source, value);
-                
+
                 if (_source != null)
                 {
                     _source.Changed += SourceChanged;
@@ -65,7 +66,9 @@ namespace Sachssoft.Sasospector.Views.Editors
             }
         }
 
-        protected virtual void OnPropertySourceChanged() { }
+        protected virtual void OnPropertySourceChanged()
+        {
+        }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
@@ -89,6 +92,10 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         private void SourceChanged(object? sender, InspectorPropertyChangedEventArgs e)
         {
+#if DEBUG
+            Debug.WriteLine(e.Property.ToString());
+#endif
+
             OnPropertySourceChanged();
         }
     }

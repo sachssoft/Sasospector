@@ -17,13 +17,15 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(Avalonia.Vector),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: null,
-                    adapter: new MultipleValuePropertyAdapter<double, Avalonia.Vector>(
-                        toValues: x => [
-                                         new(x.X, double.MinValue, double.MaxValue),
-                                         new(x.Y, double.MinValue, double.MaxValue)
-                                       ],
-                        fromValues: y => new Avalonia.Vector(
+                    defaultDecimalPlaces: null,
+                    adapter: new IndexedFieldPropertyAdapter<Avalonia.Vector>(
+                        uniformFieldType: typeof(double),
+                        fieldCount: 2,
+                        castTo: x => [
+                                        new BoundedValue<double>(x.X, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Y, double.MinValue, double.MaxValue)
+                                     ],
+                        castFrom: y => new Avalonia.Vector(
                                             x: (double)y[0],
                                             y: (double)y[1]
                                          )
@@ -32,14 +34,16 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(Vector3D),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: null,
-                    adapter: new MultipleValuePropertyAdapter<double, Vector3D>(
-                        toValues: x => [
-                                         new(x.X, double.MinValue, double.MaxValue),
-                                         new(x.Y, double.MinValue, double.MaxValue),
-                                         new(x.Z, double.MinValue, double.MaxValue)
-                                       ],
-                        fromValues: y => new Vector3D(
+                    defaultDecimalPlaces: null,
+                    adapter: new IndexedFieldPropertyAdapter<Vector3D>(
+                        uniformFieldType: typeof(double),
+                        fieldCount: 3,
+                        castTo: x => [
+                                        new BoundedValue<double>(x.X, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Y, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Z, double.MinValue, double.MaxValue)
+                                     ],
+                        castFrom: y => new Vector3D(
                                             X: (double)y[0],
                                             Y: (double)y[1],
                                             Z: (double)y[2]
@@ -49,13 +53,15 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(Point),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: null,
-                    adapter: new MultipleValuePropertyAdapter<double, Point>(
-                        toValues: x => [
-                                         new(x.X, double.MinValue, double.MaxValue),
-                                         new(x.Y, double.MinValue, double.MaxValue)
-                                       ],
-                        fromValues: y => new Point(
+                    defaultDecimalPlaces: null,
+                    adapter: new IndexedFieldPropertyAdapter<Point>(
+                        uniformFieldType: typeof(double),
+                        fieldCount: 2,
+                        castTo: x => [
+                                        new BoundedValue<double>(x.X, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Y, double.MinValue, double.MaxValue)
+                                     ],
+                        castFrom: y => new Point(
                                             x: (double)y[0],
                                             y: (double)y[1]
                                          )
@@ -64,13 +70,15 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(PixelPoint),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: 0,
-                    adapter: new MultipleValuePropertyAdapter<double, PixelPoint>(
-                        toValues: x => [
-                                         new(x.X, int.MinValue, int.MaxValue),
-                                         new(x.Y, int.MinValue, int.MaxValue)
-                                       ],
-                        fromValues: y => new PixelPoint(
+                    defaultDecimalPlaces: 0,
+                    adapter: new IndexedFieldPropertyAdapter<PixelPoint>(
+                        uniformFieldType: typeof(int),
+                        fieldCount: 2,
+                        castTo: x => [
+                                        new BoundedValue<int>(x.X, int.MinValue, int.MaxValue),
+                                        new BoundedValue<int>(x.Y, int.MinValue, int.MaxValue)
+                                     ],
+                        castFrom: y => new PixelPoint(
                                             x: (int)y[0],
                                             y: (int)y[1]
                                          )
@@ -79,13 +87,15 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(Size),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: null,
-                    adapter: new MultipleValuePropertyAdapter<double, Size>(
-                        toValues: x => [
-                                         new(x.Width, double.MinValue, double.MaxValue),
-                                         new(x.Height, double.MinValue, double.MaxValue)
-                                       ],
-                        fromValues: y => new Size(
+                    defaultDecimalPlaces: null,
+                    adapter: new IndexedFieldPropertyAdapter<Size>(
+                        uniformFieldType: typeof(double),
+                        fieldCount: 2,
+                        castTo: x => [
+                                        new BoundedValue<double>(x.Width, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Height, double.MinValue, double.MaxValue)
+                                     ],
+                        castFrom: y => new Size(
                                             width: (double)y[0],
                                             height: (double)y[1]
                                          )
@@ -94,13 +104,15 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(PixelSize),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: 0,
-                    adapter: new MultipleValuePropertyAdapter<double, PixelSize>(
-                        toValues: x => [
-                                         new(x.Width, int.MinValue, int.MaxValue),
-                                         new(x.Height, int.MinValue, int.MaxValue)
-                                       ],
-                        fromValues: y => new PixelSize(
+                    defaultDecimalPlaces: 0,
+                    adapter: new IndexedFieldPropertyAdapter<PixelSize>(
+                        uniformFieldType: typeof(int),
+                        fieldCount: 2,
+                        castTo: x => [
+                                        new BoundedValue<int>(x.Width, int.MinValue, int.MaxValue),
+                                        new BoundedValue<int>(x.Height, int.MinValue, int.MaxValue)
+                                     ],
+                        castFrom: y => new PixelSize(
                                             width: (int)y[0],
                                             height: (int)y[1]
                                          )
@@ -109,15 +121,17 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(Rect),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: null,
-                    adapter: new MultipleValuePropertyAdapter<double, Rect>(
-                        toValues: x => [
-                                         new(x.X, double.MinValue, double.MaxValue),
-                                         new(x.Y, double.MinValue, double.MaxValue),
-                                         new(x.Width, double.MinValue, double.MaxValue),
-                                         new(x.Height, double.MinValue, double.MaxValue)
-                                       ],
-                        fromValues: y => new Rect(
+                    defaultDecimalPlaces: null,
+                    adapter: new IndexedFieldPropertyAdapter<Rect>(
+                        uniformFieldType: typeof(double),
+                        fieldCount: 4,
+                        castTo: x => [
+                                        new BoundedValue<double>(x.X, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Y, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Width, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Height, double.MinValue, double.MaxValue)
+                                     ],
+                        castFrom: y => new Rect(
                                             x: (double)y[0],
                                             y: (double)y[1],
                                             width: (double)y[2],
@@ -128,15 +142,17 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(PixelRect),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: 0,
-                    adapter: new MultipleValuePropertyAdapter<double, PixelRect>(
-                        toValues: x => [
-                                         new(x.X, int.MinValue, int.MaxValue),
-                                         new(x.Y, int.MinValue, int.MaxValue),
-                                         new(x.Width, int.MinValue, int.MaxValue),
-                                         new(x.Height, int.MinValue, int.MaxValue)
-                                       ],
-                        fromValues: y => new PixelRect(
+                    defaultDecimalPlaces: 0,
+                    adapter: new IndexedFieldPropertyAdapter<PixelRect>(
+                        uniformFieldType: typeof(int),
+                        fieldCount: 4,
+                        castTo: x => [
+                                        new BoundedValue<int>(x.X, int.MinValue, int.MaxValue),
+                                        new BoundedValue<int>(x.Y, int.MinValue, int.MaxValue),
+                                        new BoundedValue<int>(x.Width, int.MinValue, int.MaxValue),
+                                        new BoundedValue<int>(x.Height, int.MinValue, int.MaxValue)
+                                     ],
+                        castFrom: y => new PixelRect(
                                             x: (int)y[0],
                                             y: (int)y[1],
                                             width: (int)y[2],
@@ -147,15 +163,17 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(CornerRadius),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: null,
-                    adapter: new MultipleValuePropertyAdapter<double, CornerRadius>(
-                        toValues: x => [
-                                         new(x.TopLeft, double.MinValue, double.MaxValue),
-                                         new(x.TopRight, double.MinValue, double.MaxValue),
-                                         new(x.BottomRight, double.MinValue, double.MaxValue),
-                                         new(x.BottomLeft, double.MinValue, double.MaxValue)
-                                       ],
-                        fromValues: y => new CornerRadius(
+                    defaultDecimalPlaces: null,
+                    adapter: new IndexedFieldPropertyAdapter<CornerRadius>(
+                        uniformFieldType: typeof(double),
+                        fieldCount: 4,
+                        castTo: x => [
+                                        new BoundedValue<double>(x.TopLeft, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.TopRight, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.BottomRight, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.BottomLeft, double.MinValue, double.MaxValue)
+                                     ],
+                        castFrom: y => new CornerRadius(
                                             topLeft: (double)y[0],
                                             topRight: (double)y[1],
                                             bottomRight: (double)y[2],
@@ -166,15 +184,17 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(Thickness),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: null,
-                    adapter: new MultipleValuePropertyAdapter<double, Thickness>(
-                        toValues: x => [
-                                         new(x.Left, double.MinValue, double.MaxValue),
-                                         new(x.Top, double.MinValue, double.MaxValue),
-                                         new(x.Right, double.MinValue, double.MaxValue),
-                                         new(x.Bottom, double.MinValue, double.MaxValue)
-                                       ],
-                        fromValues: y => new Thickness(
+                    defaultDecimalPlaces: null,
+                    adapter: new IndexedFieldPropertyAdapter<Thickness>(
+                        uniformFieldType: typeof(double),
+                        fieldCount: 4,
+                        castTo: x => [
+                                        new BoundedValue<double>(x.Left, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Top, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Right, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.Bottom, double.MinValue, double.MaxValue)
+                                     ],
+                        castFrom: y => new Thickness(
                                             left: (double)y[0],
                                             top: (double)y[1],
                                             right: (double)y[2],
@@ -185,20 +205,22 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(Matrix),
                 f => f.CreateMultipleValueEditor(
-                    decimalPlaces: null,
-                    adapter: new MultipleValuePropertyAdapter<double, Matrix>(
-                        toValues: x => [
-                                         new(x.M11, double.MinValue, double.MaxValue),
-                                         new(x.M12, double.MinValue, double.MaxValue),
-                                         new(x.M13, double.MinValue, double.MaxValue),
-                                         new(x.M21, double.MinValue, double.MaxValue),
-                                         new(x.M22, double.MinValue, double.MaxValue),
-                                         new(x.M23, double.MinValue, double.MaxValue),
-                                         new(x.M31, double.MinValue, double.MaxValue),
-                                         new(x.M32, double.MinValue, double.MaxValue),
-                                         new(x.M33, double.MinValue, double.MaxValue)
-                                       ],
-                        fromValues: y => new Matrix(
+                    defaultDecimalPlaces: null,
+                    adapter: new IndexedFieldPropertyAdapter<Matrix>(
+                        uniformFieldType: typeof(double),
+                        fieldCount: 9,
+                        castTo: x => [
+                                        new BoundedValue<double>(x.M11, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.M12, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.M13, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.M21, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.M22, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.M23, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.M31, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.M32, double.MinValue, double.MaxValue),
+                                        new BoundedValue<double>(x.M33, double.MinValue, double.MaxValue)
+                                     ],
+                        castFrom: y => new Matrix(
                                             scaleX: (double)y[0],
                                             skewY: (double)y[1],
                                             perspX: (double)y[2],
