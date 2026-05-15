@@ -5,8 +5,8 @@ namespace Sachssoft.Sasospector
 {
     public interface IInspectorPropertyInfo
     {
-        event EventHandler<InspectorPropertyChangingEventArgs>? Changing;
-        event EventHandler<InspectorPropertyChangedEventArgs>? Changed;
+        event EventHandler<InspectorPropertyChangingEventArgs>? ValueChanging;
+        event EventHandler<InspectorPropertyChangedEventArgs>? ValueChanged;
 
         string Name { get; }
 

@@ -2,25 +2,33 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Templates;
+using Avalonia.Styling;
 using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Registries;
 using Sachssoft.Sasospector.Views.Editors;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 
 namespace Sachssoft.Sasospector.Views
 {
     [TemplatePart(PART_EditorContent, typeof(ContentControl))]
+    [TemplatePart(PART_Container, typeof(ContentControl))]
     public class InspectorPropertyView : InspectorItem
     {
         private const string PART_EditorContent = nameof(PART_EditorContent);
+        private const string PART_Container = nameof(PART_Container);
 
         private bool? _propertyFound = null;
         private IInspectorPropertyInfo? _property;
         private InspectorControl? _control;
         private InspectorPropertyEditorRegistryBase? _editorRegistry;
+        private InspectorPropertyEditorBase? _editor;
         private ContentControl? _partEditorContent;
+        private ContentControl? _partContainer;
 
         public static readonly StyledProperty<string?> PropertyNameProperty =
             AvaloniaProperty.Register<InspectorPropertyView, string?>(nameof(PropertyName));
@@ -60,6 +68,8 @@ namespace Sachssoft.Sasospector.Views
             set => SetValue(CustomEditorProperty, value);
         }
 
+        public InspectorContainerTemplates ContainerTemplates { get; } = new InspectorContainerTemplates();
+
         // Nur ReadOnly wichtig für Bindings
         public IInspectorPropertyInfo? Property
         {
@@ -82,6 +92,9 @@ namespace Sachssoft.Sasospector.Views
         {
             base.OnDetachedFromVisualTree(e);
 
+            if (Property != null)
+                Property.ValueChanged -= Property_Changed;
+
             _control = null;
             _editorRegistry = null;
         }
@@ -91,6 +104,7 @@ namespace Sachssoft.Sasospector.Views
             base.OnApplyTemplate(e);
 
             _partEditorContent = e.NameScope.Get<ContentControl>(PART_EditorContent);
+            _partContainer = e.NameScope.Get<ContentControl>(PART_Container);
 
             Build();
         }
@@ -126,24 +140,74 @@ namespace Sachssoft.Sasospector.Views
             if (Property == null)
                 return;
 
+            Property.ValueChanged += Property_Changed;
+
             // 1. VariantEditor (hard override instance)
             // 2. VariantEditorKind (template selector)
             // 3. Registry (default)
 
             if (CustomEditor == null)
             {
-                var editor = _editorRegistry.Create(Property, PreferredEditorKind);
+                var editorRaw = _editorRegistry.Create(Property, PreferredEditorKind);
 
-                if (editor is InspectorPropertyEditorBase inspectorPropertyEditor)
+                if (editorRaw is InspectorPropertyEditorBase inspectorPropertyEditor)
                 {
-                    inspectorPropertyEditor.Source = Property;
+                    _editor = inspectorPropertyEditor;
+                    _editor.Source = Property;
                 }
-
-                _partEditorContent.Content = editor;
             }
             else
             {
-                _partEditorContent.Content = CustomEditor;
+                _editor = CustomEditor;
+                _editor.Source = Property;
+            }
+
+            _partEditorContent.Content = _editor;
+
+            UpdateContainer();
+        }
+
+        private void Property_Changed(object? sender, InspectorPropertyChangedEventArgs e)
+        {
+            UpdateContainer();
+        }
+
+        private void UpdateContainer()
+        {
+            if (_editor == null || _partContainer == null)
+                return;
+
+            var value = _editor.Source.GetValue();
+            Debug.WriteLine("Value Changed {0}", value);
+
+            if (value != null)
+            {
+                InspectorContainerTemplate? template = null;
+
+                // 1. Container-specific
+                template = ContainerTemplates.FirstOrDefault(t => t.Match(value));
+
+                // 2. Global DataTemplates
+                if (template == null)
+                {
+                    template = DataTemplates
+                        .OfType<InspectorContainerTemplate>()
+                        .FirstOrDefault(t => t.Match(value));
+                }
+
+                // 3. Resources fallback
+                if (template == null && Resources != null)
+                {
+                    template = Resources
+                        .Values
+                        .OfType<InspectorContainerTemplate>()
+                        .FirstOrDefault(t => t.Match(value));
+                }
+
+                if (template != null)
+                {
+                    _partContainer.Content = template.Build(value);
+                }
             }
         }
     }

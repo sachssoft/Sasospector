@@ -11,27 +11,30 @@
 		<Setter Property="Padding" Value="10"/>
 		<Setter Property="Template">
 			<ControlTemplate TargetType="controls:InspectorPropertyView">
-				<Grid ColumnDefinitions="Auto,5, *">
-					<Label Content="{TemplateBinding Header}"
-						   Grid.Column="0"
-						   Width="{Binding $parent[controls:InspectorControl].HeaderWidth}"
-						   HorizontalAlignment="Stretch"
-						   VerticalAlignment="Stretch"
-						   HorizontalContentAlignment ="Right"
-						   VerticalContentAlignment ="Top"
-						   Padding="5 5 5 0"/>
-					<GridSplitter Grid.Column="1"
-								  Width="5"
-								  HorizontalAlignment="Stretch"
-								  VerticalAlignment="Stretch"
-								  ResizeDirection="Columns"
-								  Background="Transparent"/>
-					<ContentControl Grid.Column="2"
-									x:Name="PART_EditorContent"
-									HorizontalAlignment="Stretch"
-									VerticalAlignment="Stretch"/>
+				<StackPanel Orientation="Vertical">
+					<Grid ColumnDefinitions="Auto,5, *">
+						<Label Content="{TemplateBinding Header}"
+							   Grid.Column="0"
+							   Width="{Binding $parent[controls:InspectorControl].HeaderWidth}"
+							   HorizontalAlignment="Stretch"
+							   VerticalAlignment="Stretch"
+							   HorizontalContentAlignment ="Right"
+							   VerticalContentAlignment ="Top"
+							   Padding="5 5 5 0"/>
+						<GridSplitter Grid.Column="1"
+									  Width="5"
+									  HorizontalAlignment="Stretch"
+									  VerticalAlignment="Stretch"
+									  ResizeDirection="Columns"
+									  Background="Transparent"/>
+						<ContentControl Grid.Column="2"
+										x:Name="PART_EditorContent"
+										HorizontalAlignment="Stretch"
+										VerticalAlignment="Stretch"/>
 
-				</Grid>
+					</Grid>
+					<ContentControl x:Name="PART_Container" />
+				</StackPanel>
 			</ControlTemplate>
 		</Setter>
 	</ControlTheme>

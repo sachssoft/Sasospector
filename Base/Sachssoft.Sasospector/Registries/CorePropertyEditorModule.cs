@@ -54,6 +54,13 @@ namespace Sachssoft.Sasospector.Registries
             //    type => type.IsArray,
             //    info => new ArrayPropertyEditor(),
             //    priority: 800);
+
+            registry.Register(
+                type => !type.IsValueType && !type.IsArray,
+                (pi, f) => f.CreateObjectEditor(
+                    allowNullSelection: true
+                ),
+                priority: 0);
         }
 
         private void RegisterPrimitiveTypes(InspectorPropertyEditorRegistryBase registry)
@@ -64,12 +71,13 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(typeof(sbyte),
                 (f) => f.CreateMultipleValueEditor(
-                defaultDecimalPlaces: 0,
-                adapter: new IndexedFieldPropertyAdapter<sbyte>(
-                    singleFieldType: typeof(sbyte),
-                    castTo: x => [new BoundedValue<sbyte>(x, sbyte.MinValue, sbyte.MaxValue)],
-                    castFrom: y => (sbyte)y[0]
-                )),
+                    defaultDecimalPlaces: 0,
+                    adapter: new IndexedFieldPropertyAdapter<sbyte>(
+                        singleFieldType: typeof(sbyte),
+                        castTo: x => [new BoundedValue<sbyte>(x, sbyte.MinValue, sbyte.MaxValue)],
+                        castFrom: y => (sbyte)y[0]
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(short),
@@ -79,7 +87,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(short),
                         x => [new BoundedValue<short>(x, short.MinValue, short.MaxValue)],
                         y => (short)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(int),
@@ -89,7 +98,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(int),
                         x => [new BoundedValue<int>(x, int.MinValue, int.MaxValue)],
                         y => (int)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(long),
@@ -99,7 +109,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(long),
                         x => [new BoundedValue<long>(x, long.MinValue, long.MaxValue)],
                         y => (long)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(Int128),
@@ -109,7 +120,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(Int128),
                         x => [new BoundedValue<Int128>(x, Int128.MinValue, Int128.MaxValue)],
                         y => (Int128)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(byte),
@@ -119,7 +131,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(byte),
                         x => [new BoundedValue<byte>(x, byte.MinValue, byte.MaxValue)],
                         y => (byte)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(ushort),
@@ -129,7 +142,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(ushort),
                         x => [new BoundedValue<ushort>(x, ushort.MinValue, ushort.MaxValue)],
                         y => (ushort)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(uint),
@@ -139,7 +153,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(uint),
                         x => [new BoundedValue<uint>(x, uint.MinValue, uint.MaxValue)],
                         y => (uint)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(ulong),
@@ -149,7 +164,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(ulong),
                         x => [new BoundedValue<ulong>(x, ulong.MinValue, ulong.MaxValue)],
                         y => (ulong)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(Half),
@@ -159,7 +175,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(Half),
                         x => [new BoundedValue<Half>(x, Half.MinValue, Half.MaxValue)],
                         y => (Half)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(float),
@@ -169,7 +186,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(float),
                         x => [new BoundedValue<float>(x, float.MinValue, float.MaxValue)],
                         y => (float)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(double),
@@ -179,7 +197,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(double),
                         x => [new BoundedValue<double>(x, double.MinValue, double.MaxValue)],
                         y => (double)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(decimal),
@@ -189,7 +208,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(decimal),
                         x => [new BoundedValue<decimal>(x, decimal.MinValue, decimal.MaxValue)],
                         y => (decimal)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
         }
 
@@ -202,7 +222,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(nint),
                         x => [new BoundedValue<nint>(x, nint.MinValue, nint.MaxValue)],
                         y => (nint)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
 
             registry.Register(typeof(nuint),
@@ -212,7 +233,8 @@ namespace Sachssoft.Sasospector.Registries
                         singleFieldType: typeof(nuint),
                         x => [new BoundedValue<nuint>(x, nuint.MinValue, nuint.MaxValue)],
                         y => (nuint)y[0]
-                    )),
+                    )
+                ),
                 priority: 0);
         }
 

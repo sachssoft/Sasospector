@@ -1,4 +1,6 @@
-﻿namespace Sachssoft.Sasospector
+﻿using System.Collections.Generic;
+
+namespace Sachssoft.Sasospector
 {
     public interface IPropertyEditor
     {

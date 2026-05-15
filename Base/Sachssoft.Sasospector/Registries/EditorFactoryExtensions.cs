@@ -10,6 +10,17 @@ namespace Sachssoft.Sasospector.Registries
 {
     public static class EditorFactoryExtensions
     {
+        public static IPropertyEditor CreateObjectEditor(
+            this IInspectorEditorPlatformFactory f,
+            bool allowNullSelection)
+        {
+            var editor = ((IObjectEditor)f.CreateEditor(typeof(IObjectEditor)));
+
+            editor.AllowNullSelection = allowNullSelection;
+
+            return editor;
+        }
+
         public static IPropertyEditor CreateEnumEditor(
             this IInspectorEditorPlatformFactory f,
             EnumSelectionMode selectionMode)

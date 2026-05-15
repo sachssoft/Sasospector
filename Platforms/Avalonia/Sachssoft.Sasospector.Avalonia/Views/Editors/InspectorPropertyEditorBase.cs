@@ -14,6 +14,10 @@ namespace Sachssoft.Sasospector.Views.Editors
         private CultureInfo _effectiveCulture = CultureInfo.CurrentUICulture;
         private IInspectorPropertyInfo? _source;
 
+        public static readonly StyledProperty<bool> IsHeaderVisibleProperty =
+            AvaloniaProperty.Register<InspectorPropertyEditorBase, bool>(nameof(IsHeaderVisible), defaultValue: true);
+
+
         public static readonly StyledProperty<CultureInfo?> CultureProperty =
             AvaloniaProperty.Register<InspectorPropertyEditorBase, CultureInfo?>(nameof(Culture));
 
@@ -61,12 +65,18 @@ namespace Sachssoft.Sasospector.Views.Editors
 
                 if (_source != null)
                 {
-                    _source.Changed += SourceChanged;
+                    _source.ValueChanged += SourceValueChanged;
                 }
             }
         }
 
-        protected virtual void OnPropertySourceChanged()
+        public bool IsHeaderVisible
+        {
+            get => GetValue(IsHeaderVisibleProperty);
+            set => SetValue(IsHeaderVisibleProperty, value);
+        }
+
+        protected virtual void OnPropertySourceValueChanged()
         {
         }
 
@@ -84,19 +94,19 @@ namespace Sachssoft.Sasospector.Views.Editors
         {
             if (_source != null)
             {
-                _source.Changed -= SourceChanged;
+                _source.ValueChanged -= SourceValueChanged;
             }
 
             base.OnUnloaded(e);
         }
 
-        private void SourceChanged(object? sender, InspectorPropertyChangedEventArgs e)
+        private void SourceValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
         {
 #if DEBUG
             Debug.WriteLine(e.Property.ToString());
 #endif
 
-            OnPropertySourceChanged();
+            OnPropertySourceValueChanged();
         }
     }
 }

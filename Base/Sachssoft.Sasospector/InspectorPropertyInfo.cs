@@ -7,8 +7,8 @@ namespace Sachssoft.Sasospector
     {
         private readonly Type _type;
 
-        public event EventHandler<InspectorPropertyChangingEventArgs>? Changing;
-        public event EventHandler<InspectorPropertyChangedEventArgs>? Changed;
+        public event EventHandler<InspectorPropertyChangingEventArgs>? ValueChanging;
+        public event EventHandler<InspectorPropertyChangedEventArgs>? ValueChanged;
 
         public InspectorPropertyInfo(
             InspectorSchema schema,
@@ -89,10 +89,10 @@ namespace Sachssoft.Sasospector
         }
 
         protected virtual void OnChanging(InspectorPropertyChangingEventArgs e)
-            => Changing?.Invoke(Schema, e);
+            => ValueChanging?.Invoke(Schema, e);
 
         protected virtual void OnChanged(InspectorPropertyChangedEventArgs e)
-            => Changed?.Invoke(Schema, e);
+            => ValueChanged?.Invoke(Schema, e);
 
         public override string ToString()
         {
