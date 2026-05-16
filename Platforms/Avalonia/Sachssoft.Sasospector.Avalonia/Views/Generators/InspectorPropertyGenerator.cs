@@ -4,9 +4,9 @@ namespace Sachssoft.Sasospector.Views.Generators
 {
     public class InspectorPropertyGenerator : AvaloniaObject
     {
-        public InspectorPropertyView Build(object? ownerSource, object? propertySource)
+        public PropertyViewItem Build(object? ownerSource, object? propertySource)
         {
-            var view = new InspectorPropertyView();
+            var view = new PropertyViewItem();
             return view;
         }
     }

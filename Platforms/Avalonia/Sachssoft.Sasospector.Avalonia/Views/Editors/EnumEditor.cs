@@ -5,6 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Sachssoft.Sasospector.Editors;
 using System;
+using System.Collections.Generic;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
@@ -14,7 +15,7 @@ namespace Sachssoft.Sasospector.Views.Editors
         private const string PART_EnumFields = nameof(PART_EnumFields);
 
         private SelectingItemsControl? _partEnumFields;
-        private string[]? _enumValues;
+        private string[]? _enumRawFields;
         private bool _kindSyncing;
         private bool _sourceSyncing;
 
@@ -73,7 +74,7 @@ namespace Sachssoft.Sasospector.Views.Editors
                 SetupEditorKindSelector();
                 Build();
             }
-            else if(change.Property == PreferredKindProperty && !_kindSyncing)
+            else if (change.Property == PreferredKindProperty && !_kindSyncing)
             {
                 _kindSyncing = true;
 
@@ -145,25 +146,41 @@ namespace Sachssoft.Sasospector.Views.Editors
                 ? Enum.GetName(enumType, currentValue)
                 : null;
 
-            _enumValues = Enum.GetNames(enumType);
+            _enumRawFields = Enum.GetNames(enumType);
 
-            _partEnumFields.ItemsSource = _enumValues;
+            var fields = new List<object?>();
 
+            for (int i = 0; i < _enumRawFields.Length; i++)
+            {
+                var field = _enumRawFields[i];
+                var value = Enum.Parse(enumType, field);
+
+                if (TryMatchFieldHeader(i, enumType, value, out var fieldHeader))
+                {
+                    fields.Add(fieldHeader);
+                }
+                else
+                {
+                    fields.Add(field);
+                }
+            }
+
+            _partEnumFields.ItemsSource = fields;
             _partEnumFields.SelectedIndex = enumValueName != null
-                ? Array.IndexOf(_enumValues, enumValueName)
+                ? Array.IndexOf(_enumRawFields, enumValueName)
                 : -1;
         }
 
         private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            if (_partEnumFields == null || _enumValues == null || Source == null)
+            if (_partEnumFields == null || _enumRawFields == null || Source == null)
                 return;
 
             var index = _partEnumFields.SelectedIndex;
-            if (index < 0 || index >= _enumValues.Length)
+            if (index < 0 || index >= _enumRawFields.Length)
                 return;
 
-            var selectedName = _enumValues[index];
+            var selectedName = _enumRawFields[index];
 
             var value = Enum.Parse(Source.Type, selectedName);
             Source.SetValue(value);

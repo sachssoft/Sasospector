@@ -8,7 +8,10 @@ using Avalonia.Styling;
 using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Registries;
 using Sachssoft.Sasospector.Views.Editors;
+using Sachssoft.Sasospector.Views.Fields;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -17,7 +20,7 @@ namespace Sachssoft.Sasospector.Views
 {
     [TemplatePart(PART_EditorContent, typeof(ContentControl))]
     [TemplatePart(PART_Container, typeof(ContentControl))]
-    public class InspectorPropertyView : InspectorItem
+    public class PropertyViewItem : InspectorItem
     {
         private const string PART_EditorContent = nameof(PART_EditorContent);
         private const string PART_Container = nameof(PART_Container);
@@ -30,28 +33,57 @@ namespace Sachssoft.Sasospector.Views
         private ContentControl? _partEditorContent;
         private ContentControl? _partContainer;
 
-        public static readonly StyledProperty<string?> PropertyNameProperty =
-            AvaloniaProperty.Register<InspectorPropertyView, string?>(nameof(PropertyName));
+        public static readonly StyledProperty<IList<FieldHeaderBase>?> FieldHeadersProperty =
+            AvaloniaProperty.Register<PropertyViewItem, IList<FieldHeaderBase>?>(nameof(FieldHeaders));
 
-        public static readonly DirectProperty<InspectorPropertyView, IInspectorPropertyInfo?> PropertyProperty =
-            AvaloniaProperty.RegisterDirect<InspectorPropertyView, IInspectorPropertyInfo?>(
+        public static readonly StyledProperty<string?> PropertyNameProperty =
+            AvaloniaProperty.Register<PropertyViewItem, string?>(nameof(PropertyName));
+
+        public static readonly StyledProperty<Type?> TargetTypeProperty =
+            AvaloniaProperty.Register<PropertyViewItem, Type?>(nameof(TargetType));
+
+        public static readonly DirectProperty<PropertyViewItem, IInspectorPropertyInfo?> PropertyProperty =
+            AvaloniaProperty.RegisterDirect<PropertyViewItem, IInspectorPropertyInfo?>(
                 nameof(Property),
                 o => o.Property);
 
         public static readonly StyledProperty<string?> PreferredEditorKindProperty =
-            AvaloniaProperty.Register<InspectorPropertyView, string?>(nameof(PreferredEditorKind));
+            AvaloniaProperty.Register<PropertyViewItem, string?>(nameof(PreferredEditorKind));
 
         public static readonly StyledProperty<InspectorPropertyEditorBase?> CustomEditorProperty =
-            AvaloniaProperty.Register<InspectorPropertyView, InspectorPropertyEditorBase?>(nameof(CustomEditor));
+            AvaloniaProperty.Register<PropertyViewItem, InspectorPropertyEditorBase?>(nameof(CustomEditor));
 
-        public InspectorPropertyView() { }
+        public static readonly StyledProperty<IDataTemplate?> FieldHeaderTemplateProperty =
+            AvaloniaProperty.Register<PropertyViewItem, IDataTemplate?>(nameof(FieldHeaderTemplate));
 
-        protected override Type StyleKeyOverride { get; } = typeof(InspectorPropertyView);
+        public PropertyViewItem() { }
+
+        protected override Type StyleKeyOverride { get; } = typeof(PropertyViewItem);
+
+        public IList<FieldHeaderBase>? FieldHeaders
+        {
+            get => GetValue(FieldHeadersProperty);
+            set => SetValue(FieldHeadersProperty, value);
+        }
+
+        public IDataTemplate? FieldHeaderTemplate
+        {
+            get => GetValue(FieldHeaderTemplateProperty);
+            set => SetValue(FieldHeaderTemplateProperty, value);
+        }
 
         public string? PropertyName
         {
             get => GetValue(PropertyNameProperty);
             set => SetValue(PropertyNameProperty, value);
+        }
+
+        // Optional gewünschter Typ des Eigenschafts 
+        // Vorteil: typsicher
+        public Type? TargetType
+        {
+            get => GetValue(TargetTypeProperty);
+            set => SetValue(TargetTypeProperty, value);
         }
 
         // Gewünschte alternative eingebaute Editor Art, wenn VariantEditor = null
@@ -134,6 +166,17 @@ namespace Sachssoft.Sasospector.Views
             if (_propertyFound == null)
             {
                 _propertyFound = Schema.Properties.TryGetValue(PropertyName, out var propertyInfo);
+
+                // TargetTyp = null (nur optional)
+                // Gewünschter Zieltyp (Typsicherheit!)
+                if (TargetType != null && propertyInfo != null)
+                {
+                    if (propertyInfo.Type != TargetType)
+                    {
+                        return;
+                    }
+                }
+
                 Property = propertyInfo;
             }
 
@@ -153,12 +196,16 @@ namespace Sachssoft.Sasospector.Views
                 if (editorRaw is InspectorPropertyEditorBase inspectorPropertyEditor)
                 {
                     _editor = inspectorPropertyEditor;
-                    _editor.Source = Property;
                 }
             }
             else
             {
                 _editor = CustomEditor;
+            }
+
+            if (_editor != null)
+            {
+                _editor.FieldHeaders = FieldHeaders?.AsReadOnly();
                 _editor.Source = Property;
             }
 
@@ -172,43 +219,74 @@ namespace Sachssoft.Sasospector.Views
             UpdateContainer();
         }
 
+        //private Control? GenerateFieldHeader(FieldHeaderBase? fieldHeader, object? header)
+        //{
+        //    // 1. explizite Header-Logik (höchste Priorität)
+        //    if (fieldHeader != null)
+        //    {
+        //        var result = fieldHeader.GenerateHeader(header);
+
+        //        if (result != null)
+        //            return result;
+        //    }
+
+        //    // 2. globales Template
+        //    if (FieldHeaderTemplate != null)
+        //    {
+        //        var templateResult = FieldHeaderTemplate.Build(header);
+
+        //        if (templateResult != null)
+        //            return templateResult;
+        //    }
+
+        //    // 3. fallback
+        //    if (header is Control control)
+        //        return control;
+
+        //    return new TextBlock
+        //    {
+        //        Text = header?.ToString() ?? string.Empty
+        //    };
+        //}
+
         private void UpdateContainer()
         {
-            if (_editor == null || _partContainer == null)
-                return;
+            //if (_editor == null || _partContainer == null)
+            //    return;
 
-            var value = _editor.Source.GetValue();
-            Debug.WriteLine("Value Changed {0}", value);
+            //var value = _editor.Source.GetValue();
+            //Debug.WriteLine("Value Changed {0}", value);
 
-            if (value != null)
-            {
-                InspectorContainerTemplate? template = null;
+            //if (value != null)
+            //{
+            //    InspectorContainerTemplate? template = null;
 
-                // 1. Container-specific
-                template = ContainerTemplates.FirstOrDefault(t => t.Match(value));
+            //    // 1. Container-specific
+            //    template = ContainerTemplates.FirstOrDefault(t => t.Match(value));
 
-                // 2. Global DataTemplates
-                if (template == null)
-                {
-                    template = DataTemplates
-                        .OfType<InspectorContainerTemplate>()
-                        .FirstOrDefault(t => t.Match(value));
-                }
+            //    // 2. Global DataTemplates
+            //    if (template == null)
+            //    {
+            //        template = DataTemplates
+            //            .OfType<InspectorContainerTemplate>()
+            //            .FirstOrDefault(t => t.Match(value));
+            //    }
 
-                // 3. Resources fallback
-                if (template == null && Resources != null)
-                {
-                    template = Resources
-                        .Values
-                        .OfType<InspectorContainerTemplate>()
-                        .FirstOrDefault(t => t.Match(value));
-                }
+            //    // 3. Resources fallback
+            //    if (template == null && Resources != null)
+            //    {
+            //        template = Resources
+            //            .Values
+            //            .OfType<InspectorContainerTemplate>()
+            //            .FirstOrDefault(t => t.Match(value));
+            //    }
 
-                if (template != null)
-                {
-                    _partContainer.Content = template.Build(value);
-                }
-            }
+            //    if (template != null)
+            //    {
+            //        var templatedInstance = template.Build(value);
+            //        _partContainer.Content = templatedInstance;
+            //    }
+            //}
         }
     }
 }

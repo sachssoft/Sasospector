@@ -8,7 +8,7 @@ namespace Sachssoft.Sasospector.Views
         private IInspectorPropertyInfo? _property;
 
         public static readonly StyledProperty<string?> PropertyNameProperty =
-            AvaloniaProperty.Register<InspectorPropertyView, string?>(nameof(PropertyName));
+            AvaloniaProperty.Register<PropertyViewItem, string?>(nameof(PropertyName));
 
         public static readonly DirectProperty<ToggleableInspectorSectionView, IInspectorPropertyInfo?> PropertyProperty =
             AvaloniaProperty.RegisterDirect<ToggleableInspectorSectionView, IInspectorPropertyInfo?>(

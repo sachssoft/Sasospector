@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Sachssoft.Sasospector.Schemas
 {
-    public interface IInspectorSchema : IEnumerable<IInspectorPropertyInfo>
+    public interface IInspectorSchema : IEnumerable<IInspectorPropertyInfo>, INotifyPropertyChanged, INotifyPropertyChanging
     {
         object Owner { get; }
 

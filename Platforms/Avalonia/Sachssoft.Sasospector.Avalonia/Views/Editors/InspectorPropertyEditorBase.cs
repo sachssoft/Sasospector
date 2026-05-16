@@ -3,7 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Sachssoft.Sasospector.Registries;
+using Sachssoft.Sasospector.Views.Fields;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Windows.Input;
 
@@ -13,10 +17,9 @@ namespace Sachssoft.Sasospector.Views.Editors
     {
         private CultureInfo _effectiveCulture = CultureInfo.CurrentUICulture;
         private IInspectorPropertyInfo? _source;
-
+        private IReadOnlyList<FieldHeaderBase>? _fieldHeaders;
         public static readonly StyledProperty<bool> IsHeaderVisibleProperty =
             AvaloniaProperty.Register<InspectorPropertyEditorBase, bool>(nameof(IsHeaderVisible), defaultValue: true);
-
 
         public static readonly StyledProperty<CultureInfo?> CultureProperty =
             AvaloniaProperty.Register<InspectorPropertyEditorBase, CultureInfo?>(nameof(Culture));
@@ -32,6 +35,12 @@ namespace Sachssoft.Sasospector.Views.Editors
                 nameof(Source),
                 o => o.Source,
                 (o, v) => o.Source = v);
+
+        public static readonly DirectProperty<InspectorPropertyEditorBase, IReadOnlyList<FieldHeaderBase>?> FieldHeadersProperty =
+            AvaloniaProperty.RegisterDirect<InspectorPropertyEditorBase, IReadOnlyList<FieldHeaderBase>?>(
+                nameof(Source),
+                o => o.FieldHeaders,
+                (o, v) => o.FieldHeaders = v);
 
         // null = CurrentCultureUI
         public CultureInfo? Culture
@@ -70,10 +79,35 @@ namespace Sachssoft.Sasospector.Views.Editors
             }
         }
 
+        public IReadOnlyList<FieldHeaderBase>? FieldHeaders
+        {
+            get => _fieldHeaders;
+            internal set => SetAndRaise(FieldHeadersProperty, ref _fieldHeaders, value);
+        }
+
         public bool IsHeaderVisible
         {
             get => GetValue(IsHeaderVisibleProperty);
             set => SetValue(IsHeaderVisibleProperty, value);
+        }
+
+        protected bool TryMatchFieldHeader(int index, Type? dataType, object? dataValue, [MaybeNullWhen(false)] out FieldHeaderBase header)
+        {
+            header = null;
+
+            if (FieldHeaders == null)
+                return false;
+
+            foreach(var field in FieldHeaders)
+            {
+                if (field.Match(index, dataType, dataValue))
+                {
+                    header = field;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         protected virtual void OnPropertySourceValueChanged()

@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 					xmlns:views="using:Sachssoft.Sasospector.Views"
 					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
+					xmlns:fields="using:Sachssoft.Sasospector.Views.Fields"
 					x:ClassModifier="internal">
 	
 	<ControlTheme x:Key="{x:Type editors:EnumEditor}"
@@ -10,7 +11,18 @@
 			<ControlTemplate TargetType="editors:EnumEditor">
 				<ComboBox x:Name="PART_EnumFields"
 						  HorizontalAlignment="Stretch"
-						  Height="{StaticResource InspectorPropertyEditorHeight}"/>
+						  Height="{StaticResource InspectorPropertyEditorHeight}">
+					<ComboBox.DataTemplates>
+						<DataTemplate x:DataType="fields:FieldHeaderBase">
+							<ContentControl Content="{Binding Header}"
+											ContentTemplate="{Binding HeaderTemplate}"/>
+						</DataTemplate>
+
+						<DataTemplate DataType="x:Object">
+							<TextBlock Text="{Binding}" />
+						</DataTemplate>
+					</ComboBox.DataTemplates>
+				</ComboBox>
 			</ControlTemplate>
 		</Setter>
 	</ControlTheme>

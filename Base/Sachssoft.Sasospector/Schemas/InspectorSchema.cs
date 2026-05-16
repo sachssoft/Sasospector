@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Sachssoft.Sasospector.Schemas
 {
-    public class InspectorSchema : IInspectorSchema
+    public class InspectorSchema : IInspectorSchema, IDisposable
     {
         private readonly object _owner;
         private readonly IReadOnlyDictionary<string, IInspectorPropertyInfo> _properties;
+
+        private bool _disposed;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangingEventHandler? PropertyChanging;
 
         public InspectorSchema(object owner, IEnumerable<IInspectorPropertyInfo> properties)
         {
@@ -28,6 +34,9 @@ namespace Sachssoft.Sasospector.Schemas
 
                 if (!dict.TryAdd(name, property))
                     throw new InvalidOperationException($"Duplicate property '{name}'.");
+
+                property.ValueChanging += Property_ValueChanging;
+                property.ValueChanged += Property_ValueChanged;
             }
 
             _properties = dict;
@@ -48,6 +57,9 @@ namespace Sachssoft.Sasospector.Schemas
                 var name = property.Name ?? kv.Key;
 
                 dict[name] = property;
+
+                property.ValueChanging += Property_ValueChanging;
+                property.ValueChanged += Property_ValueChanged;
             }
 
             _properties = dict;
@@ -78,5 +90,32 @@ namespace Sachssoft.Sasospector.Schemas
 
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(InspectorSchema));
+
+            foreach (var property in _properties.Values)
+            {
+                property.ValueChanging -= Property_ValueChanging;
+                property.ValueChanged -= Property_ValueChanged;
+            }
+
+            PropertyChanged = null;
+            PropertyChanging = null;
+
+            _disposed = true;
+        }
+
+        private void Property_ValueChanging(object? sender, InspectorPropertyChangingEventArgs e)
+        {
+            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(e.Property.Name));
+        }
+
+        private void Property_ValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(e.Property.Name));
+        }
     }
 }

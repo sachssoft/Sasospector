@@ -3,14 +3,14 @@
 					xmlns:controls="using:Sachssoft.Sasospector.Views"
 					x:ClassModifier="internal">
 
-	<ControlTheme x:Key="{x:Type controls:InspectorPropertyView}"
-				  TargetType="controls:InspectorPropertyView">
+	<ControlTheme x:Key="{x:Type controls:PropertyViewItem}"
+				  TargetType="controls:PropertyViewItem">
 
 		<Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
 		<Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
 		<Setter Property="Padding" Value="10"/>
 		<Setter Property="Template">
-			<ControlTemplate TargetType="controls:InspectorPropertyView">
+			<ControlTemplate TargetType="controls:PropertyViewItem">
 				<StackPanel Orientation="Vertical">
 					<Grid ColumnDefinitions="Auto,5, *">
 						<Label Content="{TemplateBinding Header}"

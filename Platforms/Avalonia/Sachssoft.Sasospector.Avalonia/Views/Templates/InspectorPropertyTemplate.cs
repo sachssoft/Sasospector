@@ -5,7 +5,7 @@ using System;
 
 namespace Sachssoft.Sasospector.Views.Templates
 {
-    public class InspectorPropertyTemplate : ITemplate<object, InspectorPropertyView>
+    public class InspectorPropertyTemplate : ITemplate<object, PropertyViewItem>
     {
         [Content]
         [TemplateContent]
@@ -13,16 +13,16 @@ namespace Sachssoft.Sasospector.Views.Templates
 
         public object? OwnerSource { get; private set; }
 
-        public InspectorPropertyView Build(object ownerSource, object propertySource)
+        public PropertyViewItem Build(object ownerSource, object propertySource)
         {
             OwnerSource = ownerSource;
 
-            var result = (InspectorPropertyView)(TemplateContent.Load(Content)?.Result ?? new InspectorPropertyView());
+            var result = (PropertyViewItem)(TemplateContent.Load(Content)?.Result ?? new PropertyViewItem());
             result.DataContext = propertySource;
             return result;
         }
 
-        InspectorPropertyView ITemplate<object, InspectorPropertyView>.Build(object propertySource)
+        PropertyViewItem ITemplate<object, PropertyViewItem>.Build(object propertySource)
         {
             if (OwnerSource == null)
                 throw new InvalidOperationException(

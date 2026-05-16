@@ -29,19 +29,17 @@ namespace Sachssoft.Sasospector.Views
             return DataType.IsInstanceOfType(data);
         }
 
-        public InspectorItem Build(object? param)
+
+        public InspectorItem? Build(object? param)
         {
-            TemplateResult<Control>? templateResult = TemplateContent.Load(Content);
+            var templateResult = TemplateContent.Load(Content);
 
-            if (templateResult?.Result is not InspectorItem)
-                throw new InvalidOperationException();
-
-            if (templateResult == null)
-            {
+            if (templateResult?.Result is not InspectorItem item)
                 return null;
-            }
 
-            return (InspectorItem)templateResult.Result;
+            item.DataContext = param;
+
+            return item;
         }
 
         Control? ITemplate<object?, Control?>.Build(object? param)
