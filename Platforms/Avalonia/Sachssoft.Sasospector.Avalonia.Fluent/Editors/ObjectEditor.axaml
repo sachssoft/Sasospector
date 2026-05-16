@@ -3,6 +3,7 @@
 					xmlns:views="using:Sachssoft.Sasospector.Views"
 					xmlns:converters="using:Sachssoft.Sasospector.Views.Converters"
 					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
+					xmlns:fields="using:Sachssoft.Sasospector.Views.Fields"
 					x:ClassModifier="internal">
 	
 	<ControlTheme x:Key="{x:Type editors:ObjectEditor}"
@@ -28,9 +29,16 @@
 				<ControlTemplate TargetType="editors:ObjectEditor">
 					<ComboBox HorizontalAlignment="Stretch"
 							  Height="{StaticResource InspectorPropertyEditorHeight}"
-							  ItemsSource="{TemplateBinding Instances}"
+							  ItemsSource="{TemplateBinding Fields}"
 							  ItemTemplate="{TemplateBinding InstanceFieldTemplate}"
-							  SelectedIndex="{TemplateBinding SelectedInstanceIndex, Mode=TwoWay}"/>
+							  SelectedIndex="{TemplateBinding SelectedInstanceIndex, Mode=TwoWay}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate x:DataType="editors:ObjectEditorField">
+								<ContentControl Content="{Binding FieldHeader.Header}"
+												ContentTemplate="{Binding FieldHeader.HeaderTemplate}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
 				</ControlTemplate>
 			</Setter>
 		</Style>

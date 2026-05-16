@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
+using Avalonia.Input;
+using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.Templates;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
@@ -15,12 +17,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Windows.Input;
 
 namespace Sachssoft.Sasospector.Views
 {
     [TemplatePart(PART_EditorContent, typeof(ContentControl))]
     [TemplatePart(PART_Container, typeof(ContentControl))]
-    public class PropertyViewItem : InspectorItem
+    public class PropertyViewItem : InspectorItem, ICommandSource
     {
         private const string PART_EditorContent = nameof(PART_EditorContent);
         private const string PART_Container = nameof(PART_Container);
@@ -32,6 +36,8 @@ namespace Sachssoft.Sasospector.Views
         private InspectorPropertyEditorBase? _editor;
         private ContentControl? _partEditorContent;
         private ContentControl? _partContainer;
+        private bool _commandCanExecute = true;
+        private EventHandler? _canExecuteChangeHandler = default;
 
         public static readonly StyledProperty<IList<FieldHeaderBase>?> FieldHeadersProperty =
             AvaloniaProperty.Register<PropertyViewItem, IList<FieldHeaderBase>?>(nameof(FieldHeaders));
@@ -55,6 +61,12 @@ namespace Sachssoft.Sasospector.Views
 
         public static readonly StyledProperty<IDataTemplate?> FieldHeaderTemplateProperty =
             AvaloniaProperty.Register<PropertyViewItem, IDataTemplate?>(nameof(FieldHeaderTemplate));
+
+        public static readonly StyledProperty<ICommand?> CommandProperty =
+            AvaloniaProperty.Register<PropertyViewItem, ICommand?>(nameof(Command));
+
+        public static readonly StyledProperty<object?> CommandParameterProperty =
+            AvaloniaProperty.Register<PropertyViewItem, object?>(nameof(CommandParameter));
 
         public PropertyViewItem() { }
 
@@ -109,6 +121,22 @@ namespace Sachssoft.Sasospector.Views
             private set => SetAndRaise(PropertyProperty, ref _property, value);
         }
 
+        public ICommand? Command
+        {
+            get => GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
+
+        public object? CommandParameter
+        {
+            get => GetValue(CommandParameterProperty);
+            set => SetValue(CommandParameterProperty, value);
+        }
+
+        protected override bool IsEnabledCore => base.IsEnabledCore && _commandCanExecute;
+
+        private EventHandler CanExecuteChangedHandler => _canExecuteChangeHandler ??= new(CanExecuteChanged);
+
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
@@ -118,11 +146,23 @@ namespace Sachssoft.Sasospector.Views
 
             _editorRegistry = _control?.EditorRegistry;
             Build();
+
+            (var command, var parameter) = (Command, CommandParameter);
+            if (command is not null)
+            {
+                command.CanExecuteChanged += CanExecuteChangedHandler;
+                CanExecuteChanged(command, parameter);
+            }
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnDetachedFromVisualTree(e);
+
+            if (Command is { } command)
+            {
+                command.CanExecuteChanged -= CanExecuteChangedHandler;
+            }
 
             if (Property != null)
                 Property.ValueChanged -= Property_Changed;
@@ -287,6 +327,28 @@ namespace Sachssoft.Sasospector.Views
             //        _partContainer.Content = templatedInstance;
             //    }
             //}
+        }
+
+        private void CanExecuteChanged(object? sender, EventArgs e)
+        {
+            CanExecuteChanged(Command, CommandParameter);
+        }
+
+        void ICommandSource.CanExecuteChanged(object sender, EventArgs e)
+        {
+            CanExecuteChanged(Command, CommandParameter);
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private void CanExecuteChanged(ICommand? command, object? parameter)
+        {
+            var canExecute = command == null || command.CanExecute(parameter);
+
+            if (canExecute != _commandCanExecute)
+            {
+                _commandCanExecute = canExecute;
+                UpdateIsEffectivelyEnabled();
+            }
         }
     }
 }

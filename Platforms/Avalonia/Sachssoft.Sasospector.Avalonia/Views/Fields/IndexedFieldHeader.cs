@@ -14,7 +14,7 @@ namespace Sachssoft.Sasospector.Views.Fields
             set => SetValue(IndexProperty, value);
         }
 
-        public override bool Match(int index, Type dataType, object? dataValue)
+        public override bool Match(int index, Type? dataType, object? dataValue)
         {
             return index == Index;
         }

@@ -3,7 +3,9 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Sachssoft.Sasospector.Constraints;
 using Sachssoft.Sasospector.Editors;
+using Sachssoft.Sasospector.Views.Fields;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,9 +15,15 @@ namespace Sachssoft.Sasospector.Views.Editors
     {
         private ObjectEditorMode _editorMode = ObjectEditorMode.None;
         private bool _sourceSyncing;
+        private IEnumerable<ObjectEditorField> _fields = Array.Empty<ObjectEditorField>();
 
         public static readonly StyledProperty<bool> AllowNullSelectionProperty =
             AvaloniaProperty.Register<ObjectEditor, bool>(nameof(AllowNullSelection));
+
+        public static readonly DirectProperty<ObjectEditor, IEnumerable<ObjectEditorField>> FieldsProperty =
+            AvaloniaProperty.RegisterDirect<ObjectEditor, IEnumerable<ObjectEditorField>>(
+                nameof(Fields),
+                o => o.Fields);
 
         public static readonly StyledProperty<IReadOnlyList<object?>?> InstancesProperty =
             AvaloniaProperty.Register<ObjectEditor, IReadOnlyList<object?>?>(nameof(Instances));
@@ -37,6 +45,12 @@ namespace Sachssoft.Sasospector.Views.Editors
         {
             get => GetValue(AllowNullSelectionProperty);
             set => SetValue(AllowNullSelectionProperty, value);
+        }
+
+        public IEnumerable<ObjectEditorField> Fields
+        {
+            get => _fields;
+            private set => SetAndRaise(FieldsProperty, ref _fields, value);
         }
 
         public IReadOnlyList<object?>? Instances
@@ -76,6 +90,7 @@ namespace Sachssoft.Sasospector.Views.Editors
 
             if (change.Property == AllowNullSelectionProperty ||
                 change.Property == EditorModeProperty ||
+                //change.Property == InstancesProperty ||
                 change.Property == SourceProperty)
             {
                 Build();
@@ -120,15 +135,19 @@ namespace Sachssoft.Sasospector.Views.Editors
         private void Build()
         {
             if (Source == null)
+            {
+                Fields = Array.Empty<ObjectEditorField>();
                 return;
+            }
 
-            var value = Source.GetValue();
+            var propertyValue = Source.GetValue();
 
             if (Source.IsReadOnly) // Expandiert
             {
-                if (value == null)
+                if (propertyValue == null)
                 {
                     EditorMode = ObjectEditorMode.None;
+                    Fields = Array.Empty<ObjectEditorField>();
                     return;
                 }
 
@@ -152,6 +171,31 @@ namespace Sachssoft.Sasospector.Views.Editors
 
                 EditorMode = ObjectEditorMode.Selectable;
             }
+
+            if (Instances == null)
+            {
+                Fields = Array.Empty<ObjectEditorField>();
+                return;
+            }
+
+            var fields = new List<ObjectEditorField>();
+            var propertyType = Source.Type;
+
+            for(int i = 0; i < Instances.Count; i++)
+            {
+                var instance = Instances[i];
+                FieldHeaderBase? fieldHeader = null;
+
+                TryMatchFieldHeader(i, propertyType, instance, out fieldHeader);
+
+                fields.Add(new ObjectEditorField
+                {
+                    FieldHeader = fieldHeader,
+                    Instance = instance
+                });
+            }
+
+            Fields = fields.AsReadOnly();
         }
     }
 }

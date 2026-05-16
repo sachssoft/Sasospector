@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,53 +48,60 @@ namespace Sachssoft.Sasospector.Views.Fields
             set => SetValue(TargetTypeEquationProperty, value);
         }
 
-        public override bool Match(int index, Type? dataType, object? dataValue)
+        public override bool Match(int index, Type? propertyType, object? propertyValue)
         {
-            bool typeMatch = true;
 
-            if (Rule != ConditionalRule.Value)
+            Debug.WriteLine("Property Type: {0}", propertyType);
+            Debug.WriteLine("Runtime Type: {0}", propertyValue?.GetType());
+            Debug.WriteLine("Target Type: {0}", TargetType);
+            Debug.WriteLine("AssignableTo Result: {0}", TargetType?.IsAssignableTo(propertyType));
+
+            return Rule switch
             {
-                typeMatch = TargetTypeEquation switch
-                {
-                    TypeEquation.Exact =>
-                        dataType != null && TargetType != null &&
-                        dataType == TargetType,
+                ConditionalRule.Type => MatchType(propertyType, propertyValue),
+                ConditionalRule.Value => MatchValue(propertyValue),
+                ConditionalRule.ValueAndType => MatchType(propertyType, propertyValue) &&
+                                                MatchValue(propertyValue),
+                _ => false
+            };
+        }
 
-                    TypeEquation.Assignable =>
-                        dataType != null &&
-                        TargetType != null &&
-                        TargetType.IsAssignableFrom(dataType),
+        private bool MatchType(Type? propertyType, object? propertyValue)
+        {
+            var runtimeType = propertyValue?.GetType();
 
-                    TypeEquation.BaseOnly =>
-                        dataType?.BaseType == TargetType,
+            // Einen Treffer ist nur dann, wenn propertyValue exakt denselben Zieltyp hat
 
-                    TypeEquation.Strict =>
-                        dataType != null &&
-                        TargetType != null &&
-                        dataType == TargetType &&
-                        Nullable.GetUnderlyingType(TargetType) == null,
-
-                    TypeEquation.Compatible =>
-                        dataType == TargetType ||
-                        (TargetType?.IsAssignableFrom(dataType) ?? false),
-
-                    _ => dataType == TargetType
-                };
-            }
-
-            bool valueMatch = Rule switch
+            bool typeMatch = TargetTypeEquation switch
             {
-                ConditionalRule.Type =>
-                    typeMatch,
+                TypeEquation.Exact =>
+                    propertyType == TargetType,
 
-                ConditionalRule.Value =>
-                    Equals(dataValue, TargetValue),
+                TypeEquation.Assignable =>
+                    TargetType != null && TargetType.IsAssignableTo(propertyType),
 
-                _ =>
-                    typeMatch && Equals(dataValue, TargetValue)
+                //TypeEquation.Strict =>
+                //    runtimeType != null &&
+                //    TargetType != null &&
+                //    runtimeType == TargetType &&
+                //    Nullable.GetUnderlyingType(runtimeType) == null,
+
+                //TypeEquation.Compatible =>
+                //    runtimeType == TargetType ||
+                //    (runtimeType != null &&
+                //     TargetType != null &&
+                //     TargetType.IsAssignableFrom(runtimeType)),
+
+                _ => false
             };
 
-            return valueMatch;
+            // Einen Treffer ist nur dann, wenn propertyValue exakt denselben Zieltyp hat
+            return typeMatch && (runtimeType == TargetType); //!!!!
+        }
+
+        private bool MatchValue(object? propertyValue)
+        {
+            return Equals(propertyValue, TargetValue);
         }
     }
 }
