@@ -8,6 +8,6 @@
 		<ResourceInclude Source="../Controls/InspectorItemView.axaml" />
 		<ResourceInclude Source="../Controls/InspectorPropertyView.axaml" />
 		<ResourceInclude Source="../Controls/InspectorSectionView.axaml" />
-		<ResourceInclude Source="../Controls/ToggleableInspectorSectionView.axaml" />
+		<ResourceInclude Source="../Controls/ToggleableSectionView.axaml" />
 	</ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

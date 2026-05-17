@@ -14,7 +14,9 @@
 				<Expander Theme="{StaticResource InspectorSectionViewExpanderTheme}">
 					<Expander.Header>
 						<StackPanel Orientation="Horizontal">
-							<CheckBox VerticalAlignment="Center"/>
+							<CheckBox x:Name="ToggleCheckBox"
+									  VerticalAlignment="Center"
+									  IsChecked="{TemplateBinding IsChecked, Mode=TwoWay}"/>
 							<ContentPresenter Content="{TemplateBinding Header}"
 											  VerticalAlignment="Center"/>
 						</StackPanel>
@@ -30,5 +32,17 @@
 				</Expander>
 			</ControlTemplate>
 		</Setter>
+		<Style Selector="^[Mode=Enabled][IsChecked=True] /template/ ItemsControl">
+			<Setter Property="IsEnabled" Value="True" />
+		</Style>
+		<Style Selector="^[Mode=Enabled][IsChecked=False] /template/ ItemsControl">
+			<Setter Property="IsEnabled" Value="False" />
+		</Style>
+		<Style Selector="^[Mode=Visible][IsChecked=True] /template/ ItemsControl">
+			<Setter Property="IsVisible" Value="True" />
+		</Style>
+		<Style Selector="^[Mode=Visible][IsChecked=False] /template/ ItemsControl">
+			<Setter Property="IsVisible" Value="False" />
+		</Style>
 	</ControlTheme>
 </ResourceDictionary>

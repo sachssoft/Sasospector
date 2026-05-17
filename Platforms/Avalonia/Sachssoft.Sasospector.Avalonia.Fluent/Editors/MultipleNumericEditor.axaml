@@ -37,6 +37,7 @@
 							<Slider Grid.Column="0"
 									HorizontalAlignment="Stretch"
 									Height="{StaticResource InspectorPropertyEditorHeight}"
+									MinHeight="{StaticResource InspectorPropertyEditorHeight}"
 									Padding="0"
 								    Margin="0"
 								    Minimum="{TemplateBinding Minimum}"
