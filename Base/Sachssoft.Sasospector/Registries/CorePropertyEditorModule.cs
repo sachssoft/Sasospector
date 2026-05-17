@@ -55,7 +55,11 @@ namespace Sachssoft.Sasospector.Registries
             //    priority: 800);
 
             registry.Register(
-                type => !type.IsValueType && !type.IsArray,
+                type =>
+                    type != typeof(string) &&
+                    !type.IsValueType &&
+                    !type.IsArray &&
+                    !typeof(System.Collections.IEnumerable).IsAssignableFrom(type),
                 (pi, f) => f.CreateObjectEditor(
                     allowNullSelection: true
                 ),

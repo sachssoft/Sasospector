@@ -3,7 +3,8 @@ using System.ComponentModel;
 
 namespace Sachssoft.Sasospector.Schemas
 {
-    public sealed class SchemaFactorySelector : IInspectorSchemaProvider, INotifyPropertyChanged
+    public sealed class SchemaFactorySelector<TModel> : IInspectorSchemaProvider, INotifyPropertyChanged
+        where TModel : class
     {
         private readonly ISchemaFactory[] _factories;
         private IInspectorSchema _schema;
@@ -33,7 +34,7 @@ namespace Sachssoft.Sasospector.Schemas
             }
         }
 
-        public void Resolve(object? model)
+        public void Resolve(TModel? model)
         {
             if (model is null)
             {
