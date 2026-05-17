@@ -3,14 +3,14 @@
 					xmlns:views="using:Sachssoft.Sasospector.Views"
 					x:ClassModifier="internal">
 
-	<ControlTheme x:Key="{x:Type views:ToggleableInspectorSectionView}"
-				  TargetType="views:ToggleableInspectorSectionView">
+	<ControlTheme x:Key="{x:Type views:ToggleableSectionView}"
+				  TargetType="views:ToggleableSectionView">
 
 		<Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
 		<Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
 		<Setter Property="Padding" Value="10"/>
 		<Setter Property="Template">
-			<ControlTemplate TargetType="views:ToggleableInspectorSectionView">
+			<ControlTemplate TargetType="views:ToggleableSectionView">
 				<Expander Theme="{StaticResource InspectorSectionViewExpanderTheme}">
 					<Expander.Header>
 						<StackPanel Orientation="Horizontal">
@@ -19,7 +19,7 @@
 											  VerticalAlignment="Center"/>
 						</StackPanel>
 					</Expander.Header>
-					<ItemsControl ItemsSource="{Binding $parent[views:ToggleableInspectorSectionView].Items}">
+					<ItemsControl ItemsSource="{Binding $parent[views:ToggleableSectionView].Items}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
 								<StackPanel Orientation="Vertical"

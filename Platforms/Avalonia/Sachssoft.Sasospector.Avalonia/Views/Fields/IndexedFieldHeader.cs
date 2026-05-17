@@ -7,7 +7,7 @@ namespace Sachssoft.Sasospector.Views.Fields
     {
         public static readonly StyledProperty<int> IndexProperty =
             AvaloniaProperty.Register<FieldHeaderBase, int>(nameof(Index));
-        
+
         public int Index
         {
             get => GetValue(IndexProperty);

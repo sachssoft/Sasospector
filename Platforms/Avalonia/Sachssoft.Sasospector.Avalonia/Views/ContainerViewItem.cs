@@ -1,8 +1,6 @@
-﻿using Avalonia;
-using Avalonia.Collections;
+﻿using Avalonia.Collections;
 using Avalonia.Metadata;
 using System;
-using System.Collections.Generic;
 
 namespace Sachssoft.Sasospector.Views
 {

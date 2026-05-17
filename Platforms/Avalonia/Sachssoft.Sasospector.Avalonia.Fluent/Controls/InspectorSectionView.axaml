@@ -3,17 +3,17 @@
 					xmlns:views="using:Sachssoft.Sasospector.Views"
 					x:ClassModifier="internal">
 
-	<ControlTheme x:Key="{x:Type views:InspectorSectionView}"
-				  TargetType="views:InspectorSectionView">
+	<ControlTheme x:Key="{x:Type views:SectionView}"
+				  TargetType="views:SectionView">
 
 		<Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
 		<Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
 		<Setter Property="Padding" Value="10"/>
 		<Setter Property="Template">
-			<ControlTemplate TargetType="views:InspectorSectionView">
+			<ControlTemplate TargetType="views:SectionView">
 				<Expander Theme="{StaticResource InspectorSectionViewExpanderTheme}"
 						  Header="{TemplateBinding Header}">
-					<ItemsControl ItemsSource="{Binding $parent[views:InspectorSectionView].Items}">
+					<ItemsControl ItemsSource="{Binding $parent[views:SectionView].Items}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
 								<StackPanel Orientation="Vertical"

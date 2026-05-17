@@ -1,26 +1,33 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					xmlns:controls="using:Sachssoft.Sasospector.Views"
+					xmlns:views="using:Sachssoft.Sasospector.Views"
+					xmlns:converters="using:Sachssoft.Sasospector.Views.Converters"
 					x:ClassModifier="internal">
 
-	<ControlTheme x:Key="{x:Type controls:PropertyViewItem}"
-				  TargetType="controls:PropertyViewItem">
+	<ControlTheme x:Key="{x:Type views:PropertyViewItem}"
+				  TargetType="views:PropertyViewItem">
 
 		<Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
 		<Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
 		<Setter Property="Padding" Value="10"/>
 		<Setter Property="Template">
-			<ControlTemplate TargetType="controls:PropertyViewItem">
+			<ControlTemplate TargetType="views:PropertyViewItem"
+							 x:DataType="views:PropertyViewItem">
 				<StackPanel Orientation="Vertical">
-					<Grid ColumnDefinitions="Auto,5, *">
-						<Label Content="{TemplateBinding Header}"
-							   Grid.Column="0"
-							   Width="{Binding $parent[controls:InspectorControl].HeaderWidth}"
-							   HorizontalAlignment="Stretch"
-							   VerticalAlignment="Stretch"
-							   HorizontalContentAlignment ="Right"
-							   VerticalContentAlignment ="Top"
-							   Padding="5 5 5 0"/>
+					<Grid ColumnDefinitions="Auto,5,*">
+						<Grid  ColumnDefinitions="Auto,5,*">
+							<Label Content="{TemplateBinding Header}"
+								   Grid.Column="0"
+								   Width="{Binding $parent[views:InspectorControl].HeaderWidth}"
+								   HorizontalAlignment="Stretch"
+								   VerticalAlignment="Stretch"
+								   HorizontalContentAlignment ="Right"
+								   VerticalContentAlignment ="Top"
+								   Padding="5 5 5 0"/>
+							<CheckBox Grid.Column="2"
+									  IsVisible="{TemplateBinding IsHeaderCheckable}"
+									  IsChecked="{TemplateBinding IsHeaderChecked}"/>
+						</Grid>
 						<GridSplitter Grid.Column="1"
 									  Width="5"
 									  HorizontalAlignment="Stretch"
@@ -38,5 +45,5 @@
 			</ControlTemplate>
 		</Setter>
 	</ControlTheme>
-	
+
 </ResourceDictionary>

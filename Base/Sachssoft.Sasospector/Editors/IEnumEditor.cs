@@ -1,6 +1,4 @@
-﻿using Sachssoft.Sasospector.Constraints;
-
-namespace Sachssoft.Sasospector.Editors
+﻿namespace Sachssoft.Sasospector.Editors
 {
     public interface IEnumEditor : IPropertyEditor
     {

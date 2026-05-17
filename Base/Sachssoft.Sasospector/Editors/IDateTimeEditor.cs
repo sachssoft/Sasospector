@@ -1,5 +1,4 @@
 ﻿using Sachssoft.Sasospector.Adapters;
-using System;
 
 namespace Sachssoft.Sasospector.Editors
 {

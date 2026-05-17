@@ -3,7 +3,6 @@ using Sachssoft.Sasospector.Constraints;
 using Sachssoft.Sasospector.Editors;
 using System;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Sachssoft.Sasospector.Registries
 {

@@ -1,8 +1,6 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using Sachssoft.Sasospector.Registries;
 using Sachssoft.Sasospector.Views.Fields;
 using System;
 using System.Collections.Generic;
@@ -98,7 +96,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             if (FieldHeaders == null)
                 return false;
 
-            foreach(var field in FieldHeaders)
+            foreach (var field in FieldHeaders)
             {
                 if (field.Match(index, dataType, dataValue))
                 {

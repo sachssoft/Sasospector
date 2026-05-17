@@ -11,6 +11,7 @@ namespace Sachssoft.Sasospector.Views.Editors
     {
         private bool _sourceSyncing;
         private bool _decimalMode;
+        private bool _allowNull;
 
         //public static readonly StyledProperty<object[]> ValueProperty =
         //    AvaloniaProperty.Register<MultipleNumericEditor, object[]>(nameof(Value));
@@ -20,6 +21,9 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         public static readonly StyledProperty<IReadOnlyList<IMultipleNumericEditorField>?> FieldsProperty =
             AvaloniaProperty.Register<MultipleNumericEditor, IReadOnlyList<IMultipleNumericEditorField>?>(nameof(Fields));
+
+        public static readonly StyledProperty<bool> IsNullProperty =
+            AvaloniaProperty.Register<MultipleNumericEditor, bool>(nameof(IsNull));
 
         protected override Type StyleKeyOverride { get; } = typeof(MultipleNumericEditor);
 
@@ -39,6 +43,14 @@ namespace Sachssoft.Sasospector.Views.Editors
         {
             get => GetValue(FieldsProperty);
             set => SetValue(FieldsProperty, value);
+        }
+
+        public bool AllowNull => _allowNull;
+
+        public bool IsNull
+        {
+            get => GetValue(IsNullProperty);
+            set => SetValue(IsNullProperty, value);
         }
 
         IMultipleNumericEditorField IMultipleNumericEditor.CreateField(Type valueType)

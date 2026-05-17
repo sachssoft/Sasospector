@@ -5,7 +5,6 @@ using Sachssoft.Sasospector.Constraints;
 using Sachssoft.Sasospector.Editors;
 using Sachssoft.Sasospector.Views.Fields;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -181,7 +180,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             var fields = new List<ObjectEditorField>();
             var propertyType = Source.Type;
 
-            for(int i = 0; i < Instances.Count; i++)
+            for (int i = 0; i < Instances.Count; i++)
             {
                 var instance = Instances[i];
                 FieldHeaderBase? fieldHeader = null;

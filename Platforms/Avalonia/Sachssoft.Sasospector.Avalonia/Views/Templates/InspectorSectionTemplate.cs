@@ -4,15 +4,15 @@ using Avalonia.Metadata;
 
 namespace Sachssoft.Sasospector.Views.Templates
 {
-    public class InspectorSectionTemplate : ITemplate<object, InspectorSectionView>
+    public class InspectorSectionTemplate : ITemplate<object, SectionView>
     {
         [Content]
         [TemplateContent]
         public object? Content { get; set; }
 
-        public InspectorSectionView Build(object categorySource)
+        public SectionView Build(object categorySource)
         {
-            var result = (InspectorSectionView)(TemplateContent.Load(Content)?.Result ?? new InspectorSectionView());
+            var result = (SectionView)(TemplateContent.Load(Content)?.Result ?? new SectionView());
             result.DataContext = categorySource;
             return result;
         }

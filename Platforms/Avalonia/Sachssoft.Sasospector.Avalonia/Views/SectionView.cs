@@ -5,20 +5,20 @@ using System;
 
 namespace Sachssoft.Sasospector.Views
 {
-    public class InspectorSectionView : InspectorItem
+    public class SectionView : InspectorItem
     {
         private readonly AvaloniaList<InspectorItem> _items = new();
 
         public static readonly StyledProperty<string?> CategoryNameProperty =
-            AvaloniaProperty.Register<InspectorSectionView, string?>(nameof(CategoryName));
+            AvaloniaProperty.Register<SectionView, string?>(nameof(CategoryName));
 
         public static readonly StyledProperty<int?> DisplayOrderProperty =
-            AvaloniaProperty.Register<InspectorSectionView, int?>(nameof(DisplayOrder));
+            AvaloniaProperty.Register<SectionView, int?>(nameof(DisplayOrder));
 
         //public static readonly StyledProperty<IEnumerable<InspectorPropertyView>?> ItemsSourceProperty =
         //    AvaloniaProperty.Register<InspectorSectionView, IEnumerable<InspectorPropertyView>?>(nameof(ItemsSource));
 
-        protected override Type StyleKeyOverride { get; } = typeof(InspectorSectionView);
+        protected override Type StyleKeyOverride { get; } = typeof(SectionView);
 
         [Content]
         public AvaloniaList<InspectorItem> Items => _items;

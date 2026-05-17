@@ -1,11 +1,8 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Media;
 using Sachssoft.Sasospector.Adapters;
 using Sachssoft.Sasospector.Editors;
 using System;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {

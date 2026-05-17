@@ -3,15 +3,15 @@
 					xmlns:views="using:Sachssoft.Sasospector.Views"
 					x:ClassModifier="internal">
 
-	<ControlTheme x:Key="{x:Type views:ConditionalViewItem}"
-				  TargetType="views:ConditionalViewItem">
+	<ControlTheme x:Key="{x:Type views:ConditionalViewItemBase}"
+				  TargetType="views:ConditionalViewItemBase">
 
 		<Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
 		<Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
 		<Setter Property="Padding" Value="10"/>
 		<Setter Property="Template">
-			<ControlTemplate TargetType="views:ConditionalViewItem">
-				<ItemsControl ItemsSource="{Binding $parent[views:ConditionalViewItem].Items}">
+			<ControlTemplate TargetType="views:ConditionalViewItemBase">
+				<ItemsControl ItemsSource="{Binding $parent[views:ConditionalViewItemBase].Items}">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
 							<StackPanel Orientation="Vertical"

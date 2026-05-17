@@ -1,13 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls.Primitives;
 using Sachssoft.Sasospector.Editors;
-using Sachssoft.Sasospector.Registries;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {

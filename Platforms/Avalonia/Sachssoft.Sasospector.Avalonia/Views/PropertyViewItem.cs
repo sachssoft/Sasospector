@@ -4,20 +4,12 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
-using Avalonia.LogicalTree;
-using Avalonia.Markup.Xaml.Templates;
-using Avalonia.Styling;
 using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Registries;
 using Sachssoft.Sasospector.Views.Editors;
 using Sachssoft.Sasospector.Views.Fields;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
 using System.Windows.Input;
 
 namespace Sachssoft.Sasospector.Views
@@ -38,6 +30,7 @@ namespace Sachssoft.Sasospector.Views
         private ContentControl? _partContainer;
         private bool _commandCanExecute = true;
         private EventHandler? _canExecuteChangeHandler = default;
+        private bool _isHeaderCheckable = false;
 
         public static readonly StyledProperty<IList<FieldHeaderBase>?> FieldHeadersProperty =
             AvaloniaProperty.Register<PropertyViewItem, IList<FieldHeaderBase>?>(nameof(FieldHeaders));
@@ -67,6 +60,14 @@ namespace Sachssoft.Sasospector.Views
 
         public static readonly StyledProperty<object?> CommandParameterProperty =
             AvaloniaProperty.Register<PropertyViewItem, object?>(nameof(CommandParameter));
+
+        public static readonly DirectProperty<PropertyViewItem, bool> IsHeaderCheckableProperty =
+            AvaloniaProperty.RegisterDirect<PropertyViewItem, bool>(
+                nameof(IsHeaderCheckable),
+                o => o.IsHeaderCheckable);
+
+        public static readonly StyledProperty<bool> IsHeaderCheckedProperty =
+            AvaloniaProperty.Register<PropertyViewItem, bool>(nameof(IsHeaderChecked));
 
         public PropertyViewItem() { }
 
@@ -133,6 +134,18 @@ namespace Sachssoft.Sasospector.Views
             set => SetValue(CommandParameterProperty, value);
         }
 
+        public bool IsHeaderCheckable
+        {
+            get => _isHeaderCheckable;
+            private set => SetAndRaise(IsHeaderCheckableProperty, ref _isHeaderCheckable, value);
+        }
+
+        public bool IsHeaderChecked
+        {
+            get => GetValue(IsHeaderCheckedProperty);
+            set => SetValue(IsHeaderCheckedProperty, value);
+        }
+
         protected override bool IsEnabledCore => base.IsEnabledCore && _commandCanExecute;
 
         private EventHandler CanExecuteChangedHandler => _canExecuteChangeHandler ??= new(CanExecuteChanged);
@@ -193,6 +206,12 @@ namespace Sachssoft.Sasospector.Views
             if (change.Property == SchemaProperty)
             {
             }
+
+            if (change.Property == IsHeaderCheckedProperty)
+            {
+                //if (_editor is IEditorNullHandling nullHandling)
+                //    nullHandling.IsNull = IsHeaderChecked;
+            }
         }
 
         private void Build()
@@ -247,6 +266,12 @@ namespace Sachssoft.Sasospector.Views
             {
                 _editor.FieldHeaders = FieldHeaders?.AsReadOnly();
                 _editor.Source = Property;
+
+                //if (_editor is IEditorNullHandling nullHandling)
+                //{
+                //    IsHeaderCheckable = nullHandling.AllowNull;
+                //    IsHeaderChecked = nullHandling.IsNull;
+                //}
             }
 
             _partEditorContent.Content = _editor;

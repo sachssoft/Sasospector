@@ -4,9 +4,9 @@ namespace Sachssoft.Sasospector.Views.Generators
 {
     public class InspectorSectionGenerator : AvaloniaObject
     {
-        public InspectorSectionView Build(object? categoryContext)
+        public SectionView Build(object? categoryContext)
         {
-            var view = new InspectorSectionView();
+            var view = new SectionView();
             return view;
         }
     }
