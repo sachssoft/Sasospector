@@ -6,34 +6,34 @@
 					xmlns:fields="using:Sachssoft.Sasospector.Views.Fields"
 					x:ClassModifier="internal">
 	
-	<ControlTheme x:Key="{x:Type editors:ObjectEditor}"
-					  TargetType="editors:ObjectEditor">
+	<ControlTheme x:Key="{x:Type editors:InstanceSelector}"
+					  TargetType="editors:InstanceSelector">
 		<Setter Property="InstanceFieldTemplate">
 			<DataTemplate>
 				<TextBlock Text="{Binding}" />
 			</DataTemplate>
 		</Setter>
 		<Setter Property="Template">
-			<ControlTemplate TargetType="editors:ObjectEditor">
+			<ControlTemplate TargetType="editors:InstanceSelector">
 			</ControlTemplate>
 		</Setter>
 		<Style Selector="^[EditorMode=Expandable]">
 			<Setter Property="Template">
-				<ControlTemplate TargetType="editors:ObjectEditor">
+				<ControlTemplate TargetType="editors:InstanceSelector">
 					<TextBlock Text="Expandable" />
 				</ControlTemplate>
 			</Setter>
 		</Style>
 		<Style Selector="^[EditorMode=Selectable]">
 			<Setter Property="Template">
-				<ControlTemplate TargetType="editors:ObjectEditor">
+				<ControlTemplate TargetType="editors:InstanceSelector">
 					<ComboBox HorizontalAlignment="Stretch"
 							  Height="{StaticResource InspectorPropertyEditorHeight}"
 							  ItemsSource="{TemplateBinding Fields}"
 							  ItemTemplate="{TemplateBinding InstanceFieldTemplate}"
-							  SelectedIndex="{TemplateBinding SelectedInstanceIndex, Mode=TwoWay}">
+							  SelectedIndex="{Binding SelectedInstanceIndex, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
 						<ComboBox.ItemTemplate>
-							<DataTemplate x:DataType="editors:ObjectEditorField">
+							<DataTemplate x:DataType="editors:InstanceSelectorField">
 								<ContentControl Content="{Binding FieldHeader.Header}"
 												ContentTemplate="{Binding FieldHeader.HeaderTemplate}"/>
 							</DataTemplate>
@@ -44,7 +44,7 @@
 		</Style>
 		<Style Selector="^[EditorMode=Browsable]">
 			<Setter Property="Template">
-				<ControlTemplate TargetType="editors:ObjectEditor">
+				<ControlTemplate TargetType="editors:InstanceSelector">
 					<TextBlock Text="Browse" />
 				</ControlTemplate>
 			</Setter>

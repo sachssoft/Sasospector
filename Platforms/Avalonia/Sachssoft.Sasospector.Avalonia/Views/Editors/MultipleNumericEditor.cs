@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
-    public class MultipleNumericEditor : InspectorPropertyEditorBase, IMultipleNumericEditor
+    public class MultipleNumericEditor : PropertyEditorBase, IMultipleNumericEditor
     {
         private bool _sourceSyncing;
         private bool _decimalMode;

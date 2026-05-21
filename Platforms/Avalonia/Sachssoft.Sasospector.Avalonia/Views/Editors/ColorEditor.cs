@@ -6,7 +6,7 @@ using System;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
-    public class ColorEditor : InspectorPropertyEditorBase, IColorEditor
+    public class ColorEditor : PropertyEditorBase, IColorEditor
     {
 
         public static readonly StyledProperty<ColorPropertyAdapter?> AdapterProperty =

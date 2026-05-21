@@ -7,7 +7,7 @@ using System;
 namespace Sachssoft.Sasospector.Views.Editors
 {
     [TemplatePart(PART_TextBox, typeof(TextBox))]
-    public class StringEditor : InspectorPropertyEditorBase, IStringEditor
+    public class StringEditor : PropertyEditorBase, IStringEditor
     {
         private const string PART_TextBox = nameof(PART_TextBox);
 

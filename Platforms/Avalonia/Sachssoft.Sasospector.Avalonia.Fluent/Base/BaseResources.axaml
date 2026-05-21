@@ -7,6 +7,11 @@
 
 	<sys:Double x:Key="InspectorPropertyEditorWidth">30</sys:Double>
 	<sys:Double x:Key="InspectorPropertyEditorHeight">30</sys:Double>
+	<CornerRadius x:Key="InspectorPropertyBorderRadius">4</CornerRadius>
+	<SolidColorBrush x:Key="InspectorPropertyFieldBackground">#202020</SolidColorBrush>
+	
+	<SolidColorBrush x:Key="InspectorContainerBackground">#404040</SolidColorBrush>
+	<SolidColorBrush x:Key="InspectorContainerBackground2">#323232</SolidColorBrush>
 	
 	<sys:Double x:Key="IconViewboxWidth">12</sys:Double>
 	<sys:Double x:Key="IconViewboxHeight">12</sys:Double>
@@ -22,5 +27,9 @@
 	<StreamGeometry x:Key="LeftArrowIcon">M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z</StreamGeometry>
 	<StreamGeometry x:Key="RightArrowIcon">M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z</StreamGeometry>
 	<StreamGeometry x:Key="BrowseIcon">M5.59,7.41L7,6L13,12L7,18L5.59,16.59L10.17,12L5.59,7.41M11.59,7.41L13,6L19,12L13,18L11.59,16.59L16.17,12L11.59,7.41Z</StreamGeometry>
+	<StreamGeometry x:Key="PlusIcon">M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z</StreamGeometry>
+	<StreamGeometry x:Key="MinusIcon">M19,13H5V11H19V13Z</StreamGeometry>
+	
+	
 	
 </ResourceDictionary>

@@ -10,12 +10,14 @@
 		<Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
 		<Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
 		<Setter Property="Padding" Value="10"/>
+		<Setter Property="IsHeaderVisible" Value="True"/>
 		<Setter Property="Template">
 			<ControlTemplate TargetType="views:PropertyViewItem"
 							 x:DataType="views:PropertyViewItem">
 				<StackPanel Orientation="Vertical">
 					<Grid ColumnDefinitions="Auto,5,*">
-						<Grid  ColumnDefinitions="Auto,5,*">
+						<Grid ColumnDefinitions="Auto,5,*"
+							  IsVisible="{TemplateBinding IsHeaderVisible}">
 							<Label Content="{TemplateBinding Header}"
 								   Grid.Column="0"
 								   Width="{Binding $parent[views:InspectorControl].HeaderWidth}"
@@ -33,7 +35,8 @@
 									  HorizontalAlignment="Stretch"
 									  VerticalAlignment="Stretch"
 									  ResizeDirection="Columns"
-									  Background="Transparent"/>
+									  Background="Transparent"
+									  IsVisible="{TemplateBinding IsHeaderVisible}"/>
 						<ContentControl Grid.Column="2"
 										x:Name="PART_EditorContent"
 										HorizontalAlignment="Stretch"

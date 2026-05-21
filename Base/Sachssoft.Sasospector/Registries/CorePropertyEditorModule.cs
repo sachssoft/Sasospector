@@ -2,7 +2,9 @@
 using Sachssoft.Sasospector.Constraints;
 using Sachssoft.Sasospector.Editors;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 
 namespace Sachssoft.Sasospector.Registries
 {
@@ -18,7 +20,32 @@ namespace Sachssoft.Sasospector.Registries
             RegisterCommonTypes(registry);
             RegisterDataTimeTypes(registry);
             RegisterNumericMathTypes(registry);
+            RegisterFeatureTypes(registry);
             RegisterRules(registry);
+        }
+
+        private void RegisterFeatureTypes(InspectorPropertyEditorRegistryBase registry)
+        {
+
+            // Unterstützt auch Command Selection
+            registry.Register(
+                type => IsEnumerableOfDelegate(type),
+                (pi, f) => f.CreateDelegateSelector(),
+                priority: 0);
+        }
+
+        private static bool IsEnumerableOfDelegate(Type t)
+        {
+            if (!t.IsGenericType)
+                return false;
+
+            if (t.GetGenericTypeDefinition() != typeof(IEnumerable<>))
+                return false;
+
+            Type itemType = t.GetGenericArguments()[0];
+
+            var result = typeof(Delegate).IsAssignableFrom(itemType);
+            return result;
         }
 
         private void RegisterRules(InspectorPropertyEditorRegistryBase registry)
@@ -56,13 +83,21 @@ namespace Sachssoft.Sasospector.Registries
 
             registry.Register(
                 type =>
+                    typeof(System.Collections.IList).IsAssignableFrom(type) ||
+                    typeof(System.Collections.Generic.IList<>).IsAssignableFrom(type),
+                (pi, f) => f.CreateListEditor(),
+                priority: 0);
+
+            registry.Register(
+                match: type =>
                     type != typeof(string) &&
                     !type.IsValueType &&
                     !type.IsArray &&
                     !typeof(System.Collections.IEnumerable).IsAssignableFrom(type),
-                (pi, f) => f.CreateObjectEditor(
-                    allowNullSelection: true
-                ),
+                factory: (pi, f) => f.CreateInstanceSelector(
+                        allowNullSelection: true
+                    ),
+                constraintMatch: (c) => c is IInstanceSelectionConstraint,
                 priority: 0);
         }
 

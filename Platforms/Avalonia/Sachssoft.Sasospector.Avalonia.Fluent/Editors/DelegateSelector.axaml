@@ -1,0 +1,47 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:views="using:Sachssoft.Sasospector.Views"
+					xmlns:converters="using:Sachssoft.Sasospector.Views.Converters"
+					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
+					xmlns:fields="using:Sachssoft.Sasospector.Views.Fields"
+					x:ClassModifier="internal">
+
+	<ControlTheme x:Key="{x:Type editors:DelegateSelector}"
+				  TargetType="editors:DelegateSelector">
+		<Setter Property="DelegateFieldTemplate">
+			<DataTemplate>
+				<TextBlock Text="{Binding}" />
+			</DataTemplate>
+		</Setter>
+		<Setter Property="Template">
+			<ControlTemplate TargetType="editors:DelegateSelector">
+				<Grid ColumnDefinitions="*,Auto">
+					<ComboBox HorizontalAlignment="Stretch"
+							  Grid.Column="0"
+							  Height="{StaticResource InspectorPropertyEditorHeight}"
+							  ItemsSource="{TemplateBinding Fields}"
+							  ItemTemplate="{TemplateBinding DelegateFieldTemplate}"
+							  SelectedIndex="{Binding SelectedDelegateIndex, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate x:DataType="editors:DelegateSelectorField">
+								<ContentControl Content="{Binding FieldHeader.Header}"
+												ContentTemplate="{Binding FieldHeader.HeaderTemplate}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+					<Button x:Name="PART_ExecuteButton"
+							Grid.Column="1"
+							Command="{TemplateBinding Command}"
+							CommandParameter="{TemplateBinding CommandParameter}"
+							Width="{StaticResource InspectorPropertyEditorWidth}"
+							Height="{StaticResource InspectorPropertyEditorHeight}">
+						<Viewbox Width="{StaticResource IconViewboxWidth}"
+								 Height="{StaticResource IconViewboxHeight}">
+							<PathIcon Data="{StaticResource PlusIcon}" />
+						</Viewbox>
+					</Button>
+				</Grid>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+</ResourceDictionary>

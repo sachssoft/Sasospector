@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Sachssoft.Sasospector.Constraints
 {
-    public class ObjectSelectionConstraint<T> : IObjectSelectionConstraint
+    public class InstanceSelectionConstraint<T> : IInstanceSelectionConstraint
     {
         private IInspectorPropertyInfo? _property;
         private IReadOnlyList<object?>? _cachedInstances;
@@ -15,18 +15,14 @@ namespace Sachssoft.Sasospector.Constraints
 
         public int DefaultItemIndex { get; set; } = -1;
 
-        public bool CanHandle(IInspectorPropertyInfo property)
-        {
-            _property = property;
-            return !property.Type.IsValueType && !property.Type.IsArray;
-        }
+        // Wenn true, werden nur Instanzen unterschiedlicher Typen berücksichtigt (keine doppelten Typen in der Liste).
+        public bool DistinctTypesOnly { get; set; } = true;
 
-        public object? Coerce(object? baseValue)
-        {
-            return baseValue;
-        }
+        // Fügt fehlende Instanzen automatisch hinzu.
+        // Hat keine Wirkung, wenn DistinctTypesOnly aktiviert ist.
+        public bool AutoAddMissingInstances { get; set; }
 
-        IReadOnlyList<object?>? IObjectSelectionConstraint.Instances
+        IReadOnlyList<object?>? IInstanceSelectionConstraint.Instances
         {
             get
             {
@@ -42,6 +38,17 @@ namespace Sachssoft.Sasospector.Constraints
 
                 return _cachedInstances;
             }
+        }
+
+        public bool CanHandle(IInspectorPropertyInfo property)
+        {
+            _property = property;
+            return !property.Type.IsValueType && !property.Type.IsArray;
+        }
+
+        public object? Coerce(object? baseValue)
+        {
+            return baseValue;
         }
 
         public ValidationResult Validate(object? value)

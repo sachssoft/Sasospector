@@ -6,6 +6,8 @@
 		<ResourceInclude Source="../Editors/StringEditor.axaml" />
 		<ResourceInclude Source="../Editors/ColorEditor.axaml" />
 		<ResourceInclude Source="../Editors/MultipleNumericEditor.axaml" />
-		<ResourceInclude Source="../Editors/ObjectEditor.axaml" />
+		<ResourceInclude Source="../Editors/InstanceSelector.axaml" />
+		<ResourceInclude Source="../Editors/ListEditor.axaml" />
+		<ResourceInclude Source="../Editors/DelegateSelector.axaml" />
 	</ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

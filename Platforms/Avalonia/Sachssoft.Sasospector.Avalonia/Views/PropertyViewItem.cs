@@ -16,50 +16,29 @@ namespace Sachssoft.Sasospector.Views
 {
     [TemplatePart(PART_EditorContent, typeof(ContentControl))]
     [TemplatePart(PART_Container, typeof(ContentControl))]
-    public class PropertyViewItem : InspectorItem, ICommandSource
+    public class PropertyViewItem : InspectorItem
     {
         private const string PART_EditorContent = nameof(PART_EditorContent);
         private const string PART_Container = nameof(PART_Container);
 
         private bool? _propertyFound = null;
-        private IInspectorPropertyInfo? _property;
         private InspectorControl? _control;
         private InspectorPropertyEditorRegistryBase? _editorRegistry;
-        private InspectorPropertyEditorBase? _editor;
+        private PropertyEditorBase? _editor;
         private ContentControl? _partEditorContent;
         private ContentControl? _partContainer;
         private bool _commandCanExecute = true;
         private EventHandler? _canExecuteChangeHandler = default;
         private bool _isHeaderCheckable = false;
 
-        public static readonly StyledProperty<IList<FieldHeaderBase>?> FieldHeadersProperty =
-            AvaloniaProperty.Register<PropertyViewItem, IList<FieldHeaderBase>?>(nameof(FieldHeaders));
-
-        public static readonly StyledProperty<string?> PropertyNameProperty =
-            AvaloniaProperty.Register<PropertyViewItem, string?>(nameof(PropertyName));
-
         public static readonly StyledProperty<Type?> TargetTypeProperty =
             AvaloniaProperty.Register<PropertyViewItem, Type?>(nameof(TargetType));
-
-        public static readonly DirectProperty<PropertyViewItem, IInspectorPropertyInfo?> PropertyProperty =
-            AvaloniaProperty.RegisterDirect<PropertyViewItem, IInspectorPropertyInfo?>(
-                nameof(Property),
-                o => o.Property);
 
         public static readonly StyledProperty<string?> PreferredEditorKindProperty =
             AvaloniaProperty.Register<PropertyViewItem, string?>(nameof(PreferredEditorKind));
 
-        public static readonly StyledProperty<InspectorPropertyEditorBase?> CustomEditorProperty =
-            AvaloniaProperty.Register<PropertyViewItem, InspectorPropertyEditorBase?>(nameof(CustomEditor));
-
-        public static readonly StyledProperty<IDataTemplate?> FieldHeaderTemplateProperty =
-            AvaloniaProperty.Register<PropertyViewItem, IDataTemplate?>(nameof(FieldHeaderTemplate));
-
-        public static readonly StyledProperty<ICommand?> CommandProperty =
-            AvaloniaProperty.Register<PropertyViewItem, ICommand?>(nameof(Command));
-
-        public static readonly StyledProperty<object?> CommandParameterProperty =
-            AvaloniaProperty.Register<PropertyViewItem, object?>(nameof(CommandParameter));
+        public static readonly StyledProperty<PropertyEditorBase?> CustomEditorProperty =
+            AvaloniaProperty.Register<PropertyViewItem, PropertyEditorBase?>(nameof(CustomEditor));
 
         public static readonly DirectProperty<PropertyViewItem, bool> IsHeaderCheckableProperty =
             AvaloniaProperty.RegisterDirect<PropertyViewItem, bool>(
@@ -72,24 +51,6 @@ namespace Sachssoft.Sasospector.Views
         public PropertyViewItem() { }
 
         protected override Type StyleKeyOverride { get; } = typeof(PropertyViewItem);
-
-        public IList<FieldHeaderBase>? FieldHeaders
-        {
-            get => GetValue(FieldHeadersProperty);
-            set => SetValue(FieldHeadersProperty, value);
-        }
-
-        public IDataTemplate? FieldHeaderTemplate
-        {
-            get => GetValue(FieldHeaderTemplateProperty);
-            set => SetValue(FieldHeaderTemplateProperty, value);
-        }
-
-        public string? PropertyName
-        {
-            get => GetValue(PropertyNameProperty);
-            set => SetValue(PropertyNameProperty, value);
-        }
 
         // Optional gewünschter Typ des Eigenschafts 
         // Vorteil: typsicher
@@ -107,7 +68,7 @@ namespace Sachssoft.Sasospector.Views
         }
 
         // Gewünschte alternative Editor
-        public InspectorPropertyEditorBase? CustomEditor
+        public PropertyEditorBase? CustomEditor
         {
             get => GetValue(CustomEditorProperty);
             set => SetValue(CustomEditorProperty, value);
@@ -115,24 +76,7 @@ namespace Sachssoft.Sasospector.Views
 
         public InspectorContainerTemplates ContainerTemplates { get; } = new InspectorContainerTemplates();
 
-        // Nur ReadOnly wichtig für Bindings
-        public IInspectorPropertyInfo? Property
-        {
-            get => _property;
-            private set => SetAndRaise(PropertyProperty, ref _property, value);
-        }
-
-        public ICommand? Command
-        {
-            get => GetValue(CommandProperty);
-            set => SetValue(CommandProperty, value);
-        }
-
-        public object? CommandParameter
-        {
-            get => GetValue(CommandParameterProperty);
-            set => SetValue(CommandParameterProperty, value);
-        }
+        public PropertyEditorActions Actions { get; } = new PropertyEditorActions();
 
         public bool IsHeaderCheckable
         {
@@ -146,10 +90,6 @@ namespace Sachssoft.Sasospector.Views
             set => SetValue(IsHeaderCheckedProperty, value);
         }
 
-        protected override bool IsEnabledCore => base.IsEnabledCore && _commandCanExecute;
-
-        private EventHandler CanExecuteChangedHandler => _canExecuteChangeHandler ??= new(CanExecuteChanged);
-
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
@@ -159,23 +99,11 @@ namespace Sachssoft.Sasospector.Views
 
             _editorRegistry = _control?.EditorRegistry;
             Build();
-
-            (var command, var parameter) = (Command, CommandParameter);
-            if (command is not null)
-            {
-                command.CanExecuteChanged += CanExecuteChangedHandler;
-                CanExecuteChanged(command, parameter);
-            }
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnDetachedFromVisualTree(e);
-
-            if (Command is { } command)
-            {
-                command.CanExecuteChanged -= CanExecuteChangedHandler;
-            }
 
             if (Property != null)
                 Property.ValueChanged -= Property_Changed;
@@ -200,6 +128,8 @@ namespace Sachssoft.Sasospector.Views
 
             if (/*change.Property == SourceProperty || */
                 change.Property == PropertyNameProperty ||
+                change.Property == CustomEditorProperty ||
+                change.Property == ItemTemplateProperty ||
                 change.Property == SchemaProperty)
                 Build();
 
@@ -252,7 +182,7 @@ namespace Sachssoft.Sasospector.Views
             {
                 var editorRaw = _editorRegistry.Create(Property, PreferredEditorKind);
 
-                if (editorRaw is InspectorPropertyEditorBase inspectorPropertyEditor)
+                if (editorRaw is PropertyEditorBase inspectorPropertyEditor)
                 {
                     _editor = inspectorPropertyEditor;
                 }
@@ -264,13 +194,13 @@ namespace Sachssoft.Sasospector.Views
 
             if (_editor != null)
             {
-                _editor.FieldHeaders = FieldHeaders?.AsReadOnly();
-                _editor.Source = Property;
+                //_editor.Container = this;
+                //_editor.FieldHeaders = FieldHeaders?.AsReadOnly();
+                //_editor.Source = Property;
 
-                //if (_editor is IEditorNullHandling nullHandling)
+                //if (_editor is IItemTemplateProvider itp)
                 //{
-                //    IsHeaderCheckable = nullHandling.AllowNull;
-                //    IsHeaderChecked = nullHandling.IsNull;
+                //    itp.ItemTemplate = ItemTemplate;
                 //}
             }
 
@@ -352,28 +282,6 @@ namespace Sachssoft.Sasospector.Views
             //        _partContainer.Content = templatedInstance;
             //    }
             //}
-        }
-
-        private void CanExecuteChanged(object? sender, EventArgs e)
-        {
-            CanExecuteChanged(Command, CommandParameter);
-        }
-
-        void ICommandSource.CanExecuteChanged(object sender, EventArgs e)
-        {
-            CanExecuteChanged(Command, CommandParameter);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private void CanExecuteChanged(ICommand? command, object? parameter)
-        {
-            var canExecute = command == null || command.CanExecute(parameter);
-
-            if (canExecute != _commandCanExecute)
-            {
-                _commandCanExecute = canExecute;
-                UpdateIsEffectivelyEnabled();
-            }
         }
     }
 }

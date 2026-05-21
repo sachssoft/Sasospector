@@ -2,7 +2,7 @@
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
-    public record class ObjectEditorField
+    public record class InstanceSelectorField
     {
         public FieldHeaderBase? FieldHeader { get; init; }
 

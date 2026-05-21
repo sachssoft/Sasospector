@@ -5,7 +5,7 @@ using System;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
-    public class BooleanEditor : InspectorPropertyEditorBase, IBooleanEditor
+    public class BooleanEditor : PropertyEditorBase, IBooleanEditor
     {
         private bool _kindSyncing;
         private bool _sourceSyncing;

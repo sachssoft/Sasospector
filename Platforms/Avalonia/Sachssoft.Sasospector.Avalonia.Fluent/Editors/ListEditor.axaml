@@ -1,0 +1,50 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:views="using:Sachssoft.Sasospector.Views"
+					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
+					xmlns:fields="using:Sachssoft.Sasospector.Views.Fields"
+					x:ClassModifier="internal">
+	
+	<ControlTheme x:Key="{x:Type editors:ListEditor}"
+			      TargetType="editors:ListEditor">
+		<Setter Property="Template">
+			<ControlTemplate TargetType="editors:ListEditor"
+							 x:DataType="editors:ListEditor">
+				<Grid ColumnDefinitions="*,Auto"
+					  ColumnSpacing="5">
+					<ListBox x:Name="PART_List"
+							 CornerRadius="{StaticResource InspectorPropertyBorderRadius}"
+							 Background="{StaticResource InspectorPropertyFieldBackground}"
+							 Grid.Column="0"
+							 Height="200"
+							 ItemsSource="{Binding ObservableItems, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=editors:ListEditor}}"
+							 ItemTemplate="{TemplateBinding ItemTemplate}" />
+					<StackPanel Orientation="Vertical"
+								Grid.Column="1">
+						<Button x:Name="PART_AddButton"
+								Command="{TemplateBinding AddCommand}"
+								CommandParameter="{TemplateBinding AddCommandParameter}"
+								Width="{StaticResource InspectorPropertyEditorWidth}"
+								Height="{StaticResource InspectorPropertyEditorHeight}">
+							<Viewbox Width="{StaticResource IconViewboxWidth}"
+									 Height="{StaticResource IconViewboxHeight}">
+								<PathIcon Data="{StaticResource PlusIcon}" />
+							</Viewbox>
+						</Button>
+						<Button x:Name="PART_RemoveButton"
+								Command="{TemplateBinding RemoveCommand}"
+								CommandParameter="{TemplateBinding RemoveCommandParameter}"
+								Width="{StaticResource InspectorPropertyEditorWidth}"
+								Height="{StaticResource InspectorPropertyEditorHeight}">
+							<Viewbox Width="{StaticResource IconViewboxWidth}"
+									 Height="{StaticResource IconViewboxHeight}">
+								<PathIcon Data="{StaticResource MinusIcon}" />
+							</Viewbox>
+						</Button>
+					</StackPanel>
+				</Grid>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+	
+</ResourceDictionary>

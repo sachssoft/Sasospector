@@ -13,21 +13,12 @@ namespace Sachssoft.Sasospector.Views
                 nameof(IsValueTypeMatched),
                 o => o.IsValueTypeMatched);
 
-        public static readonly StyledProperty<string?> PropertyNameProperty =
-            AvaloniaProperty.Register<ConditionalViewItemBase, string?>(nameof(PropertyName));
-
         protected override Type StyleKeyOverride { get; } = typeof(ConditionalViewItemBase);
 
         public bool IsValueTypeMatched
         {
             get => _isValueTypeMatched;
             private set => SetAndRaise(IsValueTypeMatchedProperty, ref _isValueTypeMatched, value);
-        }
-
-        public string? PropertyName
-        {
-            get => GetValue(PropertyNameProperty);
-            set => SetValue(PropertyNameProperty, value);
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

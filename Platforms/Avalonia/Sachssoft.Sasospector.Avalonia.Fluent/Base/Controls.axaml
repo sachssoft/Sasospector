@@ -6,8 +6,9 @@
 		<ResourceInclude Source="../Controls/InspectorControl.axaml" />
 		<ResourceInclude Source="../Controls/InspectorContentItem.axaml" />
 		<ResourceInclude Source="../Controls/InspectorItemView.axaml" />
-		<ResourceInclude Source="../Controls/InspectorPropertyView.axaml" />
-		<ResourceInclude Source="../Controls/InspectorSectionView.axaml" />
+		<ResourceInclude Source="../Controls/PropertyView.axaml" />
+		<ResourceInclude Source="../Controls/SectionView.axaml" />
 		<ResourceInclude Source="../Controls/ToggleableSectionView.axaml" />
+		<ResourceInclude Source="../Controls/CustomEditorContent.axaml" />
 	</ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

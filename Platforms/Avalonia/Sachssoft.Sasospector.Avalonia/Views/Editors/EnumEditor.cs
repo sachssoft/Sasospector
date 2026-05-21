@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace Sachssoft.Sasospector.Views.Editors
 {
     [TemplatePart(PART_EnumFields, typeof(SelectingItemsControl))]
-    public class EnumEditor : InspectorPropertyEditorBase, IEnumEditor
+    public class EnumEditor : PropertyEditorBase, IEnumEditor
     {
         private const string PART_EnumFields = nameof(PART_EnumFields);
 
@@ -58,7 +58,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             if (_partEnumFields != null)
                 _partEnumFields.SelectionChanged += OnSelectionChanged;
 
-            Build();
+            Rebuild();
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -67,19 +67,19 @@ namespace Sachssoft.Sasospector.Views.Editors
 
             if (change.Property == SourceProperty)
             {
-                Build();
+                Rebuild();
             }
             else if (change.Property == SelectionModeProperty)
             {
                 SetupEditorKindSelector();
-                Build();
+                Rebuild();
             }
             else if (change.Property == PreferredKindProperty && !_kindSyncing)
             {
                 _kindSyncing = true;
 
                 EditorKindSelector.Value = PreferredKind;
-                Build();
+                Rebuild();
 
                 _kindSyncing = false;
             }
@@ -124,14 +124,14 @@ namespace Sachssoft.Sasospector.Views.Editors
 
                     _kindSyncing = true;
                     PreferredKind = v;
-                    Build();
+                    Rebuild();
                     _kindSyncing = false;
                 },
                 kinds: kinds
             );
         }
 
-        private void Build()
+        private void Rebuild()
         {
             if (Source == null || _partEnumFields == null)
                 return;

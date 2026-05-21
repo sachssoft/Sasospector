@@ -6,14 +6,14 @@ namespace Sachssoft.Sasospector.Registries
 {
     public class AvaloniaPropertyEditorFactory : IInspectorEditorPlatformFactory
     {
-        private readonly Dictionary<Type, Func<InspectorPropertyEditorBase>> _factories = new();
+        private readonly Dictionary<Type, Func<PropertyEditorBase>> _factories = new();
 
         public AvaloniaPropertyEditorFactory()
         {
             RegisterDefaultEditors();
         }
 
-        public void Register(Type type, Func<InspectorPropertyEditorBase> editor)
+        public void Register(Type type, Func<PropertyEditorBase> editor)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -24,7 +24,7 @@ namespace Sachssoft.Sasospector.Registries
             _factories[type] = editor;
         }
 
-        public InspectorPropertyEditorBase CreateEditor(Type editorType)
+        public PropertyEditorBase CreateEditor(Type editorType)
         {
             if (editorType == null)
                 throw new ArgumentNullException(nameof(editorType));
@@ -61,7 +61,9 @@ namespace Sachssoft.Sasospector.Registries
             Register(typeof(MultipleNumericEditor), () => new MultipleNumericEditor());
             Register(typeof(StringEditor), () => new StringEditor());
             Register(typeof(VersionEditor), () => new VersionEditor());
-            Register(typeof(ObjectEditor), () => new ObjectEditor());
+            Register(typeof(InstanceSelector), () => new InstanceSelector());
+            Register(typeof(ListEditor), () => new ListEditor());
+            Register(typeof(DelegateSelector), () => new DelegateSelector());
         }
     }
 }

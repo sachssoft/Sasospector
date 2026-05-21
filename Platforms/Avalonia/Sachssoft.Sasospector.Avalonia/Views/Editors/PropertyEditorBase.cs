@@ -4,38 +4,48 @@ using Avalonia.Interactivity;
 using Sachssoft.Sasospector.Views.Fields;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
-    public abstract class InspectorPropertyEditorBase : TemplatedControl, IPropertyEditor
+    public abstract class PropertyEditorBase : TemplatedControl, IPropertyEditor
     {
         private CultureInfo _effectiveCulture = CultureInfo.CurrentUICulture;
         private IInspectorPropertyInfo? _source;
         private IReadOnlyList<FieldHeaderBase>? _fieldHeaders;
+        private InspectorItem? _container;
+
+        public static readonly DirectProperty<PropertyEditorBase, InspectorItem?> ContainerProperty =
+            AvaloniaProperty.RegisterDirect<PropertyEditorBase, InspectorItem?>(
+                nameof(Container),
+                o => o.Container,
+                (o, v) => o.Container = v);
+
         public static readonly StyledProperty<bool> IsHeaderVisibleProperty =
-            AvaloniaProperty.Register<InspectorPropertyEditorBase, bool>(nameof(IsHeaderVisible), defaultValue: true);
+            AvaloniaProperty.Register<PropertyEditorBase, bool>(nameof(IsHeaderVisible), defaultValue: true);
 
         public static readonly StyledProperty<CultureInfo?> CultureProperty =
-            AvaloniaProperty.Register<InspectorPropertyEditorBase, CultureInfo?>(nameof(Culture));
+            AvaloniaProperty.Register<PropertyEditorBase, CultureInfo?>(nameof(Culture));
 
         public static readonly StyledProperty<ICommand?> BrowseCommandProperty =
-            AvaloniaProperty.Register<InspectorPropertyEditorBase, ICommand?>(nameof(BrowseCommand));
+            AvaloniaProperty.Register<PropertyEditorBase, ICommand?>(nameof(BrowseCommand));
 
         public static readonly StyledProperty<string?> PreferredKindProperty =
-            AvaloniaProperty.Register<InspectorPropertyEditorBase, string?>(nameof(PreferredKind));
+            AvaloniaProperty.Register<PropertyEditorBase, string?>(nameof(PreferredKind));
 
-        public static readonly DirectProperty<InspectorPropertyEditorBase, IInspectorPropertyInfo?> SourceProperty =
-            AvaloniaProperty.RegisterDirect<InspectorPropertyEditorBase, IInspectorPropertyInfo?>(
+        public static readonly DirectProperty<PropertyEditorBase, IInspectorPropertyInfo?> SourceProperty =
+            AvaloniaProperty.RegisterDirect<PropertyEditorBase, IInspectorPropertyInfo?>(
                 nameof(Source),
                 o => o.Source,
                 (o, v) => o.Source = v);
 
-        public static readonly DirectProperty<InspectorPropertyEditorBase, IReadOnlyList<FieldHeaderBase>?> FieldHeadersProperty =
-            AvaloniaProperty.RegisterDirect<InspectorPropertyEditorBase, IReadOnlyList<FieldHeaderBase>?>(
+        public static readonly DirectProperty<PropertyEditorBase, IReadOnlyList<FieldHeaderBase>?> FieldHeadersProperty =
+            AvaloniaProperty.RegisterDirect<PropertyEditorBase, IReadOnlyList<FieldHeaderBase>?>(
                 nameof(Source),
                 o => o.FieldHeaders,
                 (o, v) => o.FieldHeaders = v);
@@ -63,7 +73,7 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         public CultureInfo EffectiveCulture => _effectiveCulture;
 
-        public IInspectorPropertyInfo Source
+        public IInspectorPropertyInfo? Source
         {
             get => _source!;
             internal set
@@ -83,10 +93,22 @@ namespace Sachssoft.Sasospector.Views.Editors
             internal set => SetAndRaise(FieldHeadersProperty, ref _fieldHeaders, value);
         }
 
+        public InspectorItem? Container
+        {
+            get => _container;
+            protected set => SetAndRaise(ContainerProperty, ref _container, value);
+        }
+
         public bool IsHeaderVisible
         {
             get => GetValue(IsHeaderVisibleProperty);
             set => SetValue(IsHeaderVisibleProperty, value);
+        }
+
+        protected void SetSelectedFieldValue(object? value)
+        {
+            if (Container != null)
+                Container.SelectedFieldValue = value;
         }
 
         protected bool TryMatchFieldHeader(int index, Type? dataType, object? dataValue, [MaybeNullWhen(false)] out FieldHeaderBase header)
@@ -107,6 +129,57 @@ namespace Sachssoft.Sasospector.Views.Editors
 
             return false;
         }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+
+            if (Container == null)
+            {
+                var parent = Parent;
+                while (parent != null)
+                {
+                    if (parent is InspectorItem item)
+                    {
+                        Container = item;
+                        Source = item.Property;
+                        FieldHeaders = item.FieldHeaders?.AsReadOnly();
+
+                        if (this is IItemTemplateProvider itp)
+                        {
+                            itp.ItemTemplate = item.ItemTemplate;
+                        }
+
+                        OnContainerEnter();
+                        break;
+                    }
+                    parent = parent.Parent;
+                }
+            }
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+
+            if (Container != null)
+            {
+                OnContainerExit();
+
+                if (this is IItemTemplateProvider itp)
+                {
+                    itp.ItemTemplate = null;
+                }
+
+                FieldHeaders = null;
+                Source = null;
+                Container = null;
+            }
+        }
+
+        protected virtual void OnContainerEnter() { }
+
+        protected virtual void OnContainerExit() { }
 
         protected virtual void OnPropertySourceValueChanged()
         {
