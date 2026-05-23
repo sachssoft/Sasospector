@@ -14,7 +14,7 @@ namespace Sachssoft.Sasospector.Views
     {
         private const string PART_PropertyGrid = nameof(PART_PropertyGrid);
 
-        private readonly AvaloniaList<InspectorItem> _items = new();
+        private readonly AvaloniaList<InspectorItemBase> _items = new();
         private InspectorPropertyEditorRegistryBase _editorRegistry = AvaloniaPropertyEditorRegistry.Default;
         private ItemsControl? _partPropertyGrid = null;
 
@@ -69,7 +69,7 @@ namespace Sachssoft.Sasospector.Views
         protected override Type StyleKeyOverride { get; } = typeof(InspectorControl);
 
         [Content]
-        public AvaloniaList<InspectorItem> Items => _items;
+        public AvaloniaList<InspectorItemBase> Items => _items;
 
         public InspectorPropertyEditorRegistryBase EditorRegistry
         {

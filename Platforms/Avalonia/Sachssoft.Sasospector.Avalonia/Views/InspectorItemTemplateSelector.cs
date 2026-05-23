@@ -11,7 +11,7 @@ namespace Sachssoft.Sasospector.Views
         [Content]
         public List<IDataTemplate> Templates { get; } = new();
 
-        public InspectorItem Build(object? data)
+        public InspectorItemBase Build(object? data)
         {
             foreach (var template in Templates)
             {
@@ -19,11 +19,11 @@ namespace Sachssoft.Sasospector.Views
                 {
                     var control = template.Build(data);
 
-                    if (control is InspectorItem item)
+                    if (control is InspectorItemBase item)
                         return item;
 
                     throw new InvalidOperationException(
-                        $"Template returned '{control?.GetType().Name ?? "null"}' instead of '{nameof(InspectorItem)}'.");
+                        $"Template returned '{control?.GetType().Name ?? "null"}' instead of '{nameof(InspectorItemBase)}'.");
                 }
             }
 

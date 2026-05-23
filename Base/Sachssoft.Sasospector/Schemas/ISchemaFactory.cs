@@ -4,6 +4,6 @@
     {
         bool IsMatch(object? model);
 
-        IInspectorSchemaProvider Create(object model);
+        IInspectorSchemaSource Create(object? model);
     }
 }

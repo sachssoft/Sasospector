@@ -18,10 +18,10 @@ namespace Sachssoft.Sasospector.Views.Editors
         private CultureInfo _effectiveCulture = CultureInfo.CurrentUICulture;
         private IInspectorPropertyInfo? _source;
         private IReadOnlyList<FieldHeaderBase>? _fieldHeaders;
-        private InspectorItem? _container;
+        private InspectorItemBase? _container;
 
-        public static readonly DirectProperty<PropertyEditorBase, InspectorItem?> ContainerProperty =
-            AvaloniaProperty.RegisterDirect<PropertyEditorBase, InspectorItem?>(
+        public static readonly DirectProperty<PropertyEditorBase, InspectorItemBase?> ContainerProperty =
+            AvaloniaProperty.RegisterDirect<PropertyEditorBase, InspectorItemBase?>(
                 nameof(Container),
                 o => o.Container,
                 (o, v) => o.Container = v);
@@ -93,7 +93,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             internal set => SetAndRaise(FieldHeadersProperty, ref _fieldHeaders, value);
         }
 
-        public InspectorItem? Container
+        public InspectorItemBase? Container
         {
             get => _container;
             protected set => SetAndRaise(ContainerProperty, ref _container, value);
@@ -139,7 +139,7 @@ namespace Sachssoft.Sasospector.Views.Editors
                 var parent = Parent;
                 while (parent != null)
                 {
-                    if (parent is InspectorItem item)
+                    if (parent is InspectorItemBase item)
                     {
                         Container = item;
                         Source = item.Property;

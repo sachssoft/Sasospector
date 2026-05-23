@@ -10,5 +10,6 @@
 		<ResourceInclude Source="../Controls/SectionView.axaml" />
 		<ResourceInclude Source="../Controls/ToggleableSectionView.axaml" />
 		<ResourceInclude Source="../Controls/CustomEditorContent.axaml" />
+		<ResourceInclude Source="../Controls/CollectionViewItem.axaml" />
 	</ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

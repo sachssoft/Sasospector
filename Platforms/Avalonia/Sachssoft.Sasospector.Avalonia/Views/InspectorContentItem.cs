@@ -4,7 +4,7 @@ using System;
 
 namespace Sachssoft.Sasospector.Views
 {
-    public class InspectorContentItem : InspectorItem
+    public class InspectorContentItem : InspectorItemBase
     {
         public static readonly StyledProperty<object?> ContentProperty =
             AvaloniaProperty.Register<InspectorContentItem, object?>(nameof(Content));

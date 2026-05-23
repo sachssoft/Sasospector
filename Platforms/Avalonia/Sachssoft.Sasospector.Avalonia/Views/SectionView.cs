@@ -1,13 +1,14 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Metadata;
+using Sachssoft.Sasospector.Schemas;
 using System;
 
 namespace Sachssoft.Sasospector.Views
 {
-    public class SectionView : InspectorItem
+    public class SectionView : InspectorItemBase
     {
-        private readonly AvaloniaList<InspectorItem> _items = new();
+        private readonly AvaloniaList<InspectorItemBase> _items = new();
 
         public static readonly StyledProperty<string?> CategoryNameProperty =
             AvaloniaProperty.Register<SectionView, string?>(nameof(CategoryName));
@@ -15,13 +16,16 @@ namespace Sachssoft.Sasospector.Views
         public static readonly StyledProperty<int?> DisplayOrderProperty =
             AvaloniaProperty.Register<SectionView, int?>(nameof(DisplayOrder));
 
-        //public static readonly StyledProperty<IEnumerable<InspectorPropertyView>?> ItemsSourceProperty =
-        //    AvaloniaProperty.Register<InspectorSectionView, IEnumerable<InspectorPropertyView>?>(nameof(ItemsSource));
+        public static readonly StyledProperty<IInspectorSchemaSource?> ItemSchemaSourceProperty =
+            AvaloniaProperty.Register<SectionView, IInspectorSchemaSource?>(nameof(ItemSchemaSource));
+
+        public static readonly StyledProperty<object?> ItemModelProperty =
+            AvaloniaProperty.Register<SectionView, object?>(nameof(ItemModel));
 
         protected override Type StyleKeyOverride { get; } = typeof(SectionView);
 
         [Content]
-        public AvaloniaList<InspectorItem> Items => _items;
+        public AvaloniaList<InspectorItemBase> Items => _items;
 
         public string? CategoryName
         {
@@ -35,11 +39,17 @@ namespace Sachssoft.Sasospector.Views
             set => SetValue(DisplayOrderProperty, value);
         }
 
-        //public IEnumerable<InspectorItem>? ItemsSource
-        //{
-        //    get => GetValue(ItemsSourceProperty);
-        //    set => SetValue(ItemsSourceProperty, value);
-        //}
+        public IInspectorSchemaSource? ItemSchemaSource
+        {
+            get => GetValue(ItemSchemaSourceProperty);
+            set => SetValue(ItemSchemaSourceProperty, value);
+        }
+
+        public object? ItemModel
+        {
+            get => GetValue(ItemModelProperty);
+            set => SetValue(ItemModelProperty, value);
+        }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {

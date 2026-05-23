@@ -25,7 +25,7 @@ namespace Sachssoft.Sasospector.Views
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == SchemaProperty ||
+            if (change.Property == SchemaSourceProperty ||
                 change.Property == PropertyNameProperty)
             {
                 UpdateSubscription();
@@ -41,10 +41,12 @@ namespace Sachssoft.Sasospector.Views
                 _subscribedProperty = null;
             }
 
-            if (Schema == null || string.IsNullOrEmpty(PropertyName))
+            if (SchemaSource == null || string.IsNullOrEmpty(PropertyName))
                 return;
 
-            if (Schema.Properties.TryGetValue(PropertyName, out var propertyInfo))
+            var schema = SchemaSource.Resolve(DataContext);
+
+            if (schema.Properties.TryGetValue(PropertyName, out var propertyInfo))
             {
                 _subscribedProperty = propertyInfo;
                 _subscribedProperty.ValueChanged += OnPropertyChanged;
@@ -60,14 +62,16 @@ namespace Sachssoft.Sasospector.Views
 
         protected void UpdateMatch()
         {
-            if (Schema == null ||
+            if (SchemaSource == null ||
                 string.IsNullOrEmpty(PropertyName))
             {
                 IsValueTypeMatched = false;
                 return;
             }
 
-            if (!Schema.Properties.TryGetValue(PropertyName, out var propertyInfo))
+            var schema = SchemaSource.Resolve(DataContext);
+
+            if (!schema.Properties.TryGetValue(PropertyName, out var propertyInfo))
             {
                 IsValueTypeMatched = false;
                 return;

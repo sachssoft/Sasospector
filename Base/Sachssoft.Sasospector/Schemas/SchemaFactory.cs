@@ -2,29 +2,29 @@
 
 namespace Sachssoft.Sasospector.Schemas
 {
-    public class SchemaFactory<T> : ISchemaFactory
-        where T : class
+    public class SchemaFactory<TModel> : ISchemaFactory
+        where TModel : class
     {
-        private readonly Func<T, IInspectorSchemaProvider> _factory;
+        private readonly Func<IInspectorSchemaSource> _factory;
 
-        public SchemaFactory(Func<T, IInspectorSchemaProvider> factory)
+        public SchemaFactory(Func<IInspectorSchemaSource> factory)
         {
             _factory = factory;
         }
 
-        public IInspectorSchemaProvider Create(T model)
+        public IInspectorSchemaSource Create(TModel? model)
         {
-            return _factory(model);
+            return _factory();
         }
 
-        IInspectorSchemaProvider ISchemaFactory.Create(object model)
+        IInspectorSchemaSource ISchemaFactory.Create(object? model)
         {
-            return _factory((T)model);
+            return _factory();
         }
 
         public bool IsMatch(object? model)
         {
-            return model is T;
+            return model is TModel;
         }
     }
 }

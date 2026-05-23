@@ -6,7 +6,7 @@ using System;
 
 namespace Sachssoft.Sasospector.Views
 {
-    public class InspectorContainerTemplate : ITemplate<object?, InspectorItem>, IDataTemplate
+    public class InspectorContainerTemplate : ITemplate<object?, InspectorItemBase>, IDataTemplate
     {
         [DataType]
         public Type? DataType { get; set; }
@@ -26,11 +26,11 @@ namespace Sachssoft.Sasospector.Views
         }
 
 
-        public InspectorItem? Build(object? param)
+        public InspectorItemBase? Build(object? param)
         {
             var templateResult = TemplateContent.Load(Content);
 
-            if (templateResult?.Result is not InspectorItem item)
+            if (templateResult?.Result is not InspectorItemBase item)
                 return null;
 
             item.DataContext = param;
