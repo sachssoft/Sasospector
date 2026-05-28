@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using System;
-using System.Diagnostics;
 
 namespace Sachssoft.Sasospector.Views.Fields
 {
@@ -46,12 +45,6 @@ namespace Sachssoft.Sasospector.Views.Fields
 
         public override bool Match(int index, Type? propertyType, object? propertyValue)
         {
-
-            Debug.WriteLine("Property Type: {0}", propertyType);
-            Debug.WriteLine("Runtime Type: {0}", propertyValue?.GetType());
-            Debug.WriteLine("Target Type: {0}", TargetType);
-            Debug.WriteLine("AssignableTo Result: {0}", TargetType?.IsAssignableTo(propertyType));
-
             return Rule switch
             {
                 ConditionalRule.Type => MatchType(propertyType, propertyValue),

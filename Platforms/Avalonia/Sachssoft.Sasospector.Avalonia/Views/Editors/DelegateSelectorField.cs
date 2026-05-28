@@ -1,6 +1,5 @@
 ﻿using Sachssoft.Sasospector.Views.Fields;
 using System;
-using System.Windows.Input;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {

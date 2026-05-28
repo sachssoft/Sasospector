@@ -65,7 +65,8 @@ namespace Sachssoft.Sasospector.Views.Editors
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == SourceProperty)
+            if (change.Property == CurrentPropertyProperty ||
+                change.Property == CurrentModelProperty)
             {
                 Rebuild();
             }
@@ -87,7 +88,8 @@ namespace Sachssoft.Sasospector.Views.Editors
             {
                 _sourceSyncing = true;
 
-                Source?.SetValue(Value);
+                if (CurrentModel != null && CurrentProperty != null)
+                    CurrentProperty.SetValue(CurrentModel, Value);
 
                 _sourceSyncing = false;
             }
@@ -133,15 +135,15 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         private void Rebuild()
         {
-            if (Source == null || _partEnumFields == null)
+            if (CurrentModel == null || CurrentProperty == null || _partEnumFields == null)
                 return;
 
-            if (!Source.Type.IsEnum)
+            if (!CurrentProperty.Type.IsEnum)
                 return;
 
-            var enumType = Source.Type;
+            var enumType = CurrentProperty.Type;
 
-            var currentValue = Source.GetValue();
+            var currentValue = CurrentProperty.GetValue(CurrentModel);
             var enumValueName = currentValue != null
                 ? Enum.GetName(enumType, currentValue)
                 : null;
@@ -173,7 +175,7 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            if (_partEnumFields == null || _enumRawFields == null || Source == null)
+            if (CurrentModel == null || _partEnumFields == null || _enumRawFields == null || CurrentProperty == null)
                 return;
 
             var index = _partEnumFields.SelectedIndex;
@@ -182,8 +184,8 @@ namespace Sachssoft.Sasospector.Views.Editors
 
             var selectedName = _enumRawFields[index];
 
-            var value = Enum.Parse(Source.Type, selectedName);
-            Source.SetValue(value);
+            var value = Enum.Parse(CurrentProperty.Type, selectedName);
+            CurrentProperty.SetValue(CurrentModel, value);
         }
     }
 }

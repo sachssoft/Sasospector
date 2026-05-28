@@ -4,7 +4,6 @@ using Sachssoft.Sasospector.Editors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 
 namespace Sachssoft.Sasospector.Registries
 {

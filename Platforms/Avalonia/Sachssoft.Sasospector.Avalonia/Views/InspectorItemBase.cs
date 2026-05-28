@@ -4,6 +4,7 @@ using Avalonia.Controls.Templates;
 using Sachssoft.Sasospector.Schemas;
 using Sachssoft.Sasospector.Views.Fields;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Sachssoft.Sasospector.Views
 {
@@ -11,12 +12,23 @@ namespace Sachssoft.Sasospector.Views
     {
         private IInspectorPropertyInfo? _property;
         private object? _selectedFieldValue;
+        private IInspectorSchema? _schema;
+
+        private bool _visualTreeAttached;
+        private IInspectorSchema? _activeSchema;
+        private object? _activeModel;
 
         public static readonly StyledProperty<IInspectorSchemaSource?> SchemaSourceProperty =
             AvaloniaProperty.Register<InspectorItemBase, IInspectorSchemaSource?>(nameof(SchemaSource));
 
         public static readonly StyledProperty<object?> ModelProperty =
             AvaloniaProperty.Register<InspectorItemBase, object?>(nameof(Model));
+
+        public static readonly DirectProperty<InspectorItemBase, IInspectorSchema?> SchemaProperty =
+            AvaloniaProperty.RegisterDirect<InspectorItemBase, IInspectorSchema?>(
+                nameof(Schema),
+                o => o.Schema,
+                (o, v) => o.Schema = v);
 
         public static readonly StyledProperty<object?> HeaderProperty =
             AvaloniaProperty.Register<InspectorItemBase, object?>(nameof(Header));
@@ -30,7 +42,7 @@ namespace Sachssoft.Sasospector.Views
         public static readonly DirectProperty<InspectorItemBase, IInspectorPropertyInfo?> PropertyProperty =
             AvaloniaProperty.RegisterDirect<InspectorItemBase, IInspectorPropertyInfo?>(
                 nameof(Property),
-                o => o.Property,
+                o => o._property,
                 (o, v) => o.Property = v);
 
         public static readonly StyledProperty<IList<FieldHeaderBase>?> FieldHeadersProperty =
@@ -42,8 +54,8 @@ namespace Sachssoft.Sasospector.Views
         public static readonly DirectProperty<InspectorItemBase, object?> SelectedFieldValueProperty =
             AvaloniaProperty.RegisterDirect<InspectorItemBase, object?>(
                 nameof(SelectedFieldValue),
-                o => o.SelectedFieldValue,
-                (o, v) => o.SelectedFieldValue = v,
+                o => o._selectedFieldValue,
+                (o, v) => o._selectedFieldValue = v,
                 defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
         public static readonly StyledProperty<IDataTemplate?> ItemTemplateProperty =
@@ -52,7 +64,19 @@ namespace Sachssoft.Sasospector.Views
         public static readonly StyledProperty<bool> AutoSynchronizationProperty =
             AvaloniaProperty.Register<InspectorItemBase, bool>(nameof(AutoSynchronization));
 
-        public record SchemaResult(IInspectorSchemaSource? SchemaSource, object? Model);
+        public static readonly DirectProperty<InspectorItemBase, IInspectorSchema?> ActiveSchemaProperty =
+            AvaloniaProperty.RegisterDirect<InspectorItemBase, IInspectorSchema?>(
+                nameof(ActiveSchema),
+                o => o._activeSchema,
+                (o, v) => o._activeSchema = v,
+                defaultBindingMode: Avalonia.Data.BindingMode.OneWay);
+
+        public static readonly DirectProperty<InspectorItemBase, object?> ActiveModelProperty =
+            AvaloniaProperty.RegisterDirect<InspectorItemBase, object?>(
+                nameof(ActiveModel),
+                o => o._activeModel,
+                (o, v) => o._activeModel = v,
+                defaultBindingMode: Avalonia.Data.BindingMode.OneWay);
 
         public string? PropertyName
         {
@@ -76,6 +100,12 @@ namespace Sachssoft.Sasospector.Views
         {
             get => GetValue(ModelProperty);
             set => SetValue(ModelProperty, value);
+        }
+
+        public IInspectorSchema? Schema
+        {
+            get => _schema;
+            private set => SetAndRaise(SchemaProperty, ref _schema, value);
         }
 
         public object? Header
@@ -120,73 +150,156 @@ namespace Sachssoft.Sasospector.Views
             internal set => SetAndRaise(SelectedFieldValueProperty, ref _selectedFieldValue, value);
         }
 
-        protected SchemaResult ResolveSchemaContext()
+        public IInspectorSchema? ActiveSchema
         {
-            IInspectorSchemaSource? schemaSource = null;
-            object? model = null;
+            get => _activeSchema;
+            private set => SetAndRaise(ActiveSchemaProperty, ref _activeSchema, value);
+        }
 
-            if (SchemaSource != null)
-                schemaSource = SchemaSource;
+        public object? ActiveModel
+        {
+            get => _activeModel;
+            private set => SetAndRaise(ActiveModelProperty, ref _activeModel, value);
+        }
 
-            if (Model != null)
-                model = Model;
+        #region Lifecycle
 
-            var parent = Parent;
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
 
-            while (parent != null)
-            {
-                if (parent is SectionView section)
-                {
-                    if (schemaSource == null && section.SchemaSource != null)
-                        schemaSource = section.SchemaSource;
+            _visualTreeAttached = true;
 
-                    if (model == null && section.Model != null)
-                        model = section.Model;
-                }
+            ApplySchema();
+            UpdateSchema();
+            UpdateProperty();
+        }
 
-                if (schemaSource != null && model != null)
-                    break;
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
 
-                parent = parent.Parent;
-            }
-
-            return new SchemaResult(schemaSource, model);
+            _visualTreeAttached = false;
+            _activeSchema = null;
+            Property = null;
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == PropertyNameProperty ||
-                change.Property == SchemaSourceProperty)
+            if (!_visualTreeAttached)
+                return;
+
+            if (change.Property == SchemaSourceProperty ||
+                change.Property == ModelProperty)
             {
-                InvalidateProperty();
+                _activeSchema = null;
+                ApplySchema();
+                UpdateSchema();
+            }
+            else if (change.Property == SchemaProperty ||
+                change.Property == PropertyNameProperty)
+            {
+                UpdateProperty();
             }
         }
+
+        #endregion
+
+        #region Core 
+
+        internal protected virtual void OnParentSchemaChanged() { }
+
+        protected virtual void OnSchemaPropertyChanging(PropertyChangingEventArgs e) { }
+
+        protected virtual void OnSchemaPropertyChanged(PropertyChangedEventArgs e) { }
+
+        private void CurrentSchema_PropertyChanging(object? sender, PropertyChangingEventArgs e)
+            => OnSchemaPropertyChanging(e);
+
+        private void CurrentSchema_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+            => OnSchemaPropertyChanged(e);
+
+        private void ApplySchema()
+        {
+            if (SchemaSource == null || Model == null)
+            {
+                Schema = null;
+                return;
+            }
+
+            Schema = SchemaSource.Resolve(Model);
+        }
+
+        // Durchsuche nach Schema und Model in der aktuellen Instanz und den Eltern,
+        // bis beides gefunden wurde oder keine Eltern mehr da sind.
+        private void UpdateSchema()
+        {
+            IInspectorSchema? schema = Schema;
+            object? model = Model;
+
+            var parent = Parent;
+
+            while (parent != null)
+            {
+                if (parent is ContainerViewItem container)
+                {
+                    schema ??= container.ItemSchema;
+                    model ??= container.ItemModel;
+                }
+
+                if (schema != null || model != null)
+                    break;
+
+                parent = parent.Parent;
+            }
+
+            ActiveSchema = schema;
+            ActiveModel = model;
+        }
+
+        protected void UpdateProperty()
+        {
+            IInspectorPropertyInfo? newProperty = null;
+
+            if (_activeSchema != null &&
+                PropertyName != null &&
+                _activeSchema.Properties.TryGetValue(PropertyName, out var propertyInfo))
+            {
+                newProperty = PreferredPropertyOverride(propertyInfo);
+            }
+
+            // ACHTUNG! ReferenceEquals NICHT ERLAUBT!! 
+            // Ständige Aktualisierung WICHTIG
+
+            var oldProperty = Property;
+            Property = newProperty;
+
+            if (oldProperty != null)
+            {
+                OnUpdatePropertyExit(oldProperty);
+            }
+
+            if (newProperty != null)
+            {
+                OnUpdatePropertyEnter(newProperty);
+            }
+        }
+
+        protected virtual void OnUpdatePropertyEnter(IInspectorPropertyInfo property)
+            => System.Diagnostics.Debug.WriteLine($"ENTER: {property?.Name ?? "<null>"}");
+
+        protected virtual void OnUpdatePropertyExit(IInspectorPropertyInfo property)
+            => System.Diagnostics.Debug.WriteLine($"EXIT: {property?.Name ?? "<null>"}");
+
+        #endregion
+
+        #region Extension Points
 
         protected virtual IInspectorPropertyInfo? PreferredPropertyOverride(IInspectorPropertyInfo? basePropertyInfo)
             => basePropertyInfo;
 
-        protected virtual void OnPropertyInvalidated(IInspectorPropertyInfo propertyInfo) { }
-
-        protected void InvalidateProperty()
-        {
-            if (string.IsNullOrEmpty(PropertyName) || SchemaSource == null)
-                return;
-
-            var schema = SchemaSource.Resolve(DataContext);
-
-            if (schema.Properties.TryGetValue(PropertyName, out var propertyInfo))
-            {
-                Property = PreferredPropertyOverride(propertyInfo);
-
-                if (Property != null)
-                    OnPropertyInvalidated(Property);
-            }
-            else
-            {
-                Property = null;
-            }
-        }
+        #endregion
     }
 }

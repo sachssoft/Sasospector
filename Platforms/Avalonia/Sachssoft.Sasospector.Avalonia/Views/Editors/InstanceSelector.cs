@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Sachssoft.Sasospector.Constraints;
 using Sachssoft.Sasospector.Editors;
@@ -7,7 +6,6 @@ using Sachssoft.Sasospector.Views.Fields;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
@@ -110,7 +108,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             if (change.Property == AllowNullSelectionProperty ||
                 change.Property == EditorModeProperty ||
                 //change.Property == InstancesProperty ||
-                change.Property == SourceProperty)
+                change.Property == CurrentPropertyProperty)
             {
                 //Build();
             }
@@ -120,11 +118,25 @@ namespace Sachssoft.Sasospector.Views.Editors
 
                 if (Instances != null && SelectedInstanceIndex >= 0 && SelectedInstanceIndex < Instances.Count)
                 {
-                    Source?.SetValue(Instances[SelectedInstanceIndex]);
+                    var instance = Instances[SelectedInstanceIndex];
+
+                    if (CurrentProperty != null)
+                        CurrentProperty.ValueChanged += Source_ValueChanged;
+
+                    CurrentProperty?.SetValue(CurrentModel, instance);
+
+                    if (CurrentProperty != null)
+                        CurrentProperty.ValueChanged -= Source_ValueChanged;
+
                 }
 
                 _sourceSyncing = false;
             }
+        }
+
+        private void Source_ValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"Source Event PropertyChanged: {e.Property}");
         }
 
         protected override void OnPropertySourceValueChanged()
@@ -147,19 +159,19 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         private void Build()
         {
-            if (Source == null)
+            if (CurrentProperty == null)
             {
                 Fields = Array.Empty<InstanceSelectorField>();
                 return;
             }
 
-            var propertyValue = Source.GetValue();
+            var propertyValue = CurrentProperty.GetValue(CurrentModel);
             List<object> candidates = new List<object>();
             int selectedInstanceIndex = 0;
             bool distinctTypesOnly = true;
             bool autoAddMissingInstances = false;
 
-            if (Source.IsReadOnly) // Expandiert
+            if (CurrentProperty.IsReadOnly) // Expandiert
             {
                 if (propertyValue == null)
                 {
@@ -172,7 +184,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             }
             else
             {
-                _constraint = Source.Metadata.Constraints?.OfType<IInstanceSelectionConstraint>()
+                _constraint = CurrentProperty.Metadata.Constraints?.OfType<IInstanceSelectionConstraint>()
                                                              .FirstOrDefault();
 
                 if (_constraint != null)
@@ -200,7 +212,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             }
 
             var fields = new List<InstanceSelectorField>();
-            var propertyType = Source.Type;
+            var propertyType = CurrentProperty.Type;
             bool valueMatched = false;
 
             for (int i = 0; i < candidates.Count; i++)

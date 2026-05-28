@@ -3,25 +3,22 @@ using System.Collections.Generic;
 
 namespace Sachssoft.Sasospector.Schemas
 {
-    public class InspectorSchemaBuilder<TOwner>
-        where TOwner : class
+    public class InspectorSchemaBuilder<TSource>
+        where TSource : class
     {
-        private readonly TOwner _owner;
-        private readonly Dictionary<string, Func<InspectorSchema<TOwner>, IInspectorPropertyInfo>> _propertyFactories = new();
+        private readonly Dictionary<string, Func<InspectorSchema, IInspectorPropertyInfo>> _propertyFactories = new();
 
         private bool _built;
 
-        public InspectorSchemaBuilder(TOwner owner)
+        public InspectorSchemaBuilder()
         {
-            _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         }
 
-        public TOwner Owner => _owner;
-
-        public void AddProperty<T>(
+        public void AddProperty(
+            Type type,
             string name,
-            Func<TOwner, T?> getter,
-            Action<TOwner, T?>? setter = null,
+            GetterDelegate<TSource> getter,
+            SetterDelegate<TSource>? setter = null,
             InspectorPropertyInfoMetadata? metadata = null)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -34,30 +31,31 @@ namespace Sachssoft.Sasospector.Schemas
                 throw new InvalidOperationException($"Property '{name}' is already registered.");
 
             metadata ??= CreatePropertyMeta() ?? new InspectorPropertyInfoMetadata();
-            _propertyFactories[name] = (scheme) => CreateProperty(scheme, name, getter, setter, metadata);
+            _propertyFactories[name] = (scheme) => CreateProperty(scheme, name, type, getter, setter, metadata);
         }
 
         protected virtual InspectorPropertyInfoMetadata CreatePropertyMeta()
             => new InspectorPropertyInfoMetadata();
 
-        protected virtual InspectorPropertyInfo<TOwner, T> CreateProperty<T>(
-            InspectorSchema<TOwner> scheme,
+        protected virtual IInspectorPropertyInfo CreateProperty(
+            InspectorSchema scheme,
             string name,
-            Func<TOwner, T?> getter,
-            Action<TOwner, T?>? setter,
+            Type type,
+            GetterDelegate<TSource> getter,
+            SetterDelegate<TSource>? setter,
             InspectorPropertyInfoMetadata metadata)
         {
-            return new InspectorPropertyInfo<TOwner, T>(scheme, name, getter, setter, metadata);
+            return new InspectorPropertyInfo<TSource>(scheme, name, type, getter, setter, metadata);
         }
 
-        public InspectorSchema<TOwner> Build()
+        public InspectorSchema Build()
         {
             if (_built)
                 throw new InvalidOperationException("Already built.");
 
             _built = true;
 
-            return new InspectorSchema<TOwner>(_owner, _propertyFactories);
+            return new InspectorSchema(_propertyFactories);
         }
     }
 }

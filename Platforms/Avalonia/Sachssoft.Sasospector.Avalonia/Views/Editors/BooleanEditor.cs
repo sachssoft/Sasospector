@@ -71,7 +71,8 @@ namespace Sachssoft.Sasospector.Views.Editors
             {
                 _sourceSyncing = true;
 
-                Source?.SetValue(Value);
+                if (CurrentModel != null && CurrentProperty != null)
+                    CurrentProperty.SetValue(CurrentModel, Value);
 
                 _sourceSyncing = false;
             }
@@ -84,7 +85,8 @@ namespace Sachssoft.Sasospector.Views.Editors
 
             _sourceSyncing = true;
 
-            Value = (bool)Source!.GetValue()!;
+            if (CurrentModel != null && CurrentProperty != null)
+                Value = (bool)CurrentProperty.GetValue(CurrentModel)!;
 
             _sourceSyncing = false;
         }

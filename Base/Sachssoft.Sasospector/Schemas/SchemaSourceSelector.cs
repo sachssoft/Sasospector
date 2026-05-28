@@ -3,7 +3,7 @@
 namespace Sachssoft.Sasospector.Schemas
 {
     public sealed class SchemaSourceSelector<T> : IInspectorSchemaSource
-        where T  : class
+        where T : class
     {
         private readonly ISchemaFactory[] _factories;
 

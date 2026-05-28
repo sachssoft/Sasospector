@@ -105,7 +105,7 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         protected override void OnPropertySourceValueChanged()
         {
-            if (_sourceSyncing || Adapter == null || Source == null)
+            if (_sourceSyncing || Adapter == null || CurrentProperty == null)
                 return;
 
             _sourceSyncing = true;
@@ -122,7 +122,7 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         private void PushToSource()
         {
-            if (Adapter == null || Source == null)
+            if (Adapter == null || CurrentProperty == null)
                 return;
 
             _sourceSyncing = true;

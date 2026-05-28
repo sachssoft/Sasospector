@@ -7,7 +7,6 @@ namespace Sachssoft.Sasospector.Schemas
 {
     public class InspectorSchema : IInspectorSchema, IDisposable
     {
-        private readonly object _owner;
         private readonly IReadOnlyDictionary<string, IInspectorPropertyInfo> _properties;
 
         private bool _disposed;
@@ -15,9 +14,8 @@ namespace Sachssoft.Sasospector.Schemas
         public event PropertyChangedEventHandler? PropertyChanged;
         public event PropertyChangingEventHandler? PropertyChanging;
 
-        public InspectorSchema(object owner, IEnumerable<IInspectorPropertyInfo> properties)
+        public InspectorSchema(IEnumerable<IInspectorPropertyInfo> properties)
         {
-            _owner = owner ?? throw new ArgumentNullException(nameof(owner));
             if (properties == null)
                 throw new ArgumentNullException(nameof(properties));
 
@@ -43,11 +41,8 @@ namespace Sachssoft.Sasospector.Schemas
         }
 
         internal InspectorSchema(
-            object owner,
             Dictionary<string, Func<InspectorSchema, IInspectorPropertyInfo>> propertyFactories)
         {
-            _owner = owner ?? throw new ArgumentNullException(nameof(owner));
-
             var dict = new Dictionary<string, IInspectorPropertyInfo>(propertyFactories.Count);
 
             foreach (var kv in propertyFactories)
@@ -65,17 +60,15 @@ namespace Sachssoft.Sasospector.Schemas
             _properties = dict;
         }
 
-        public object Owner => _owner;
-
         public IReadOnlyDictionary<string, IInspectorPropertyInfo> Properties => _properties;
 
         public bool TryGet(string name, out IInspectorPropertyInfo? property)
             => _properties.TryGetValue(name, out property);
 
-        public bool TryGet<T>(string name, out InspectorPropertyInfo? property)
+        public bool TryGet<T>(string name, out IInspectorPropertyInfo? property)
         {
             if (_properties.TryGetValue(name, out var entry) &&
-                entry is InspectorPropertyInfo typed)
+                entry is IInspectorPropertyInfo typed)
             {
                 property = typed;
                 return true;

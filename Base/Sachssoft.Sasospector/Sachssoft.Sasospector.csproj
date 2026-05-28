@@ -37,6 +37,9 @@
 		<IsTrimmable>True</IsTrimmable>
 		<IsAotCompatible>True</IsAotCompatible>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Folder Include="Experminental\" />
+	</ItemGroup>
 
 </Project>
 

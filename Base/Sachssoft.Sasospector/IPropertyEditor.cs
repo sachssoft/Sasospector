@@ -2,7 +2,7 @@
 {
     public interface IPropertyEditor
     {
-        IInspectorPropertyInfo Source { get; }
+        IInspectorPropertyInfo CurrentProperty { get; }
 
         string? PreferredKind { get; set; }
     }

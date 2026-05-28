@@ -5,23 +5,19 @@ namespace Sachssoft.Sasospector.Schemas
 {
     public class InspectorSchemaBuilder
     {
-        private readonly object _owner;
         private readonly Dictionary<string, Func<InspectorSchema, IInspectorPropertyInfo>> _propertyFactories = new();
 
         private bool _built;
 
-        public InspectorSchemaBuilder(object owner)
+        public InspectorSchemaBuilder()
         {
-            _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         }
-
-        public object Owner => _owner;
 
         public void AddProperty(
             Type type,
             string name,
-            Func<object, Type, object?> getter,
-            Action<object, Type, object?>? setter = null,
+            GetterDelegate getter,
+            SetterDelegate? setter = null,
             InspectorPropertyInfoMetadata? metadata = null)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -44,8 +40,8 @@ namespace Sachssoft.Sasospector.Schemas
             InspectorSchema scheme,
             string name,
             Type type,
-            Func<object, Type, object?> getter,
-            Action<object, Type, object?>? setter,
+            GetterDelegate getter,
+            SetterDelegate? setter,
             InspectorPropertyInfoMetadata metadata)
         {
             return new InspectorPropertyInfo(scheme, name, type, getter, setter, metadata);
@@ -58,7 +54,7 @@ namespace Sachssoft.Sasospector.Schemas
 
             _built = true;
 
-            return new InspectorSchema(_owner, _propertyFactories);
+            return new InspectorSchema(_propertyFactories);
         }
     }
 }

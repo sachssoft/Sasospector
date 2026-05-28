@@ -23,8 +23,6 @@ namespace Sachssoft.Sasospector.Schemas
             remove { }
         }
 
-        object IInspectorSchema.Owner => null!;
-
         IReadOnlyDictionary<string, IInspectorPropertyInfo> IInspectorSchema.Properties
             => EmptyProperties;
 

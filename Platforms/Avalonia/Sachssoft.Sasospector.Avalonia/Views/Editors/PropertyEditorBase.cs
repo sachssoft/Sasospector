@@ -4,19 +4,17 @@ using Avalonia.Interactivity;
 using Sachssoft.Sasospector.Views.Fields;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Windows.Input;
-using System.Xml.Linq;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
     public abstract class PropertyEditorBase : TemplatedControl, IPropertyEditor
     {
         private CultureInfo _effectiveCulture = CultureInfo.CurrentUICulture;
-        private IInspectorPropertyInfo? _source;
+        private IInspectorPropertyInfo? _currentProperty;
+        private object? _currentModel;
         private IReadOnlyList<FieldHeaderBase>? _fieldHeaders;
         private InspectorItemBase? _container;
 
@@ -38,15 +36,21 @@ namespace Sachssoft.Sasospector.Views.Editors
         public static readonly StyledProperty<string?> PreferredKindProperty =
             AvaloniaProperty.Register<PropertyEditorBase, string?>(nameof(PreferredKind));
 
-        public static readonly DirectProperty<PropertyEditorBase, IInspectorPropertyInfo?> SourceProperty =
+        public static readonly DirectProperty<PropertyEditorBase, IInspectorPropertyInfo?> CurrentPropertyProperty =
             AvaloniaProperty.RegisterDirect<PropertyEditorBase, IInspectorPropertyInfo?>(
-                nameof(Source),
-                o => o.Source,
-                (o, v) => o.Source = v);
+                nameof(CurrentProperty),
+                o => o.CurrentProperty,
+                (o, v) => o.CurrentProperty = v);
+
+        public static readonly DirectProperty<PropertyEditorBase, object?> CurrentModelProperty =
+            AvaloniaProperty.RegisterDirect<PropertyEditorBase, object?>(
+                nameof(CurrentModel),
+                o => o.CurrentModel,
+                (o, v) => o.CurrentModel = v);
 
         public static readonly DirectProperty<PropertyEditorBase, IReadOnlyList<FieldHeaderBase>?> FieldHeadersProperty =
             AvaloniaProperty.RegisterDirect<PropertyEditorBase, IReadOnlyList<FieldHeaderBase>?>(
-                nameof(Source),
+                nameof(CurrentProperty),
                 o => o.FieldHeaders,
                 (o, v) => o.FieldHeaders = v);
 
@@ -73,17 +77,26 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         public CultureInfo EffectiveCulture => _effectiveCulture;
 
-        public IInspectorPropertyInfo? Source
+        public IInspectorPropertyInfo? CurrentProperty
         {
-            get => _source!;
+            get => _currentProperty;
             internal set
             {
-                SetAndRaise(SourceProperty, ref _source, value);
+                SetAndRaise(CurrentPropertyProperty, ref _currentProperty, value);
 
-                if (_source != null)
+                if (_currentProperty != null)
                 {
-                    _source.ValueChanged += SourceValueChanged;
+                    _currentProperty.ValueChanged += SourceValueChanged;
                 }
+            }
+        }
+
+        public object? CurrentModel
+        {
+            get => _currentModel;
+            internal set
+            {
+                SetAndRaise(CurrentModelProperty, ref _currentModel, value);
             }
         }
 
@@ -142,7 +155,8 @@ namespace Sachssoft.Sasospector.Views.Editors
                     if (parent is InspectorItemBase item)
                     {
                         Container = item;
-                        Source = item.Property;
+                        CurrentProperty = item.Property;
+                        CurrentModel = item.ActiveModel;
                         FieldHeaders = item.FieldHeaders?.AsReadOnly();
 
                         if (this is IItemTemplateProvider itp)
@@ -172,7 +186,8 @@ namespace Sachssoft.Sasospector.Views.Editors
                 }
 
                 FieldHeaders = null;
-                Source = null;
+                CurrentProperty = null;
+                CurrentModel = null;
                 Container = null;
             }
         }
@@ -197,9 +212,9 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         protected override void OnUnloaded(RoutedEventArgs e)
         {
-            if (_source != null)
+            if (_currentProperty != null)
             {
-                _source.ValueChanged -= SourceValueChanged;
+                _currentProperty.ValueChanged -= SourceValueChanged;
             }
 
             base.OnUnloaded(e);
@@ -207,10 +222,6 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         private void SourceValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
         {
-#if DEBUG
-            Debug.WriteLine(e.Property.ToString());
-#endif
-
             OnPropertySourceValueChanged();
         }
     }

@@ -7,7 +7,6 @@ using Sachssoft.Sasospector.Editors;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Input;
 
 namespace Sachssoft.Sasospector.Views.Editors
@@ -171,7 +170,7 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         private void SynchronizeToObservable()
         {
-            var enumerable = Source?.GetValue() as IEnumerable;
+            var enumerable = CurrentProperty?.GetValue(CurrentModel) as IEnumerable;
 
             _observableItems.Clear();
 

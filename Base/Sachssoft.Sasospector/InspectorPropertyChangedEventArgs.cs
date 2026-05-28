@@ -12,5 +12,6 @@ namespace Sachssoft.Sasospector
         public IInspectorPropertyInfo Property { get; }
 
         public IInspectorSchema Schema => Property.Schema;
+
     }
 }

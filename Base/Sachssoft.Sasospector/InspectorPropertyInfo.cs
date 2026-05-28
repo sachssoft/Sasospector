@@ -14,8 +14,8 @@ namespace Sachssoft.Sasospector
             InspectorSchema schema,
             string name,
             Type type,
-            Func<object, Type, object?> getter,
-            Action<object, Type, object?>? setter,
+            GetterDelegate getter,
+            SetterDelegate? setter,
             InspectorPropertyInfoMetadata meta)
         {
             Schema = schema ?? throw new ArgumentNullException(nameof(schema));
@@ -38,15 +38,17 @@ namespace Sachssoft.Sasospector
 
         public InspectorPropertyInfoMetadata Metadata { get; }
 
-        public Func<object, Type, object?> Getter { get; }
+        public GetterDelegate Getter { get; }
 
-        public Action<object, Type, object?>? Setter { get; }
+        public SetterDelegate? Setter { get; }
 
         public bool IsReadOnly => Setter == null;
 
-        public object? GetValue()
+        public object? GetValue(object source)
         {
-            var value = OnGetting(_type);
+            source = source ?? throw new ArgumentNullException(nameof(source));
+
+            var value = OnGetting(source, _type);
 
             if (value != null && !_type.IsInstanceOfType(value))
             {
@@ -57,8 +59,10 @@ namespace Sachssoft.Sasospector
             return value;
         }
 
-        public void SetValue(object? value)
+        public void SetValue(object source, object? value)
         {
+            source = source ?? throw new ArgumentNullException(nameof(source));
+
             if (IsReadOnly)
                 return;
 
@@ -73,30 +77,30 @@ namespace Sachssoft.Sasospector
             if (changingEventArgs.Cancel)
                 return;
 
-            OnSetting(_type, value);
+            OnSetting(source, _type, value);
 
             OnChanged(new InspectorPropertyChangedEventArgs(this));
         }
 
-        protected virtual object? OnGetting(Type type)
+        protected virtual object? OnGetting(object source, Type type)
         {
-            return Getter.Invoke(Schema.Owner, type);
+            return Getter.Invoke(source, type);
         }
 
-        protected virtual void OnSetting(Type type, object? value)
+        protected virtual void OnSetting(object source, Type type, object? value)
         {
-            Setter?.Invoke(Schema.Owner, type, value);
+            Setter?.Invoke(source, type, value);
         }
 
         protected virtual void OnChanging(InspectorPropertyChangingEventArgs e)
-            => ValueChanging?.Invoke(Schema, e);
+            => ValueChanging?.Invoke(this, e);
 
         protected virtual void OnChanged(InspectorPropertyChangedEventArgs e)
-            => ValueChanged?.Invoke(Schema, e);
+            => ValueChanged?.Invoke(this, e);
 
         public override string ToString()
         {
-            return $"{Name} ({GetValue()})";
+            return $"{Name}";
         }
     }
 }

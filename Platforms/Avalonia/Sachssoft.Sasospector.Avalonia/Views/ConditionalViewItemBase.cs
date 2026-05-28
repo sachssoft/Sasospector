@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls.Primitives;
 using System;
 
 namespace Sachssoft.Sasospector.Views
@@ -6,7 +7,6 @@ namespace Sachssoft.Sasospector.Views
     public abstract class ConditionalViewItemBase : ContainerViewItem
     {
         private bool _isValueTypeMatched;
-        private IInspectorPropertyInfo? _subscribedProperty;
 
         public static readonly DirectProperty<ConditionalViewItemBase, bool> IsValueTypeMatchedProperty =
             AvaloniaProperty.RegisterDirect<ConditionalViewItemBase, bool>(
@@ -21,39 +21,33 @@ namespace Sachssoft.Sasospector.Views
             private set => SetAndRaise(IsValueTypeMatchedProperty, ref _isValueTypeMatched, value);
         }
 
+        protected override void OnUpdatePropertyEnter(IInspectorPropertyInfo property)
+        {
+            base.OnUpdatePropertyEnter(property);
+
+            property.ValueChanged += OnPropertyValueChanged;
+            UpdateMatch();
+        }
+
+        protected override void OnUpdatePropertyExit(IInspectorPropertyInfo property)
+        {
+            base.OnUpdatePropertyExit(property);
+
+            property.ValueChanged -= OnPropertyValueChanged;
+        }
+
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == SchemaSourceProperty ||
-                change.Property == PropertyNameProperty)
+            if (change.Property == ActiveModelProperty ||
+                change.Property == ActiveSchemaProperty)
             {
-                UpdateSubscription();
                 UpdateMatch();
             }
         }
 
-        private void UpdateSubscription()
-        {
-            if (_subscribedProperty != null)
-            {
-                _subscribedProperty.ValueChanged -= OnPropertyChanged;
-                _subscribedProperty = null;
-            }
-
-            if (SchemaSource == null || string.IsNullOrEmpty(PropertyName))
-                return;
-
-            var schema = SchemaSource.Resolve(DataContext);
-
-            if (schema.Properties.TryGetValue(PropertyName, out var propertyInfo))
-            {
-                _subscribedProperty = propertyInfo;
-                _subscribedProperty.ValueChanged += OnPropertyChanged;
-            }
-        }
-
-        private void OnPropertyChanged(object? sender, InspectorPropertyChangedEventArgs e)
+        private void OnPropertyValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
         {
             UpdateMatch();
         }
@@ -62,22 +56,25 @@ namespace Sachssoft.Sasospector.Views
 
         protected void UpdateMatch()
         {
-            if (SchemaSource == null ||
-                string.IsNullOrEmpty(PropertyName))
+            if (ActiveModel == null)
             {
                 IsValueTypeMatched = false;
                 return;
             }
 
-            var schema = SchemaSource.Resolve(DataContext);
-
-            if (!schema.Properties.TryGetValue(PropertyName, out var propertyInfo))
+            if (string.IsNullOrEmpty(PropertyName))
             {
                 IsValueTypeMatched = false;
                 return;
             }
 
-            IsValueTypeMatched = Match(propertyInfo.GetValue(), propertyInfo.Type);
+            if (Property == null)
+            {
+                IsValueTypeMatched = false;
+                return;
+            }
+
+            IsValueTypeMatched = Match(Property.GetValue(ActiveModel), Property.Type);
         }
     }
 }

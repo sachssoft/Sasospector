@@ -2,11 +2,9 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Templates;
 using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Registries;
 using Sachssoft.Sasospector.Views.Editors;
-using Sachssoft.Sasospector.Views.Fields;
 using System;
 
 namespace Sachssoft.Sasospector.Views
@@ -86,8 +84,6 @@ namespace Sachssoft.Sasospector.Views
 
             _control = this.FindAncestorOfType<InspectorControl>();
             _editorRegistry = _control?.EditorRegistry;
-
-            InvalidateProperty();
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -106,19 +102,17 @@ namespace Sachssoft.Sasospector.Views
             _partEditorContent = e.NameScope.Get<ContentControl>(PART_EditorContent);
             _partContainer = e.NameScope.Get<ContentControl>(PART_Container);
 
-            InvalidateProperty();
+            UpdateProperty();
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == PropertyNameProperty ||
-                change.Property == CustomEditorProperty ||
-                change.Property == ItemTemplateProperty ||
-                change.Property == SchemaSourceProperty)
+            if (change.Property == CustomEditorProperty ||
+                change.Property == ItemTemplateProperty)
             {
-                InvalidateProperty();
+                UpdateProperty();
             }
         }
 
@@ -133,12 +127,10 @@ namespace Sachssoft.Sasospector.Views
             return basePropertyInfo;
         }
 
-        protected override void OnPropertyInvalidated(IInspectorPropertyInfo propertyInfo)
+        protected override void OnUpdatePropertyEnter(IInspectorPropertyInfo propertyInfo)
         {
             if (_editorRegistry == null || _partEditorContent == null)
                 return;
-
-            base.OnPropertyInvalidated(propertyInfo);
 
             _editor = null;
             _partEditorContent.Content = null;

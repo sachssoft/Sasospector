@@ -32,16 +32,16 @@
 				</Expander>
 			</ControlTemplate>
 		</Setter>
-		<Style Selector="^[Mode=Enabled][IsChecked=True] /template/ ItemsControl">
+		<Style Selector="^[Action=Enabled][IsChecked=True] /template/ ItemsControl">
 			<Setter Property="IsEnabled" Value="True" />
 		</Style>
-		<Style Selector="^[Mode=Enabled][IsChecked=False] /template/ ItemsControl">
+		<Style Selector="^[Action=Enabled][IsChecked=False] /template/ ItemsControl">
 			<Setter Property="IsEnabled" Value="False" />
 		</Style>
-		<Style Selector="^[Mode=Visible][IsChecked=True] /template/ ItemsControl">
+		<Style Selector="^[Action=Visible][IsChecked=True] /template/ ItemsControl">
 			<Setter Property="IsVisible" Value="True" />
 		</Style>
-		<Style Selector="^[Mode=Visible][IsChecked=False] /template/ ItemsControl">
+		<Style Selector="^[Action=Visible][IsChecked=False] /template/ ItemsControl">
 			<Setter Property="IsVisible" Value="False" />
 		</Style>
 	</ControlTheme>

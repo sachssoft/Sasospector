@@ -1,13 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Templates;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sachssoft.Sasospector.Views
 {
@@ -25,44 +19,44 @@ namespace Sachssoft.Sasospector.Views
             base.OnApplyTemplate(e);
 
             _partItems = e.NameScope.Get<ItemsControl>(PART_Items);
-            InvalidateProperty();
+            UpdateProperty();
         }
 
-        protected override void OnPropertyInvalidated(IInspectorPropertyInfo propertyInfo)
-        {
-            base.OnPropertyInvalidated(propertyInfo);
+        //protected override void OnPropertyInvalidated(IInspectorPropertyInfo propertyInfo)
+        //{
+        //    base.OnPropertyInvalidated(propertyInfo);
 
-            if (_partItems == null)
-                return;
+        //    if (_partItems == null)
+        //        return;
 
-            var enumerable = (propertyInfo.GetValue() as IEnumerable)
-                             ?? Array.Empty<object?>();
+        //    var enumerable = (propertyInfo.GetValue() as IEnumerable)
+        //                     ?? Array.Empty<object?>();
 
-            _partItems.ItemsSource = enumerable;
+        //    _partItems.ItemsSource = enumerable;
 
-            //var list = new List<InspectorItem>();
+        //    //var list = new List<InspectorItem>();
 
-            //foreach (var item in enumerable)
-            //{
-            //    var template = ResolveTemplate(item);
+        //    //foreach (var item in enumerable)
+        //    //{
+        //    //    var template = ResolveTemplate(item);
 
-            //    if (template == null)
-            //        continue;
+        //    //    if (template == null)
+        //    //        continue;
 
-            //    var instance = template.Build(item);
+        //    //    var instance = template.Build(item);
 
-            //    if (instance is not InspectorItem inspectorItem)
-            //        throw new InvalidOperationException("Template must produce InspectorItem");
+        //    //    if (instance is not InspectorItem inspectorItem)
+        //    //        throw new InvalidOperationException("Template must produce InspectorItem");
 
-            //    inspectorItem.DataContext = item;
+        //    //    inspectorItem.DataContext = item;
 
-            //    var testTag = inspectorItem.Tag;
+        //    //    var testTag = inspectorItem.Tag;
 
-            //    list.Add(inspectorItem);
-            //}
+        //    //    list.Add(inspectorItem);
+        //    //}
 
-            //_partItems.ItemsSource = list;
-        }
+        //    //_partItems.ItemsSource = list;
+        //}
 
         //private IDataTemplate? ResolveTemplate(object? value)
         //{

@@ -3,110 +3,125 @@ using System;
 
 namespace Sachssoft.Sasospector
 {
-    public class InspectorPropertyInfo<TOwner, T> : IInspectorPropertyInfo
-        where TOwner : class
+    public class InspectorPropertyInfo<TSource> : IInspectorPropertyInfo
+        where TSource : class
     {
+        private readonly Type _type;
 
         public event EventHandler<InspectorPropertyChangingEventArgs>? ValueChanging;
         public event EventHandler<InspectorPropertyChangedEventArgs>? ValueChanged;
 
         public InspectorPropertyInfo(
-            InspectorSchema<TOwner> schema,
+            InspectorSchema schema,
             string name,
-            Func<TOwner, T?> getter,
-            Action<TOwner, T?>? setter,
+            Type type,
+            GetterDelegate<TSource> getter,
+            SetterDelegate<TSource>? setter,
             InspectorPropertyInfoMetadata meta)
         {
             Schema = schema ?? throw new ArgumentNullException(nameof(schema));
             Name = name ?? throw new ArgumentNullException(nameof(name));
+            _type = type ?? throw new ArgumentNullException(nameof(type));
             Getter = getter ?? throw new ArgumentNullException(nameof(getter));
             Setter = setter;
             Metadata = meta ?? throw new ArgumentNullException(nameof(meta));
-
-            //Metadata.Setup(this);
         }
 
         public string Name { get; }
 
-        public Type Type => typeof(T);
+        public Type Type => _type;
 
-        public InspectorSchema<TOwner> Schema { get; }
+        public InspectorSchema Schema { get; }
 
         IInspectorSchema IInspectorPropertyInfo.Schema => Schema;
 
         public InspectorPropertyInfoMetadata Metadata { get; }
 
-        public Func<TOwner, T?> Getter { get; }
+        public GetterDelegate<TSource> Getter { get; }
 
-        public Action<TOwner, T?>? Setter { get; }
+        public SetterDelegate<TSource>? Setter { get; }
 
         public bool IsReadOnly => Setter == null;
 
-        public T? GetValue()
+        public object? GetValue(TSource source)
         {
-            return OnGetting();
+            source = source ?? throw new ArgumentNullException(nameof(source));
+
+            var value = OnGetting(source, _type);
+
+            if (value != null && !_type.IsInstanceOfType(value))
+            {
+                throw new InvalidOperationException(
+                    $"Getter returned '{value.GetType()}', expected '{_type}' for '{Name}'.");
+            }
+
+            return value;
         }
 
-        public void SetValue(T? value)
+        object? IInspectorPropertyInfo.GetValue(object source)
         {
+            if (source is not TSource typedSource)
+            {
+                throw new InvalidOperationException(
+                    $"Invalid source type '{source.GetType()}' for '{Name}'. Expected '{typeof(TSource)}'.");
+            }
+
+            return GetValue(typedSource);
+        }
+
+        public void SetValue(TSource source, object? value)
+        {
+            source = source ?? throw new ArgumentNullException(nameof(source));
+
             if (IsReadOnly)
                 return;
+
+            if (value != null && !_type.IsInstanceOfType(value))
+            {
+                throw new InvalidOperationException(
+                    $"Invalid value type '{value.GetType()}' for '{Name}'. Expected '{_type}'.");
+            }
 
             var changingEventArgs = new InspectorPropertyChangingEventArgs(this);
             OnChanging(changingEventArgs);
             if (changingEventArgs.Cancel)
                 return;
 
-            OnSetting(value);
+            OnSetting(source, _type, value);
 
             OnChanged(new InspectorPropertyChangedEventArgs(this));
         }
 
-        object? IInspectorPropertyInfo.GetValue()
+        void IInspectorPropertyInfo.SetValue(object source, object? value)
         {
-            return GetValue();
-        }
-
-        void IInspectorPropertyInfo.SetValue(object? value)
-        {
-            if (IsReadOnly)
-                return;
-
-            if (value is null)
+            if (source is not TSource typedSource)
             {
-                SetValue(default);
-                return;
+                throw new InvalidOperationException(
+                    $"Invalid source type '{source.GetType()}' for '{Name}'. Expected '{typeof(TSource)}'.");
             }
 
-            if (value is T typed)
-            {
-                SetValue(typed);
-                return;
-            }
-
-            throw new InvalidOperationException(
-                $"Invalid value type '{value.GetType()}' for property '{Name}'. Expected '{typeof(T)}'.");
+            SetValue(typedSource, value);
         }
 
-        protected virtual T? OnGetting()
+        protected virtual object? OnGetting(TSource source, Type type)
         {
-            return Getter(Schema.Owner);
+            return Getter.Invoke(source, type);
         }
 
-        protected virtual void OnSetting(T? value)
+        protected virtual void OnSetting(TSource source, Type type, object? value)
         {
-            Setter?.Invoke(Schema.Owner, value);
+            Setter?.Invoke(source, type, value);
         }
 
         protected virtual void OnChanging(InspectorPropertyChangingEventArgs e)
-            => ValueChanging?.Invoke(Schema, e);
+            => ValueChanging?.Invoke(this, e);
 
         protected virtual void OnChanged(InspectorPropertyChangedEventArgs e)
-            => ValueChanged?.Invoke(Schema, e);
+            => ValueChanged?.Invoke(this, e);
 
         public override string ToString()
         {
-            return $"{Name} ({GetValue()})";
+            return $"{Name}";
         }
     }
 }

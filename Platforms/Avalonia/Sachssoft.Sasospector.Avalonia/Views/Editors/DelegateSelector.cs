@@ -3,14 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Interactivity;
-using Sachssoft.Sasospector.Constraints;
 using Sachssoft.Sasospector.Editors;
-using Sachssoft.Sasospector.Views.Fields;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Windows.Input;
 
 namespace Sachssoft.Sasospector.Views.Editors
@@ -112,7 +109,7 @@ namespace Sachssoft.Sasospector.Views.Editors
 
             if (change.Property == EditorModeProperty ||
                 //change.Property == DelegatesProperty ||
-                change.Property == SourceProperty)
+                change.Property == CurrentPropertyProperty)
             {
                 //Rebuild();
             }
@@ -120,7 +117,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             {
                 if (Delegates != null && SelectedDelegateIndex >= 0 && SelectedDelegateIndex < Delegates.Count)
                 {
-                    Source?.SetValue(Delegates[SelectedDelegateIndex]);
+                    CurrentProperty?.SetValue(CurrentModel, Delegates[SelectedDelegateIndex]);
                 }
             }
         }
@@ -153,7 +150,7 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         private void Rebuild()
         {
-            var value = Source?.GetValue();
+            var value = CurrentProperty?.GetValue(CurrentModel);
 
             if (value is IEnumerable enumerable)
             {

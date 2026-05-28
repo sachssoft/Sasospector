@@ -18,8 +18,8 @@ namespace Sachssoft.Sasospector
 
         bool IsReadOnly { get; }
 
-        object? GetValue();
+        object? GetValue(object source);
 
-        void SetValue(object? value);
+        void SetValue(object source, object? value);
     }
 }
