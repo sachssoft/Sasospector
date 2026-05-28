@@ -156,7 +156,7 @@ namespace Sachssoft.Sasospector.Views.Editors
                     {
                         Container = item;
                         CurrentProperty = item.Property;
-                        CurrentModel = item.ActiveModel;
+                        CurrentModel = item.ResolvedModel;
                         FieldHeaders = item.FieldHeaders?.AsReadOnly();
 
                         if (this is IItemTemplateProvider itp)

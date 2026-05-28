@@ -12,23 +12,23 @@ namespace Sachssoft.Sasospector.Views
     {
         private IInspectorPropertyInfo? _property;
         private object? _selectedFieldValue;
-        private IInspectorSchema? _schema;
+        private IInspectorSchema? _localSchema;
 
         private bool _visualTreeAttached;
-        private IInspectorSchema? _activeSchema;
-        private object? _activeModel;
+        private IInspectorSchema? _resolvedSchema;
+        private object? _resolvedModel;
 
-        public static readonly StyledProperty<IInspectorSchemaSource?> SchemaSourceProperty =
-            AvaloniaProperty.Register<InspectorItemBase, IInspectorSchemaSource?>(nameof(SchemaSource));
+        public static readonly StyledProperty<IInspectorSchemaSource?> LocalSchemaSourceProperty =
+            AvaloniaProperty.Register<InspectorItemBase, IInspectorSchemaSource?>(nameof(LocalSchemaSource));
 
-        public static readonly StyledProperty<object?> ModelProperty =
-            AvaloniaProperty.Register<InspectorItemBase, object?>(nameof(Model));
+        public static readonly StyledProperty<object?> LocalModelProperty =
+            AvaloniaProperty.Register<InspectorItemBase, object?>(nameof(LocalModel));
 
-        public static readonly DirectProperty<InspectorItemBase, IInspectorSchema?> SchemaProperty =
+        public static readonly DirectProperty<InspectorItemBase, IInspectorSchema?> LocalSchemaProperty =
             AvaloniaProperty.RegisterDirect<InspectorItemBase, IInspectorSchema?>(
-                nameof(Schema),
-                o => o.Schema,
-                (o, v) => o.Schema = v);
+                nameof(LocalSchema),
+                o => o.LocalSchema,
+                (o, v) => o.LocalSchema = v);
 
         public static readonly StyledProperty<object?> HeaderProperty =
             AvaloniaProperty.Register<InspectorItemBase, object?>(nameof(Header));
@@ -64,18 +64,18 @@ namespace Sachssoft.Sasospector.Views
         public static readonly StyledProperty<bool> AutoSynchronizationProperty =
             AvaloniaProperty.Register<InspectorItemBase, bool>(nameof(AutoSynchronization));
 
-        public static readonly DirectProperty<InspectorItemBase, IInspectorSchema?> ActiveSchemaProperty =
+        public static readonly DirectProperty<InspectorItemBase, IInspectorSchema?> ResolvedSchemaProperty =
             AvaloniaProperty.RegisterDirect<InspectorItemBase, IInspectorSchema?>(
-                nameof(ActiveSchema),
-                o => o._activeSchema,
-                (o, v) => o._activeSchema = v,
+                nameof(ResolvedSchema),
+                o => o._resolvedSchema,
+                (o, v) => o._resolvedSchema = v,
                 defaultBindingMode: Avalonia.Data.BindingMode.OneWay);
 
-        public static readonly DirectProperty<InspectorItemBase, object?> ActiveModelProperty =
+        public static readonly DirectProperty<InspectorItemBase, object?> ResolvedModelProperty =
             AvaloniaProperty.RegisterDirect<InspectorItemBase, object?>(
-                nameof(ActiveModel),
-                o => o._activeModel,
-                (o, v) => o._activeModel = v,
+                nameof(ResolvedModel),
+                o => o._resolvedModel,
+                (o, v) => o._resolvedModel = v,
                 defaultBindingMode: Avalonia.Data.BindingMode.OneWay);
 
         public string? PropertyName
@@ -90,22 +90,22 @@ namespace Sachssoft.Sasospector.Views
             protected set => SetAndRaise(PropertyProperty, ref _property, value);
         }
 
-        public IInspectorSchemaSource? SchemaSource
+        public IInspectorSchemaSource? LocalSchemaSource
         {
-            get => GetValue(SchemaSourceProperty);
-            set => SetValue(SchemaSourceProperty, value);
+            get => GetValue(LocalSchemaSourceProperty);
+            set => SetValue(LocalSchemaSourceProperty, value);
         }
 
-        public object? Model
+        public object? LocalModel
         {
-            get => GetValue(ModelProperty);
-            set => SetValue(ModelProperty, value);
+            get => GetValue(LocalModelProperty);
+            set => SetValue(LocalModelProperty, value);
         }
 
-        public IInspectorSchema? Schema
+        public IInspectorSchema? LocalSchema
         {
-            get => _schema;
-            private set => SetAndRaise(SchemaProperty, ref _schema, value);
+            get => _localSchema;
+            private set => SetAndRaise(LocalSchemaProperty, ref _localSchema, value);
         }
 
         public object? Header
@@ -150,16 +150,16 @@ namespace Sachssoft.Sasospector.Views
             internal set => SetAndRaise(SelectedFieldValueProperty, ref _selectedFieldValue, value);
         }
 
-        public IInspectorSchema? ActiveSchema
+        public IInspectorSchema? ResolvedSchema
         {
-            get => _activeSchema;
-            private set => SetAndRaise(ActiveSchemaProperty, ref _activeSchema, value);
+            get => _resolvedSchema;
+            private set => SetAndRaise(ResolvedSchemaProperty, ref _resolvedSchema, value);
         }
 
-        public object? ActiveModel
+        public object? ResolvedModel
         {
-            get => _activeModel;
-            private set => SetAndRaise(ActiveModelProperty, ref _activeModel, value);
+            get => _resolvedModel;
+            private set => SetAndRaise(ResolvedModelProperty, ref _resolvedModel, value);
         }
 
         #region Lifecycle
@@ -180,7 +180,7 @@ namespace Sachssoft.Sasospector.Views
             base.OnDetachedFromVisualTree(e);
 
             _visualTreeAttached = false;
-            _activeSchema = null;
+            _resolvedSchema = null;
             Property = null;
         }
 
@@ -191,14 +191,14 @@ namespace Sachssoft.Sasospector.Views
             if (!_visualTreeAttached)
                 return;
 
-            if (change.Property == SchemaSourceProperty ||
-                change.Property == ModelProperty)
+            if (change.Property == LocalSchemaSourceProperty ||
+                change.Property == LocalModelProperty)
             {
-                _activeSchema = null;
+                _resolvedSchema = null;
                 ApplySchema();
                 UpdateSchema();
             }
-            else if (change.Property == SchemaProperty ||
+            else if (change.Property == LocalSchemaProperty ||
                 change.Property == PropertyNameProperty)
             {
                 UpdateProperty();
@@ -223,21 +223,21 @@ namespace Sachssoft.Sasospector.Views
 
         private void ApplySchema()
         {
-            if (SchemaSource == null || Model == null)
+            if (LocalSchemaSource == null || LocalModel == null)
             {
-                Schema = null;
+                LocalSchema = null;
                 return;
             }
 
-            Schema = SchemaSource.Resolve(Model);
+            LocalSchema = LocalSchemaSource.Resolve(LocalModel);
         }
 
         // Durchsuche nach Schema und Model in der aktuellen Instanz und den Eltern,
         // bis beides gefunden wurde oder keine Eltern mehr da sind.
         private void UpdateSchema()
         {
-            IInspectorSchema? schema = Schema;
-            object? model = Model;
+            IInspectorSchema? resolvedSchema =  LocalSchema;
+            object? resolvedModel = LocalModel;
 
             var parent = Parent;
 
@@ -245,27 +245,27 @@ namespace Sachssoft.Sasospector.Views
             {
                 if (parent is ContainerViewItem container)
                 {
-                    schema ??= container.ItemSchema;
-                    model ??= container.ItemModel;
+                    resolvedSchema ??= container.Schema;
+                    resolvedModel ??= container.Model;
                 }
 
-                if (schema != null || model != null)
+                if (resolvedSchema != null || resolvedModel != null)
                     break;
 
                 parent = parent.Parent;
             }
 
-            ActiveSchema = schema;
-            ActiveModel = model;
+            ResolvedSchema = resolvedSchema;
+            ResolvedModel = resolvedModel;
         }
 
         protected void UpdateProperty()
         {
             IInspectorPropertyInfo? newProperty = null;
 
-            if (_activeSchema != null &&
+            if (_resolvedSchema != null &&
                 PropertyName != null &&
-                _activeSchema.Properties.TryGetValue(PropertyName, out var propertyInfo))
+                _resolvedSchema.Properties.TryGetValue(PropertyName, out var propertyInfo))
             {
                 newProperty = PreferredPropertyOverride(propertyInfo);
             }

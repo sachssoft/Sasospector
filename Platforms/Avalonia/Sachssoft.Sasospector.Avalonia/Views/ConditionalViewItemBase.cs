@@ -40,8 +40,8 @@ namespace Sachssoft.Sasospector.Views
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == ActiveModelProperty ||
-                change.Property == ActiveSchemaProperty)
+            if (change.Property == ResolvedModelProperty ||
+                change.Property == ResolvedSchemaProperty)
             {
                 UpdateMatch();
             }
@@ -56,7 +56,7 @@ namespace Sachssoft.Sasospector.Views
 
         protected void UpdateMatch()
         {
-            if (ActiveModel == null)
+            if (ResolvedModel == null)
             {
                 IsValueTypeMatched = false;
                 return;
@@ -74,7 +74,7 @@ namespace Sachssoft.Sasospector.Views
                 return;
             }
 
-            IsValueTypeMatched = Match(Property.GetValue(ActiveModel), Property.Type);
+            IsValueTypeMatched = Match(Property.GetValue(ResolvedModel), Property.Type);
         }
     }
 }

@@ -9,49 +9,49 @@ namespace Sachssoft.Sasospector.Views
     public class ContainerViewItem : InspectorItemBase
     {
         private readonly AvaloniaList<InspectorItemBase> _items = new();
-        private IInspectorSchema? _itemSchema;
+        private IInspectorSchema? _schema;
 
-        public static readonly StyledProperty<IInspectorSchemaSource?> ItemSchemaSourceProperty =
-            AvaloniaProperty.Register<ContainerViewItem, IInspectorSchemaSource?>(nameof(ItemSchemaSource));
+        public static readonly StyledProperty<IInspectorSchemaSource?> SchemaSourceProperty =
+            AvaloniaProperty.Register<ContainerViewItem, IInspectorSchemaSource?>(nameof(SchemaSource));
 
-        public static readonly StyledProperty<object?> ItemModelProperty =
-            AvaloniaProperty.Register<ContainerViewItem, object?>(nameof(ItemModel));
+        public static readonly StyledProperty<object?> ModelProperty =
+            AvaloniaProperty.Register<ContainerViewItem, object?>(nameof(Model));
 
-        public static readonly DirectProperty<ContainerViewItem, IInspectorSchema?> ItemSchemaProperty =
+        public static readonly DirectProperty<ContainerViewItem, IInspectorSchema?> SchemaProperty =
             AvaloniaProperty.RegisterDirect<ContainerViewItem, IInspectorSchema?>(
-                nameof(ItemSchema),
-                o => o.ItemSchema,
-                (o, v) => o.ItemSchema = v);
+                nameof(Schema),
+                o => o.Schema,
+                (o, v) => o.Schema = v);
 
         [Content]
         public AvaloniaList<InspectorItemBase> Items => _items;
 
         protected override Type StyleKeyOverride { get; } = typeof(ContainerViewItem);
 
-        public IInspectorSchemaSource? ItemSchemaSource
+        public IInspectorSchemaSource? SchemaSource
         {
-            get => GetValue(ItemSchemaSourceProperty);
-            set => SetValue(ItemSchemaSourceProperty, value);
+            get => GetValue(SchemaSourceProperty);
+            set => SetValue(SchemaSourceProperty, value);
         }
 
-        public object? ItemModel
+        public object? Model
         {
-            get => GetValue(ItemModelProperty);
-            set => SetValue(ItemModelProperty, value);
+            get => GetValue(ModelProperty);
+            set => SetValue(ModelProperty, value);
         }
 
-        public IInspectorSchema? ItemSchema
+        public IInspectorSchema? Schema
         {
-            get => _itemSchema;
-            private set => SetAndRaise(ItemSchemaProperty, ref _itemSchema, value);
+            get => _schema;
+            private set => SetAndRaise(SchemaProperty, ref _schema, value);
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == ItemSchemaSourceProperty ||
-                change.Property == ItemModelProperty)
+            if (change.Property == SchemaSourceProperty ||
+                change.Property == ModelProperty)
             {
                 ApplySchema();
                 NotifyChildrenSchemaChanged();
@@ -60,13 +60,13 @@ namespace Sachssoft.Sasospector.Views
 
         private void ApplySchema()
         {
-            if (ItemSchemaSource == null || ItemModel == null)
+            if (SchemaSource == null || Model == null)
             {
-                ItemSchema = null;
+                Schema = null;
                 return;
             }
 
-            ItemSchema = ItemSchemaSource.Resolve(ItemModel);
+            Schema = SchemaSource.Resolve(Model);
         }
 
         private void NotifyChildrenSchemaChanged()
