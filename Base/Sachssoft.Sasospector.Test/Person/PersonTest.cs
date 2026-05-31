@@ -1,7 +1,4 @@
-﻿using System;
-using Xunit;
-
-namespace Sachssoft.Sasospector.Test.Person
+﻿namespace Sachssoft.Sasospector.Test.Person
 {
     public class PersonTests
     {

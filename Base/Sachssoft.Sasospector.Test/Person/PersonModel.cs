@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Sachssoft.Sasospector.Test.Person
+﻿namespace Sachssoft.Sasospector.Test.Person
 {
     internal class PersonModel
     {

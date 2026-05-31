@@ -1,8 +1,4 @@
-﻿using Sachssoft.Sasospector.Experminental;
-using Sachssoft.Sasospector.Schemas;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Sachssoft.Sasospector.Schemas;
 
 namespace Sachssoft.Sasospector.Test.Person
 {
@@ -36,7 +32,8 @@ namespace Sachssoft.Sasospector.Test.Person
             builder.AddProperty(
                 typeof(int),
                 nameof(PersonModel.Age),
-                (s, t) => s.Age
+                (s, t) => s.Age,
+                new InspectorPropertyInfoMetadata()
             );
 
             return builder.Build();
