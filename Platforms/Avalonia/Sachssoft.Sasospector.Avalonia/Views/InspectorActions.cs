@@ -2,7 +2,7 @@
 
 namespace Sachssoft.Sasospector.Views
 {
-    public class PropertyEditorActions : AvaloniaList<PropertyEditorAction>
+    public class InspectorActions : AvaloniaList<InspectorAction>
     {
     }
 }

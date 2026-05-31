@@ -209,6 +209,8 @@ namespace Sachssoft.Sasospector.Views
 
         #region Core 
 
+        public virtual void RefreshProperty() { }
+
         internal protected virtual void OnParentSchemaChanged() { }
 
         protected virtual void OnSchemaPropertyChanging(PropertyChangingEventArgs e) { }
@@ -236,7 +238,7 @@ namespace Sachssoft.Sasospector.Views
         // bis beides gefunden wurde oder keine Eltern mehr da sind.
         private void UpdateSchema()
         {
-            IInspectorSchema? resolvedSchema =  LocalSchema;
+            IInspectorSchema? resolvedSchema = LocalSchema;
             object? resolvedModel = LocalModel;
 
             var parent = Parent;

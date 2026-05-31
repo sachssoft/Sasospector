@@ -22,23 +22,25 @@
 					<StackPanel Orientation="Vertical"
 								Grid.Column="1">
 						<Button x:Name="PART_AddButton"
-								Command="{TemplateBinding AddCommand}"
-								CommandParameter="{TemplateBinding AddCommandParameter}"
+								Command="{Binding AddAction.Command, RelativeSource={RelativeSource TemplatedParent}}"
+								CommandParameter="{Binding AddAction.CommandParameter, RelativeSource={RelativeSource TemplatedParent}}"
+								Tag="{Binding AddAction, RelativeSource={RelativeSource TemplatedParent}}"
 								Width="{StaticResource InspectorPropertyEditorWidth}"
 								Height="{StaticResource InspectorPropertyEditorHeight}">
 							<Viewbox Width="{StaticResource IconViewboxWidth}"
 									 Height="{StaticResource IconViewboxHeight}">
-								<PathIcon Data="{StaticResource PlusIcon}" />
+								<ContentPresenter Content="{Binding AddAction.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
 							</Viewbox>
 						</Button>
 						<Button x:Name="PART_RemoveButton"
-								Command="{TemplateBinding RemoveCommand}"
-								CommandParameter="{TemplateBinding RemoveCommandParameter}"
+								Command="{Binding RemoveAction.Command, RelativeSource={RelativeSource TemplatedParent}}"
+								CommandParameter="{Binding RemoveAction.CommandParameter, RelativeSource={RelativeSource TemplatedParent}}"
+								Tag="{Binding RemoveAction, RelativeSource={RelativeSource TemplatedParent}}"
 								Width="{StaticResource InspectorPropertyEditorWidth}"
 								Height="{StaticResource InspectorPropertyEditorHeight}">
 							<Viewbox Width="{StaticResource IconViewboxWidth}"
 									 Height="{StaticResource IconViewboxHeight}">
-								<PathIcon Data="{StaticResource MinusIcon}" />
+								<ContentPresenter Content="{Binding RemoveAction.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
 							</Viewbox>
 						</Button>
 					</StackPanel>

@@ -33,7 +33,7 @@
 								 Height="{StaticResource IconViewboxHeight}"
 								 HorizontalAlignment="Center"
 								 VerticalAlignment="Center">
-							<PathIcon Data="{StaticResource BrowseIcon}"/>
+							<!--<PathIcon Data="{StaticResource BrowseIcon}"/>-->
 						</Viewbox>
 					</Button>
 				</Grid>

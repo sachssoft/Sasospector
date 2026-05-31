@@ -13,13 +13,36 @@
 			<ControlTemplate TargetType="views:ToggleableSectionView">
 				<Expander Theme="{StaticResource InspectorSectionViewExpanderTheme}">
 					<Expander.Header>
-						<StackPanel Orientation="Horizontal">
-							<CheckBox x:Name="ToggleCheckBox"
-									  VerticalAlignment="Center"
-									  IsChecked="{TemplateBinding IsChecked, Mode=TwoWay}"/>
-							<ContentPresenter Content="{TemplateBinding Header}"
-											  VerticalAlignment="Center"/>
-						</StackPanel>
+						<Grid ColumnDefinitions="*,Auto">
+							<StackPanel Orientation="Horizontal"
+										Grid.Column="0">
+								<CheckBox x:Name="ToggleCheckBox"
+										  VerticalAlignment="Center"
+										  IsChecked="{TemplateBinding IsChecked, Mode=TwoWay}"/>
+								<ContentPresenter Content="{TemplateBinding Header}"
+												  VerticalAlignment="Center"/>
+							</StackPanel>
+							<ItemsControl Grid.Column="1"
+										  ItemsSource="{Binding $parent[views:ToggleableSectionView].Actions}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Horizontal" />
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="views:InspectorAction">
+										<Button Command="{Binding Command}"
+												Width="{StaticResource InspectorPropertyEditorWidth}"
+												Height="{StaticResource InspectorPropertyEditorHeight}">
+											<Viewbox Width="{StaticResource IconViewboxWidth}"
+													 Height="{StaticResource IconViewboxHeight}">
+												<ContentPresenter Content="{Binding Icon}" />
+											</Viewbox>
+										</Button>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</Grid>
 					</Expander.Header>
 					<ItemsControl ItemsSource="{Binding $parent[views:ToggleableSectionView].Items}">
 						<ItemsControl.ItemsPanel>

@@ -8,14 +8,14 @@ namespace Sachssoft.Sasospector.Registries
     {
         public void Register(InspectorPropertyEditorRegistryBase registry)
         {
-            registry.Register(typeof(Color),
+            registry.RegisterType(typeof(Color),
                 (f) => f.CreateColorEditor(
                     includeAlpha: true,
                     adapter: new ColorPropertyAdapter()
                 ),
                 priority: 0);
 
-            registry.Register(typeof(Avalonia.Vector),
+            registry.RegisterType(typeof(Avalonia.Vector),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<Avalonia.Vector>(
@@ -32,7 +32,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(Vector3D),
+            registry.RegisterType(typeof(Vector3D),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<Vector3D>(
@@ -51,7 +51,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(Point),
+            registry.RegisterType(typeof(Point),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<Point>(
@@ -68,7 +68,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(PixelPoint),
+            registry.RegisterType(typeof(PixelPoint),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<PixelPoint>(
@@ -85,7 +85,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(Size),
+            registry.RegisterType(typeof(Size),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<Size>(
@@ -102,7 +102,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(PixelSize),
+            registry.RegisterType(typeof(PixelSize),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<PixelSize>(
@@ -119,7 +119,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(Rect),
+            registry.RegisterType(typeof(Rect),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<Rect>(
@@ -140,7 +140,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(PixelRect),
+            registry.RegisterType(typeof(PixelRect),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<PixelRect>(
@@ -161,7 +161,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(CornerRadius),
+            registry.RegisterType(typeof(CornerRadius),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<CornerRadius>(
@@ -182,7 +182,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(Thickness),
+            registry.RegisterType(typeof(Thickness),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<Thickness>(
@@ -203,7 +203,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(Matrix),
+            registry.RegisterType(typeof(Matrix),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<Matrix>(

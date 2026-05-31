@@ -2,6 +2,8 @@
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using System;
+using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace Sachssoft.Sasospector.Views
 {
@@ -10,98 +12,63 @@ namespace Sachssoft.Sasospector.Views
     {
         private const string PART_Items = nameof(PART_Items);
 
+        private readonly ObservableCollection<object?> _observableItems = new();
         private ItemsControl? _partItems;
 
         protected override Type StyleKeyOverride => typeof(CollectionViewItem);
+
+        //public ObservableCollection<object?> ObservableItems
+        //{
+        //    get => _observableItems;
+        //}
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             base.OnApplyTemplate(e);
 
             _partItems = e.NameScope.Get<ItemsControl>(PART_Items);
-            UpdateProperty();
+
+            if (_partItems != null)
+            {
+                _partItems.ItemsSource = _observableItems;
+            }
+
+            SynchronizeToObservable();
         }
 
-        //protected override void OnPropertyInvalidated(IInspectorPropertyInfo propertyInfo)
-        //{
-        //    base.OnPropertyInvalidated(propertyInfo);
+        protected override void OnUpdatePropertyEnter(IInspectorPropertyInfo property)
+        {
+            base.OnUpdatePropertyEnter(property);
+            SynchronizeToObservable();
+        }
 
-        //    if (_partItems == null)
-        //        return;
+        protected override void OnUpdatePropertyExit(IInspectorPropertyInfo property)
+        {
+            base.OnUpdatePropertyExit(property);
+        }
 
-        //    var enumerable = (propertyInfo.GetValue() as IEnumerable)
-        //                     ?? Array.Empty<object?>();
+        public override void RefreshProperty()
+        {
+            base.RefreshProperty();
+            SynchronizeToObservable();
+        }
 
-        //    _partItems.ItemsSource = enumerable;
+        private void SynchronizeToObservable()
+        {
+            _observableItems.Clear();
 
-        //    //var list = new List<InspectorItem>();
+            if (ResolvedModel == null || Property == null)
+                return;
 
-        //    //foreach (var item in enumerable)
-        //    //{
-        //    //    var template = ResolveTemplate(item);
+            var enumerable = Property.GetValue(ResolvedModel) as IEnumerable;
 
-        //    //    if (template == null)
-        //    //        continue;
+            if (enumerable == null)
+                return;
 
-        //    //    var instance = template.Build(item);
-
-        //    //    if (instance is not InspectorItem inspectorItem)
-        //    //        throw new InvalidOperationException("Template must produce InspectorItem");
-
-        //    //    inspectorItem.DataContext = item;
-
-        //    //    var testTag = inspectorItem.Tag;
-
-        //    //    list.Add(inspectorItem);
-        //    //}
-
-        //    //_partItems.ItemsSource = list;
-        //}
-
-        //private IDataTemplate? ResolveTemplate(object? value)
-        //{
-        //    // 1. explizites ItemTemplate (höchste Priorität)
-        //    if (ItemTemplate != null)
-        //        return ItemTemplate;
-
-        //    // 2. lokale DataTemplates (richtig gefiltert!)
-        //    var localTemplate = DataTemplates?
-        //        .OfType<IDataTemplate>()
-        //        .FirstOrDefault(t => MatchesTemplate(t, value));
-
-        //    if (localTemplate != null)
-        //        return localTemplate;
-
-        //    // 3. Resources fallback (FEHLT bei dir)
-        //    if (Resources != null)
-        //    {
-        //        var resourceTemplate = Resources.Values
-        //            .OfType<IDataTemplate>()
-        //            .FirstOrDefault(t => MatchesTemplate(t, value));
-
-        //        if (resourceTemplate != null)
-        //            return resourceTemplate;
-        //    }
-
-        //    return null;
-        //}
-
-        //private bool MatchesTemplate(IDataTemplate template, object? value)
-        //{
-        //    if (template == null)
-        //        return false;
-
-        //    if (value == null)
-        //        return true; // optional fallback
-
-        //    // 1. Wenn Template Type-basiert ist (typisch in Avalonia)
-        //    if (template is IDataTemplate typed)
-        //    {
-        //        return typed.Match(value);
-        //    }
-
-        //    // 2. fallback: keine harte Entscheidung erzwingen
-        //    return true;
-        //}
+            foreach (var item in enumerable)
+            {
+                _observableItems.Add(item);
+            }
+        }
     }
 }

@@ -18,6 +18,15 @@ namespace Sachssoft.Sasospector.Schemas
             Type type,
             string name,
             GetterDelegate<TSource> getter,
+            InspectorPropertyInfoMetadata? metadata = null)
+        {
+            AddProperty(type, name, getter, null, metadata);
+        }
+
+        public void AddProperty(
+            Type type,
+            string name,
+            GetterDelegate<TSource> getter,
             SetterDelegate<TSource>? setter = null,
             InspectorPropertyInfoMetadata? metadata = null)
         {

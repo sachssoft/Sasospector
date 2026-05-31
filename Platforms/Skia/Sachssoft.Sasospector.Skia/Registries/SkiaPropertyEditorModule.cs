@@ -7,28 +7,28 @@ namespace Sachssoft.Sasospector.Registries
     {
         public void Register(InspectorPropertyEditorRegistryBase registry)
         {
-            registry.Register(typeof(SKColor),
+            registry.RegisterType(typeof(SKColor),
                 (f) => f.CreateColorEditor(
                     includeAlpha: true,
                     adapter: new ColorPropertyAdapter()
                 ),
                 priority: 0);
 
-            registry.Register(typeof(SKColorF),
+            registry.RegisterType(typeof(SKColorF),
                 (f) => f.CreateColorEditor(
                     includeAlpha: true,
                     adapter: new ColorPropertyAdapter()
                 ),
                 priority: 0);
 
-            registry.Register(typeof(SKPMColor),
+            registry.RegisterType(typeof(SKPMColor),
                 (f) => f.CreateColorEditor(
                     includeAlpha: true,
                     adapter: new ColorPropertyAdapter()
                 ),
                 priority: 0);
 
-            registry.Register(typeof(SKPoint),
+            registry.RegisterType(typeof(SKPoint),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<SKPoint>(
@@ -45,7 +45,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(SKPoint3),
+            registry.RegisterType(typeof(SKPoint3),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<SKPoint3>(
@@ -64,7 +64,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(SKPointI),
+            registry.RegisterType(typeof(SKPointI),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<SKPointI>(
@@ -81,7 +81,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(SKSize),
+            registry.RegisterType(typeof(SKSize),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<SKSize>(
@@ -98,7 +98,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(SKSizeI),
+            registry.RegisterType(typeof(SKSizeI),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<SKSizeI>(
@@ -115,7 +115,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(SKRect),
+            registry.RegisterType(typeof(SKRect),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<SKRect>(
@@ -136,7 +136,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(SKRectI),
+            registry.RegisterType(typeof(SKRectI),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<SKRectI>(
@@ -157,7 +157,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(SKMatrix),
+            registry.RegisterType(typeof(SKMatrix),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<SKMatrix>(
@@ -188,7 +188,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(SKMatrix44),
+            registry.RegisterType(typeof(SKMatrix44),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<SKMatrix44>(

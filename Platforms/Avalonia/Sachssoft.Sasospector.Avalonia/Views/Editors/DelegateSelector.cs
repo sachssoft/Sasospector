@@ -8,7 +8,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
@@ -19,7 +18,7 @@ namespace Sachssoft.Sasospector.Views.Editors
         private Button? _partExecuteButton;
         private ObjectEditorMode _editorMode = ObjectEditorMode.None;
         private IEnumerable? _fields;
-
+        private InspectorAction? _addAction;
         public static readonly DirectProperty<DelegateSelector, IEnumerable?> FieldsProperty =
             AvaloniaProperty.RegisterDirect<DelegateSelector, IEnumerable?>(
                 nameof(Fields),
@@ -39,11 +38,12 @@ namespace Sachssoft.Sasospector.Views.Editors
                 nameof(EditorMode),
                 o => o.EditorMode);
 
-        public static readonly StyledProperty<ICommand?> CommandProperty =
-            AvaloniaProperty.Register<ListEditor, ICommand?>(nameof(Command));
-
-        public static readonly StyledProperty<object?> CommandParameterProperty =
-            AvaloniaProperty.Register<ListEditor, object?>(nameof(CommandParameter));
+        public static readonly DirectProperty<DelegateSelector, InspectorAction?> ActionProperty =
+            AvaloniaProperty.RegisterDirect<DelegateSelector, InspectorAction?>(
+                nameof(Action),
+                o => o.Action,
+                (o, v) => o.Action = v,
+                defaultBindingMode: Avalonia.Data.BindingMode.OneWay);
 
         protected override Type StyleKeyOverride { get; } = typeof(DelegateSelector);
 
@@ -78,16 +78,10 @@ namespace Sachssoft.Sasospector.Views.Editors
             private set => SetAndRaise(EditorModeProperty, ref _editorMode, value);
         }
 
-        public ICommand? Command
+        public InspectorAction? Action
         {
-            get => GetValue(CommandProperty);
-            set => SetValue(CommandProperty, value);
-        }
-
-        public object? CommandParameter
-        {
-            get => GetValue(CommandParameterProperty);
-            set => SetValue(CommandParameterProperty, value);
+            get => _addAction;
+            private set => SetAndRaise(ActionProperty, ref _addAction, value);
         }
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -117,7 +111,8 @@ namespace Sachssoft.Sasospector.Views.Editors
             {
                 if (Delegates != null && SelectedDelegateIndex >= 0 && SelectedDelegateIndex < Delegates.Count)
                 {
-                    CurrentProperty?.SetValue(CurrentModel, Delegates[SelectedDelegateIndex]);
+                    if (CurrentModel != null && CurrentProperty != null)
+                        CurrentProperty.SetValue(CurrentModel, Delegates[SelectedDelegateIndex]);
                 }
             }
         }
@@ -125,7 +120,23 @@ namespace Sachssoft.Sasospector.Views.Editors
         protected override void OnContainerEnter()
         {
             base.OnContainerEnter();
+
+            foreach (var action in Actions)
+            {
+                if (action.Target == DelegateEditorActions.Execute)
+                {
+                    Action = action;
+                }
+            }
+
             Rebuild();
+        }
+
+        protected override void OnContainerExit()
+        {
+            base.OnContainerExit();
+
+            Action = null;
         }
 
         private void _partExecuteButton_Click(object? sender, RoutedEventArgs e)
@@ -133,24 +144,35 @@ namespace Sachssoft.Sasospector.Views.Editors
             if (sender is not Button button)
                 return;
 
-            if (button.Command != null &&
-                button.Command.CanExecute(button.CommandParameter))
-            {
-                button.Command.Execute(button.CommandParameter);
-            }
-
             var field = Fields?
                 .Cast<object>()
                 .ElementAtOrDefault(SelectedDelegateIndex);
 
-            SetSelectedFieldValue(field);
+            ApplySelectedField(field);
+
+            if (button.Command != null &&
+                button.Command.CanExecute(button.CommandParameter))
+            {
+                button.Command.Execute(button.CommandParameter);
+
+                var action = (InspectorAction)button.Tag!;
+                action.RefreshItem?.RefreshProperty();
+            }
 
             e.Handled = true;
         }
 
         private void Rebuild()
         {
-            var value = CurrentProperty?.GetValue(CurrentModel);
+            if (CurrentModel == null || CurrentProperty == null)
+            {
+                Fields = null;
+                Delegates = null;
+                SelectedDelegateIndex = -1;
+                return;
+            }
+
+            var value = CurrentProperty.GetValue(CurrentModel);
 
             if (value is IEnumerable enumerable)
             {
@@ -176,6 +198,20 @@ namespace Sachssoft.Sasospector.Views.Editors
 
                 Fields = fields;
                 SelectedDelegateIndex = 0;
+
+                ApplySelectedField(fields[SelectedDelegateIndex]);
+            }
+        }
+
+        private void ApplySelectedField(object? value)
+        {
+            if (value is DelegateSelectorField field)
+            {
+                SetSelectedFieldValue(field.Delegate);
+            }
+            else if (value is Delegate d)
+            {
+                SetSelectedFieldValue(d);
             }
         }
     }

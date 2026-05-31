@@ -8,6 +8,8 @@ namespace Sachssoft.Sasospector.Views
         public static readonly StyledProperty<bool?> ExpectedValueProperty =
             AvaloniaProperty.Register<BooleanConditionalViewItem, bool?>(nameof(ExpectedValue));
 
+        protected override Type StyleKeyOverride { get; } = typeof(BooleanConditionalViewItem);
+
         public bool? ExpectedValue
         {
             get => GetValue(ExpectedValueProperty);

@@ -38,7 +38,7 @@
 		<IsAotCompatible>True</IsAotCompatible>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Folder Include="Experminental\" />
+	  <Folder Include="Features\" />
 	</ItemGroup>
 
 </Project>

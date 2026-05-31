@@ -31,13 +31,14 @@
 					</ComboBox>
 					<Button x:Name="PART_ExecuteButton"
 							Grid.Column="1"
-							Command="{TemplateBinding Command}"
-							CommandParameter="{TemplateBinding CommandParameter}"
+							Command="{Binding Action.Command, RelativeSource={RelativeSource TemplatedParent}}"
+							CommandParameter="{Binding Action.CommandParameter, RelativeSource={RelativeSource TemplatedParent}}"
+							Tag="{Binding Action, RelativeSource={RelativeSource TemplatedParent}}"
 							Width="{StaticResource InspectorPropertyEditorWidth}"
 							Height="{StaticResource InspectorPropertyEditorHeight}">
 						<Viewbox Width="{StaticResource IconViewboxWidth}"
 								 Height="{StaticResource IconViewboxHeight}">
-							<PathIcon Data="{StaticResource PlusIcon}" />
+							<ContentPresenter Content="{Binding Action.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
 						</Viewbox>
 					</Button>
 				</Grid>

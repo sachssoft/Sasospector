@@ -17,6 +17,7 @@ namespace Sachssoft.Sasospector.Views.Editors
         private object? _currentModel;
         private IReadOnlyList<FieldHeaderBase>? _fieldHeaders;
         private InspectorItemBase? _container;
+        private InspectorActions _actions;
 
         public static readonly DirectProperty<PropertyEditorBase, InspectorItemBase?> ContainerProperty =
             AvaloniaProperty.RegisterDirect<PropertyEditorBase, InspectorItemBase?>(
@@ -118,6 +119,23 @@ namespace Sachssoft.Sasospector.Views.Editors
             set => SetValue(IsHeaderVisibleProperty, value);
         }
 
+        protected InspectorActions Actions => _actions ??= new InspectorActions();
+
+        protected void RefreshProperty(ICommand actionCommand)
+        {
+            if (_actions != null)
+            {
+                foreach (var action in _actions)
+                {
+                    if (action.Command == actionCommand)
+                    {
+                        action.RefreshItem?.RefreshProperty();
+                        break;
+                    }
+                }
+            }
+        }
+
         protected void SetSelectedFieldValue(object? value)
         {
             if (Container != null)
@@ -158,6 +176,11 @@ namespace Sachssoft.Sasospector.Views.Editors
                         CurrentProperty = item.Property;
                         CurrentModel = item.ResolvedModel;
                         FieldHeaders = item.FieldHeaders?.AsReadOnly();
+
+                        if (item is PropertyViewItem pvi)
+                        {
+                            _actions = pvi.Actions;
+                        }
 
                         if (this is IItemTemplateProvider itp)
                         {

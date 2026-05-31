@@ -25,6 +25,8 @@ namespace Sachssoft.Sasospector.Views
             set => SetValue(DisplayOrderProperty, value);
         }
 
+        public InspectorActions Actions { get; } = new InspectorActions();
+
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);

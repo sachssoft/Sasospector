@@ -27,7 +27,7 @@ namespace Sachssoft.Sasospector.Registries
         {
 
             // Unterstützt auch Command Selection
-            registry.Register(
+            registry.RegisterRule(
                 type => IsEnumerableOfDelegate(type),
                 (pi, f) => f.CreateDelegateSelector(),
                 priority: 0);
@@ -50,29 +50,20 @@ namespace Sachssoft.Sasospector.Registries
         private void RegisterRules(InspectorPropertyEditorRegistryBase registry)
         {
             // Enum
-            registry.Register(
+            registry.RegisterRule(
                 type => type.IsEnum && !type.IsDefined(typeof(FlagsAttribute), false),
                 (pi, f) => f.CreateEnumEditor(selectionMode: EnumSelectionMode.Single),
                 priority: 0);
 
-            registry.Register(
+            registry.RegisterRule(
                 type => type.IsEnum && type.IsDefined(typeof(FlagsAttribute), false),
                 (pi, f) => f.CreateEnumEditor(selectionMode: EnumSelectionMode.Multiple),
                 priority: 0);
 
-            //// NULLABLE
-            //RegisterRule(
-            //    type => Nullable.GetUnderlyingType(type) != null,
-            //    info =>
-            //    {
-            //        var underlying = Nullable.GetUnderlyingType(info.Type)!;
-
-            //        return new NullablePropertyEditor(
-            //            underlying,
-            //            Create(info with { Type = underlying }) // rekursiv
-            //        );
-            //    },
-            //    priority: 900);
+            // NULLABLE
+            registry.RegisterRedirection(
+                match: type => Nullable.GetUnderlyingType(type) != null,
+                target: type => Nullable.GetUnderlyingType(type)!);
 
             //// ARRAY (optional)
             //RegisterRule(
@@ -80,14 +71,14 @@ namespace Sachssoft.Sasospector.Registries
             //    info => new ArrayPropertyEditor(),
             //    priority: 800);
 
-            registry.Register(
+            registry.RegisterRule(
                 type =>
                     typeof(System.Collections.IList).IsAssignableFrom(type) ||
                     typeof(System.Collections.Generic.IList<>).IsAssignableFrom(type),
                 (pi, f) => f.CreateListEditor(),
                 priority: 0);
 
-            registry.Register(
+            registry.RegisterRule(
                 match: type =>
                     type != typeof(string) &&
                     !type.IsValueType &&
@@ -102,11 +93,11 @@ namespace Sachssoft.Sasospector.Registries
 
         private void RegisterPrimitiveTypes(InspectorPropertyEditorRegistryBase registry)
         {
-            registry.Register(typeof(bool),
+            registry.RegisterType(typeof(bool),
                 (f) => f.CreateEditor(typeof(IBooleanEditor)),
                 priority: 0);
 
-            registry.Register(typeof(sbyte),
+            registry.RegisterType(typeof(sbyte),
                 (f) => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<sbyte>(
@@ -117,7 +108,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(short),
+            registry.RegisterType(typeof(short),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<short>(
@@ -128,7 +119,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(int),
+            registry.RegisterType(typeof(int),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<int>(
@@ -139,7 +130,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(long),
+            registry.RegisterType(typeof(long),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<long>(
@@ -150,7 +141,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(Int128),
+            registry.RegisterType(typeof(Int128),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<Int128>(
@@ -161,7 +152,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(byte),
+            registry.RegisterType(typeof(byte),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<byte>(
@@ -172,7 +163,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(ushort),
+            registry.RegisterType(typeof(ushort),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<ushort>(
@@ -183,7 +174,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(uint),
+            registry.RegisterType(typeof(uint),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<uint>(
@@ -194,7 +185,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(ulong),
+            registry.RegisterType(typeof(ulong),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<ulong>(
@@ -205,7 +196,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(Half),
+            registry.RegisterType(typeof(Half),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: HALF_DECIMAL_PLACES,
                     adapter: new IndexedFieldPropertyAdapter<Half>(
@@ -216,7 +207,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(float),
+            registry.RegisterType(typeof(float),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: FLOAT_DECIMAL_PLACES,
                     adapter: new IndexedFieldPropertyAdapter<float>(
@@ -227,7 +218,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(double),
+            registry.RegisterType(typeof(double),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<double>(
@@ -238,7 +229,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(decimal),
+            registry.RegisterType(typeof(decimal),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<decimal>(
@@ -252,7 +243,7 @@ namespace Sachssoft.Sasospector.Registries
 
         private void RegisterPlatformDependencyTypes(InspectorPropertyEditorRegistryBase registry)
         {
-            registry.Register(typeof(nint),
+            registry.RegisterType(typeof(nint),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<nint>(
@@ -263,7 +254,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(nuint),
+            registry.RegisterType(typeof(nuint),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<nuint>(
@@ -277,68 +268,68 @@ namespace Sachssoft.Sasospector.Registries
 
         private void RegisterCommonTypes(InspectorPropertyEditorRegistryBase registry)
         {
-            registry.Register(typeof(string),
+            registry.RegisterType(typeof(string),
                 (f) => f.CreateStringEditor(),
                 priority: 0);
 
-            registry.Register(typeof(string),
+            registry.RegisterType(typeof(string),
                 (f) => f.CreateFileSystemEditor(),
                 (c) => c.Any(x => x is FileSystemConstraint),
                 priority: 0);
 
-            registry.Register(typeof(string),
+            registry.RegisterType(typeof(string),
                 (f) => f.CreateUriEditor(),
                 (c) => c.Any(x => x is UriConstraint),
                 priority: 0);
 
-            registry.Register(typeof(Uri),
+            registry.RegisterType(typeof(Uri),
                 (f) => f.CreateUriEditor(),
                 priority: 0);
 
-            registry.Register(typeof(char),
+            registry.RegisterType(typeof(char),
                 (f) => f.CreateStringEditor(),
                 priority: 0);
 
-            registry.Register(typeof(Version),
+            registry.RegisterType(typeof(Version),
                 (f) => f.CreateVersionEditor(),
                 priority: 0);
 
-            registry.Register(typeof(Guid),
+            registry.RegisterType(typeof(Guid),
                 (f) => f.CreateGuidEditor(),
                 priority: 0);
         }
 
         private void RegisterDataTimeTypes(InspectorPropertyEditorRegistryBase registry)
         {
-            registry.Register(typeof(DateTime),
+            registry.RegisterType(typeof(DateTime),
                 (f) => f.CreateDateTimeEditor(
                     parts: DateTimeEditorParts.DateTime,
                     adapter: null
                 ),
                 priority: 0);
 
-            registry.Register(typeof(DateTimeOffset),
+            registry.RegisterType(typeof(DateTimeOffset),
                 (f) => f.CreateDateTimeEditor(
                     parts: DateTimeEditorParts.DateTime,
                     adapter: null
                 ),
                 priority: 0);
 
-            registry.Register(typeof(TimeSpan),
+            registry.RegisterType(typeof(TimeSpan),
                 (f) => f.CreateDateTimeEditor(
                     parts: DateTimeEditorParts.Time,
                     adapter: null
                 ),
                 priority: 0);
 
-            registry.Register(typeof(TimeOnly),
+            registry.RegisterType(typeof(TimeOnly),
                 (f) => f.CreateDateTimeEditor(
                     parts: DateTimeEditorParts.Time,
                     adapter: null
                 ),
                 priority: 0);
 
-            registry.Register(typeof(DateOnly),
+            registry.RegisterType(typeof(DateOnly),
                 (f) => f.CreateDateTimeEditor(
                     parts: DateTimeEditorParts.Date,
                     adapter: null
@@ -348,7 +339,7 @@ namespace Sachssoft.Sasospector.Registries
 
         private void RegisterNumericMathTypes(InspectorPropertyEditorRegistryBase registry)
         {
-            registry.Register(typeof(System.Numerics.Vector2),
+            registry.RegisterType(typeof(System.Numerics.Vector2),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: FLOAT_DECIMAL_PLACES,
                     adapter: new IndexedFieldPropertyAdapter<System.Numerics.Vector2>(
@@ -370,7 +361,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(System.Numerics.Vector3),
+            registry.RegisterType(typeof(System.Numerics.Vector3),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: FLOAT_DECIMAL_PLACES,
                     adapter: new IndexedFieldPropertyAdapter<System.Numerics.Vector3>(
@@ -395,7 +386,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(System.Numerics.Vector4),
+            registry.RegisterType(typeof(System.Numerics.Vector4),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: FLOAT_DECIMAL_PLACES,
                     adapter: new IndexedFieldPropertyAdapter<System.Numerics.Vector4>(
@@ -423,7 +414,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(System.Numerics.Matrix3x2),
+            registry.RegisterType(typeof(System.Numerics.Matrix3x2),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: FLOAT_DECIMAL_PLACES,
                     adapter: new IndexedFieldPropertyAdapter<System.Numerics.Matrix3x2>(
@@ -457,7 +448,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(System.Numerics.Matrix4x4),
+            registry.RegisterType(typeof(System.Numerics.Matrix4x4),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: FLOAT_DECIMAL_PLACES,
                     adapter: new IndexedFieldPropertyAdapter<System.Numerics.Matrix4x4>(
@@ -521,7 +512,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(System.Numerics.Quaternion),
+            registry.RegisterType(typeof(System.Numerics.Quaternion),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: FLOAT_DECIMAL_PLACES,
                     adapter: new IndexedFieldPropertyAdapter<System.Numerics.Quaternion>(
@@ -549,7 +540,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(System.Numerics.Plane),
+            registry.RegisterType(typeof(System.Numerics.Plane),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: FLOAT_DECIMAL_PLACES,
                     adapter: new IndexedFieldPropertyAdapter<System.Numerics.Plane>(
@@ -577,7 +568,7 @@ namespace Sachssoft.Sasospector.Registries
                 ),
                 priority: 0);
 
-            registry.Register(typeof(System.Numerics.BigInteger),
+            registry.RegisterType(typeof(System.Numerics.BigInteger),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: 0,
                     adapter: new IndexedFieldPropertyAdapter<System.Numerics.BigInteger>(
@@ -587,7 +578,7 @@ namespace Sachssoft.Sasospector.Registries
                     )),
                 priority: 0);
 
-            registry.Register(typeof(System.Numerics.Complex),
+            registry.RegisterType(typeof(System.Numerics.Complex),
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<System.Numerics.Complex>(

@@ -23,8 +23,6 @@ namespace Sachssoft.Sasospector.Views
         private ContentControl? _partEditorContent;
         private ContentControl? _partContainer;
 
-        private bool _isHeaderCheckable;
-
         public static readonly StyledProperty<Type?> TargetTypeProperty =
             AvaloniaProperty.Register<PropertyViewItem, Type?>(nameof(TargetType));
 
@@ -34,14 +32,7 @@ namespace Sachssoft.Sasospector.Views
         public static readonly StyledProperty<PropertyEditorBase?> CustomEditorProperty =
             AvaloniaProperty.Register<PropertyViewItem, PropertyEditorBase?>(nameof(CustomEditor));
 
-        public static readonly DirectProperty<PropertyViewItem, bool> IsHeaderCheckableProperty =
-            AvaloniaProperty.RegisterDirect<PropertyViewItem, bool>(
-                nameof(IsHeaderCheckable),
-                o => o.IsHeaderCheckable,
-                (o, v) => o.IsHeaderCheckable = v);
-
-        public static readonly StyledProperty<bool> IsHeaderCheckedProperty =
-            AvaloniaProperty.Register<PropertyViewItem, bool>(nameof(IsHeaderChecked));
+        protected override Type StyleKeyOverride => typeof(PropertyViewItem);
 
         public Type? TargetType
         {
@@ -61,22 +52,9 @@ namespace Sachssoft.Sasospector.Views
             set => SetValue(CustomEditorProperty, value);
         }
 
-        public bool IsHeaderCheckable
-        {
-            get => _isHeaderCheckable;
-            private set => SetAndRaise(IsHeaderCheckableProperty, ref _isHeaderCheckable, value);
-        }
-
-        public bool IsHeaderChecked
-        {
-            get => GetValue(IsHeaderCheckedProperty);
-            set => SetValue(IsHeaderCheckedProperty, value);
-        }
-
         public InspectorContainerTemplates ContainerTemplates { get; } = new InspectorContainerTemplates();
-        public PropertyEditorActions Actions { get; } = new PropertyEditorActions();
 
-        protected override Type StyleKeyOverride => typeof(PropertyViewItem);
+        public InspectorActions Actions { get; } = new InspectorActions();
 
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {

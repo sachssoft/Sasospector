@@ -10,6 +10,7 @@ namespace Sachssoft.Sasospector.Registries
         private readonly IInspectorEditorPlatformFactory _platformFactory;
         private readonly Dictionary<Type, List<Entry>> _entries = new();
         private readonly List<RuleEntry> _rules = new();
+        private readonly List<RedirectionEntry> _redirections = new();
         private readonly HashSet<IInspectorPropertyEditorModule> _registeredModules = new();
 
         private sealed record Entry(
@@ -23,10 +24,16 @@ namespace Sachssoft.Sasospector.Registries
             int Priority
         );
 
+        private sealed record RedirectionEntry(
+            Func<Type, bool> Match,
+            Func<Type, Type> Redirect,
+            Func<IEnumerable<IInspectorConstraint>, bool>? ConstraintMatch,
+            int Priority
+        );
+
         public InspectorPropertyEditorRegistryBase()
         {
             _platformFactory = CreatePlatformFactory();
-            //RegisterRules();
         }
 
         public InspectorPropertyEditorRegistryBase(IEnumerable<IInspectorPropertyEditorModule> modules)
@@ -37,7 +44,7 @@ namespace Sachssoft.Sasospector.Registries
                 AddModule(module);
         }
 
-        public void Register(
+        public void RegisterType(
             Type type,
             Func<IInspectorEditorPlatformFactory, IPropertyEditor> factory,
             Func<IEnumerable<IInspectorConstraint>, bool>? constraintMatch = null,
@@ -47,13 +54,24 @@ namespace Sachssoft.Sasospector.Registries
             list.Add(new Entry(factory, priority));
         }
 
-        public void Register(
+        public void RegisterRule(
             Func<Type, bool> match,
             Func<IInspectorPropertyInfo, IInspectorEditorPlatformFactory, IPropertyEditor> factory,
             Func<IEnumerable<IInspectorConstraint>, bool>? constraintMatch = null,
             int priority = 0)
         {
             _rules.Add(new RuleEntry(match, factory, priority));
+        }
+
+        // Weiterleitung von generischen Typen, z.B. Nullable<T> -> T, Array<T> -> T, ...
+        // z.b. Nullable<T>, Array<T>, ...
+        public void RegisterRedirection(
+            Func<Type, bool> match,
+            Func<Type, Type> target,
+            Func<IEnumerable<IInspectorConstraint>, bool>? constraintMatch = null,
+            int priority = 0)
+        {
+            _redirections.Add(new RedirectionEntry(match, target, constraintMatch, priority));
         }
 
         public bool TryAddModule(IInspectorPropertyEditorModule module)
@@ -77,14 +95,13 @@ namespace Sachssoft.Sasospector.Registries
             }
         }
 
-        // info: Eigenschaft
-        // preferredEditorKind: gewünschter Editor-Typ, falls vorhanden
         public IPropertyEditor? Create(IInspectorPropertyInfo info, string? preferredEditorKind = null)
         {
             IPropertyEditor? result = null;
-            var type = info.Type;
 
-            // 1. RULE SYSTEM (Semantik: Enum, Nullable, spezielle Fälle)
+            var type = ResolveType(info.Type);
+
+            // 1. RULE SYSTEM
             var rule = _rules
                 .Where(r => r.Match(type))
                 .OrderByDescending(r => r.Priority)
@@ -96,7 +113,7 @@ namespace Sachssoft.Sasospector.Registries
             }
             else
             {
-                // 2. REGISTRY SYSTEM (konkrete Typen)
+                // 2. REGISTRY SYSTEM
                 var candidates = _entries
                     .Where(x => x.Key.IsAssignableFrom(type))
                     .SelectMany(x => x.Value)
@@ -116,6 +133,29 @@ namespace Sachssoft.Sasospector.Registries
         }
 
         protected abstract IInspectorEditorPlatformFactory CreatePlatformFactory();
+
+        private Type ResolveType(Type type, HashSet<Type>? visited = null)
+        {
+            visited ??= new HashSet<Type>();
+
+            if (!visited.Add(type))
+                return type; // Schutz vor Zyklen
+
+            var redirection = _redirections
+                .Where(r => r.Match(type))
+                .OrderByDescending(r => r.Priority)
+                .FirstOrDefault();
+
+            if (redirection == null)
+                return type;
+
+            var redirected = redirection.Redirect(type);
+
+            if (redirected == type)
+                return type;
+
+            return ResolveType(redirected, visited);
+        }
 
         private List<Entry> GetOrCreateList(Type type)
         {
