@@ -1,4 +1,5 @@
-﻿using Sachssoft.Sasospector.Constraints;
+﻿using Sachssoft.Sasospector.Purposes;
+using Sachssoft.Sasospector.Constraints;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,20 +16,22 @@ namespace Sachssoft.Sasospector.Registries
 
         private sealed record Entry(
             Func<IInspectorEditorPlatformFactory, IPropertyEditor> Factory,
-            int Priority
+            IInspectorPropertyPurpose? Purpose,
+            bool IsFallback
         );
 
         private sealed record RuleEntry(
             Func<Type, bool> Match,
             Func<IInspectorPropertyInfo, IInspectorEditorPlatformFactory, IPropertyEditor> Factory,
-            int Priority
+            IInspectorPropertyPurpose? Purpose,
+            bool IsFallback
         );
 
         private sealed record RedirectionEntry(
             Func<Type, bool> Match,
             Func<Type, Type> Redirect,
-            Func<IEnumerable<IInspectorConstraint>, bool>? ConstraintMatch,
-            int Priority
+            IInspectorPropertyPurpose? Purpose,
+            bool IsFallback
         );
 
         public InspectorPropertyEditorRegistryBase()
@@ -47,20 +50,20 @@ namespace Sachssoft.Sasospector.Registries
         public void RegisterType(
             Type type,
             Func<IInspectorEditorPlatformFactory, IPropertyEditor> factory,
-            Func<IEnumerable<IInspectorConstraint>, bool>? constraintMatch = null,
-            int priority = 0)
+            IInspectorPropertyPurpose? purpose = null,
+            bool isFallback = false)
         {
             var list = GetOrCreateList(type);
-            list.Add(new Entry(factory, priority));
+            list.Add(new Entry(factory, purpose, isFallback));
         }
 
         public void RegisterRule(
             Func<Type, bool> match,
             Func<IInspectorPropertyInfo, IInspectorEditorPlatformFactory, IPropertyEditor> factory,
-            Func<IEnumerable<IInspectorConstraint>, bool>? constraintMatch = null,
-            int priority = 0)
+            IInspectorPropertyPurpose? purpose = null,
+            bool isFallback = false)
         {
-            _rules.Add(new RuleEntry(match, factory, priority));
+            _rules.Add(new RuleEntry(match, factory, purpose, isFallback));
         }
 
         // Weiterleitung von generischen Typen, z.B. Nullable<T> -> T, Array<T> -> T, ...
@@ -68,10 +71,10 @@ namespace Sachssoft.Sasospector.Registries
         public void RegisterRedirection(
             Func<Type, bool> match,
             Func<Type, Type> target,
-            Func<IEnumerable<IInspectorConstraint>, bool>? constraintMatch = null,
-            int priority = 0)
+            IInspectorPropertyPurpose? purpose = null,
+            bool isFallback = false)
         {
-            _redirections.Add(new RedirectionEntry(match, target, constraintMatch, priority));
+            _redirections.Add(new RedirectionEntry(match, target, purpose, isFallback));
         }
 
         public bool TryAddModule(IInspectorPropertyEditorModule module)
@@ -97,36 +100,53 @@ namespace Sachssoft.Sasospector.Registries
 
         public IPropertyEditor? Create(IInspectorPropertyInfo info, string? preferredEditorKind = null)
         {
+            var type = ResolveType(info.Type);
+            var purpose = info.Metadata.Purpose;
+
             IPropertyEditor? result = null;
 
-            var type = ResolveType(info.Type);
-
-            // 1. RULE SYSTEM
-            var rule = _rules
-                .Where(r => r.Match(type))
-                .OrderByDescending(r => r.Priority)
-                .FirstOrDefault();
-
-            if (rule != null)
+            // 1. EXACT TYPE MATCH
+            if (_entries.TryGetValue(type, out var exactList))
             {
-                result = rule.Factory(info, _platformFactory);
+                var filtered = exactList
+                    .Where(e => e.Purpose == null || e.Purpose.IsEquivalentTo(purpose))
+                    .ToList();
+
+                result =
+                    filtered.FirstOrDefault(e => !e.IsFallback)?.Factory(_platformFactory)
+                    ?? filtered.FirstOrDefault(e => e.IsFallback)?.Factory(_platformFactory);
             }
-            else
+
+            // 2. ASSIGNABLE MATCH
+            if (result == null)
             {
-                // 2. REGISTRY SYSTEM
                 var candidates = _entries
                     .Where(x => x.Key.IsAssignableFrom(type))
                     .SelectMany(x => x.Value)
+                    .Where(e => e.Purpose == null || e.Purpose.IsEquivalentTo(purpose))
                     .ToList();
 
-                if (candidates.Count == 0)
-                    return null;
-
-                result = candidates
-                    .OrderByDescending(x => x.Priority)
-                    .First()
-                    .Factory(_platformFactory);
+                result =
+                    candidates.FirstOrDefault(e => !e.IsFallback)?.Factory(_platformFactory)
+                    ?? candidates.FirstOrDefault(e => e.IsFallback)?.Factory(_platformFactory);
             }
+
+            // 3. RULE SYSTEM
+            if (result == null)
+            {
+                var rules = _rules
+                    .Where(r => r.Match(type))
+                    .Where(r => r.Purpose == null || r.Purpose.IsEquivalentTo(purpose))
+                    .ToList();
+
+                result =
+                    rules.FirstOrDefault(r => !r.IsFallback)?.Factory(info, _platformFactory)
+                    ?? rules.FirstOrDefault(r => r.IsFallback)?.Factory(info, _platformFactory);
+            }
+
+            // ❗ FINAL SAFETY: wirklich nichts gefunden → NULL
+            if (result == null)
+                return null;
 
             result.PreferredKind = preferredEditorKind;
             return result;
@@ -143,7 +163,6 @@ namespace Sachssoft.Sasospector.Registries
 
             var redirection = _redirections
                 .Where(r => r.Match(type))
-                .OrderByDescending(r => r.Priority)
                 .FirstOrDefault();
 
             if (redirection == null)
@@ -151,7 +170,7 @@ namespace Sachssoft.Sasospector.Registries
 
             var redirected = redirection.Redirect(type);
 
-            if (redirected == type)
+            if (redirected == type || redirected == null)
                 return type;
 
             return ResolveType(redirected, visited);

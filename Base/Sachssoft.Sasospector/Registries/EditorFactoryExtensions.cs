@@ -49,8 +49,10 @@ namespace Sachssoft.Sasospector.Registries
         public static IPropertyEditor CreateColorEditor(
             this IInspectorEditorPlatformFactory f,
             bool includeAlpha,
-            ColorPropertyAdapter adapter)
+            ColorPropertyAdapterBase adapter)
         {
+            _ = adapter ?? throw new ArgumentNullException(nameof(adapter));
+
             var editor = ((IColorEditor)f.CreateEditor(typeof(IColorEditor)));
 
             editor.IncludeAlpha = includeAlpha;
@@ -104,9 +106,12 @@ namespace Sachssoft.Sasospector.Registries
         }
 
         public static IPropertyEditor CreateFileSystemEditor(
-            this IInspectorEditorPlatformFactory f)
+            this IInspectorEditorPlatformFactory f,
+            FileSystemMode mode)
         {
             var editor = ((IFileSystemEditor)f.CreateEditor(typeof(IFileSystemEditor)));
+            
+            editor.Mode = mode;
 
             return editor;
         }

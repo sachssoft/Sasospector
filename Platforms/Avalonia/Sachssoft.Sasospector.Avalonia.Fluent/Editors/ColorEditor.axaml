@@ -21,10 +21,12 @@
 							<SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=editors:ColorEditor}, Mode=TwoWay}" />
 						</Border.Background>
 					</Border>
-					<TextBox Text="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=editors:ColorEditor}, Converter={StaticResource ColorToHexConverter}, Mode=TwoWay}"
+					<TextBox x:Name="PART_TextBox"
+							 Text="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=editors:ColorEditor}, Converter={StaticResource ColorToHexConverter}, Mode=TwoWay}"
 							 HorizontalAlignment="Stretch"
 							 Grid.Column="1"/>
-					<Button Grid.Column="2"
+					<Button x:Name="PART_BrowseButton"
+							Grid.Column="2"
 							HorizontalAlignment="Stretch"
 							HorizontalContentAlignment="Center"
 							Width="{StaticResource InspectorPropertyEditorWidth}"
@@ -33,7 +35,7 @@
 								 Height="{StaticResource IconViewboxHeight}"
 								 HorizontalAlignment="Center"
 								 VerticalAlignment="Center">
-							<!--<PathIcon Data="{StaticResource BrowseIcon}"/>-->
+							<ContentPresenter Content="{Binding Action.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
 						</Viewbox>
 					</Button>
 				</Grid>

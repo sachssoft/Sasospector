@@ -59,6 +59,8 @@ namespace Sachssoft.Sasospector.Registries
             Register(typeof(EnumEditor), () => new EnumEditor());
             Register(typeof(GuidEditor), () => new GuidEditor());
             Register(typeof(MultipleNumericEditor), () => new MultipleNumericEditor());
+            Register(typeof(FileSystemEditor), () => new FileSystemEditor());
+            Register(typeof(UriEditor), () => new UriEditor());
             Register(typeof(StringEditor), () => new StringEditor());
             Register(typeof(VersionEditor), () => new VersionEditor());
             Register(typeof(InstanceSelector), () => new InstanceSelector());

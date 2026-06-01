@@ -4,6 +4,8 @@
 		<ResourceInclude Source="../Editors/BooleanEditor.axaml" />
 		<ResourceInclude Source="../Editors/EnumEditor.axaml" />
 		<ResourceInclude Source="../Editors/StringEditor.axaml" />
+		<ResourceInclude Source="../Editors/FileSystemEditor.axaml" />
+		<ResourceInclude Source="../Editors/UriEditor.axaml" />
 		<ResourceInclude Source="../Editors/ColorEditor.axaml" />
 		<ResourceInclude Source="../Editors/MultipleNumericEditor.axaml" />
 		<ResourceInclude Source="../Editors/InstanceSelector.axaml" />

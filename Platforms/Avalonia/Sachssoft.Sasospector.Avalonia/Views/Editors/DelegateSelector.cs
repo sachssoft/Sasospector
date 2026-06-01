@@ -18,7 +18,8 @@ namespace Sachssoft.Sasospector.Views.Editors
         private Button? _partExecuteButton;
         private ObjectEditorMode _editorMode = ObjectEditorMode.None;
         private IEnumerable? _fields;
-        private InspectorAction? _addAction;
+        private InspectorAction? _action;
+
         public static readonly DirectProperty<DelegateSelector, IEnumerable?> FieldsProperty =
             AvaloniaProperty.RegisterDirect<DelegateSelector, IEnumerable?>(
                 nameof(Fields),
@@ -80,8 +81,8 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         public InspectorAction? Action
         {
-            get => _addAction;
-            private set => SetAndRaise(ActionProperty, ref _addAction, value);
+            get => _action;
+            private set => SetAndRaise(ActionProperty, ref _action, value);
         }
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -89,12 +90,12 @@ namespace Sachssoft.Sasospector.Views.Editors
             base.OnApplyTemplate(e);
 
             if (_partExecuteButton != null)
-                _partExecuteButton.Click -= _partExecuteButton_Click;
+                _partExecuteButton.Click -= OnPartExecuteButtonClick;
 
             _partExecuteButton = e.NameScope.Get<Button>(PART_ExecuteButton);
 
             if (_partExecuteButton != null)
-                _partExecuteButton.Click += _partExecuteButton_Click;
+                _partExecuteButton.Click += OnPartExecuteButtonClick;
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -139,7 +140,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             Action = null;
         }
 
-        private void _partExecuteButton_Click(object? sender, RoutedEventArgs e)
+        private void OnPartExecuteButtonClick(object? sender, RoutedEventArgs e)
         {
             if (sender is not Button button)
                 return;

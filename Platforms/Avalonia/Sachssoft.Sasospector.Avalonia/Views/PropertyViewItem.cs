@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Registries;
 using Sachssoft.Sasospector.Views.Editors;

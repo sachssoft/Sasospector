@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:views="using:Sachssoft.Sasospector.Views"
+					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
+					x:ClassModifier="internal">
+
+	<ControlTheme x:Key="{x:Type editors:FileSystemEditor}"
+					  TargetType="editors:FileSystemEditor">
+		<Setter Property="Template">
+			<ControlTemplate TargetType="editors:FileSystemEditor">
+				<Grid ColumnDefinitions="*,Auto">
+					<TextBox x:Name="PART_TextBox"
+							 Height="{StaticResource InspectorPropertyEditorHeight}"
+							 Grid.Column="0"/>
+					<Button x:Name="PART_BrowseButton"
+							Grid.Column="2"
+							HorizontalAlignment="Stretch"
+							HorizontalContentAlignment="Center"
+							Width="{StaticResource InspectorPropertyEditorWidth}"
+							Height="{StaticResource InspectorPropertyEditorHeight}">
+						<Viewbox Width="{StaticResource IconViewboxWidth}"
+								 Height="{StaticResource IconViewboxHeight}">
+							<ContentPresenter Content="{Binding Action.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+						</Viewbox>
+					</Button>
+				</Grid>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+
+</ResourceDictionary>

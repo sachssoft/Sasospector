@@ -4,16 +4,15 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
-using Sachssoft.Sasospector.Adapters;
 using Sachssoft.Sasospector.Editors;
 using System;
+using System.Collections.Generic;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
     [TemplatePart(PART_BrowseButton, typeof(Button))]
     [TemplatePart(PART_TextBox, typeof(TextBox))]
-    public class ColorEditor : PropertyEditorBase, IColorEditor
+    public class FileSystemEditor : PropertyEditorBase, IFileSystemEditor
     {
         private const string PART_BrowseButton = nameof(PART_BrowseButton);
         private const string PART_TextBox = nameof(PART_TextBox);
@@ -23,40 +22,31 @@ namespace Sachssoft.Sasospector.Views.Editors
         private TextBox? _partTextBox;
         private InspectorAction? _action;
 
-        public static readonly StyledProperty<ColorPropertyAdapterBase?> AdapterProperty =
-            AvaloniaProperty.Register<ColorEditor, ColorPropertyAdapterBase?>(nameof(Adapter));
+        public static readonly StyledProperty<FileSystemMode> ModeProperty =
+            AvaloniaProperty.Register<FileSystemEditor, FileSystemMode>(nameof(Mode));
 
-        public static readonly StyledProperty<bool> IncludeAlphaProperty =
-            AvaloniaProperty.Register<ColorEditor, bool>(nameof(IncludeAlpha));
+        public static readonly StyledProperty<IEnumerable<string>?> FiltersProperty =
+            AvaloniaProperty.Register<FileSystemEditor, IEnumerable<string>?>(nameof(Filters));
 
-        public static readonly StyledProperty<Color> SelectedColorProperty =
-            AvaloniaProperty.Register<ColorEditor, Color>(nameof(SelectedColor));
-
-        public static readonly DirectProperty<ColorEditor, InspectorAction?> ActionProperty =
-            AvaloniaProperty.RegisterDirect<ColorEditor, InspectorAction?>(
+        public static readonly DirectProperty<FileSystemEditor, InspectorAction?> ActionProperty =
+            AvaloniaProperty.RegisterDirect<FileSystemEditor, InspectorAction?>(
                 nameof(Action),
                 o => o.Action,
                 (o, v) => o.Action = v,
                 defaultBindingMode: Avalonia.Data.BindingMode.OneWay);
 
-        protected override Type StyleKeyOverride { get; } = typeof(ColorEditor);
+        protected override Type StyleKeyOverride { get; } = typeof(FileSystemEditor);
 
-        public ColorPropertyAdapterBase? Adapter
+        public FileSystemMode Mode
         {
-            get => GetValue(AdapterProperty);
-            set => SetValue(AdapterProperty, value);
+            get => GetValue(ModeProperty);
+            set => SetValue(ModeProperty, value);
         }
 
-        public bool IncludeAlpha
+        public IEnumerable<string>? Filters
         {
-            get => GetValue(IncludeAlphaProperty);
-            set => SetValue(IncludeAlphaProperty, value);
-        }
-
-        public Color SelectedColor
-        {
-            get => GetValue(SelectedColorProperty);
-            set => SetValue(SelectedColorProperty, value);
+            get => GetValue(FiltersProperty);
+            set => SetValue(FiltersProperty, value);
         }
 
         public InspectorAction? Action
@@ -114,7 +104,7 @@ namespace Sachssoft.Sasospector.Views.Editors
 
             foreach (var action in Actions)
             {
-                if (action.Target == ColorEditorActions.Select)
+                if (action.Target == FileSystemEditorActions.Browse)
                 {
                     Action = action;
                 }
@@ -170,23 +160,20 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         private void SyncFromSource()
         {
-            if (_partTextBox is null || CurrentProperty is null || CurrentModel is null || Adapter is null)
+            if (_partTextBox is null || CurrentProperty is null || CurrentModel is null)
                 return;
 
-            var fieldValue = Adapter.ToField(CurrentProperty.GetValue(CurrentModel));
-            _partTextBox.Text = fieldValue.ToString();
+            var value = (string?)CurrentProperty.GetValue(CurrentModel);
+
+            _partTextBox.Text = value;
         }
 
         private void SyncToSource()
         {
-            if (_partTextBox is null || CurrentProperty is null || CurrentModel is null || Adapter is null)
+            if (_partTextBox is null || CurrentProperty is null || CurrentModel is null)
                 return;
 
-            var color = Sasospector.Models.Color.TryParse(_partTextBox.Text, out var result) ?
-                result : new Sasospector.Models.Color(0, 0, 0, 0);
-
-            var sourceValue = Adapter.ToSource(color);
-            CurrentProperty.SetValue(CurrentModel, sourceValue);
+            CurrentProperty.SetValue(CurrentModel, _partTextBox.Text);
         }
     }
 }

@@ -3,9 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using Sachssoft.Sasospector.Editors;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Sachssoft.Sasospector.Editors;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {
@@ -15,15 +16,20 @@ namespace Sachssoft.Sasospector.Views.Editors
         private const string PART_EnumFields = nameof(PART_EnumFields);
 
         private SelectingItemsControl? _partEnumFields;
-        private string[]? _enumRawFields;
         private bool _kindSyncing;
         private bool _sourceSyncing;
-
-        public static readonly StyledProperty<Enum> ValueProperty =
-            AvaloniaProperty.Register<EnumEditor, Enum>(nameof(Value));
+        private List<EnumItem>? _items;
 
         public static readonly StyledProperty<EnumSelectionMode> SelectionModeProperty =
             AvaloniaProperty.Register<EnumEditor, EnumSelectionMode>(nameof(SelectionMode));
+
+        protected override Type StyleKeyOverride { get; } = typeof(EnumEditor);
+
+        public EnumSelectionMode SelectionMode
+        {
+            get => GetValue(SelectionModeProperty);
+            set => SetValue(SelectionModeProperty, value);
+        }
 
         public EnumEditor()
         {
@@ -31,20 +37,6 @@ namespace Sachssoft.Sasospector.Views.Editors
         }
 
         public EditorKindSelector EditorKindSelector { get; private set; }
-
-        protected override Type StyleKeyOverride { get; } = typeof(EnumEditor);
-
-        public Enum Value
-        {
-            get => GetValue(ValueProperty);
-            set => SetValue(ValueProperty, value);
-        }
-
-        public EnumSelectionMode SelectionMode
-        {
-            get => GetValue(SelectionModeProperty);
-            set => SetValue(SelectionModeProperty, value);
-        }
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
@@ -59,59 +51,112 @@ namespace Sachssoft.Sasospector.Views.Editors
                 _partEnumFields.SelectionChanged += OnSelectionChanged;
 
             Rebuild();
+            SyncFromSource();
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+
+            if (_partEnumFields != null)
+                _partEnumFields.SelectionChanged -= OnSelectionChanged;
+        }
+
+        protected override void OnPropertySourceValueChanged()
+        {
+            _sourceSyncing = true;
+            SyncFromSource();
+            _sourceSyncing = false;
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == CurrentPropertyProperty ||
-                change.Property == CurrentModelProperty)
+            if (change.Property == CurrentModelProperty ||
+                change.Property == CurrentPropertyProperty)
             {
                 Rebuild();
+                SyncFromSource();
             }
             else if (change.Property == SelectionModeProperty)
             {
                 SetupEditorKindSelector();
                 Rebuild();
+                SyncFromSource();
             }
             else if (change.Property == PreferredKindProperty && !_kindSyncing)
             {
                 _kindSyncing = true;
-
                 EditorKindSelector.Value = PreferredKind;
                 Rebuild();
-
+                SyncFromSource();
                 _kindSyncing = false;
-            }
-            else if (change.Property == ValueProperty && !_sourceSyncing)
-            {
-                _sourceSyncing = true;
-
-                if (CurrentModel != null && CurrentProperty != null)
-                    CurrentProperty.SetValue(CurrentModel, Value);
-
-                _sourceSyncing = false;
             }
         }
 
-        protected override void OnUnloaded(RoutedEventArgs e)
+        private void Rebuild()
         {
-            if (_partEnumFields != null)
-                _partEnumFields.SelectionChanged -= OnSelectionChanged;
+            if (CurrentModel == null || CurrentProperty == null || _partEnumFields == null)
+                return;
 
-            base.OnUnloaded(e);
+            if (!CurrentProperty.Type.IsEnum)
+                return;
+
+            var enumType = CurrentProperty.Type;
+            var names = Enum.GetNames(enumType);
+
+            _items = new List<EnumItem>();
+
+            foreach (var name in names)
+            {
+                var value = Enum.Parse(enumType, name);
+                _items.Add(new EnumItem(name, value));
+            }
+
+            _partEnumFields.ItemsSource = _items;
+        }
+
+        private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            if (_sourceSyncing)
+                return;
+
+            _sourceSyncing = true;
+            SyncToSource();
+            _sourceSyncing = false;
+        }
+
+        private void SyncFromSource()
+        {
+            if (_partEnumFields == null || CurrentProperty == null || CurrentModel == null || _items == null)
+                return;
+
+            var value = CurrentProperty.GetValue(CurrentModel);
+
+            _partEnumFields.SelectedItem = _items.FirstOrDefault(x => Equals(x.Value, value));
+        }
+
+        private void SyncToSource()
+        {
+            if (_partEnumFields == null || CurrentProperty == null || CurrentModel == null)
+                return;
+
+            if (_partEnumFields.SelectedItem is not EnumItem item)
+                return;
+
+            CurrentProperty.SetValue(CurrentModel, item.Value);
         }
 
         private void SetupEditorKindSelector()
         {
-            var kinds = SelectionMode == EnumSelectionMode.Single ?
-                new[]
+            var kinds = SelectionMode == EnumSelectionMode.Single
+                ? new[]
                 {
                     SingleSelectionEnumEditorKinds.Dropdown,
                     SingleSelectionEnumEditorKinds.Radio
-                } :
-                new[]
+                }
+                : new[]
                 {
                     MultipleSelectionEnumEditorKinds.Radio,
                     MultipleSelectionEnumEditorKinds.Segment
@@ -127,65 +172,25 @@ namespace Sachssoft.Sasospector.Views.Editors
                     _kindSyncing = true;
                     PreferredKind = v;
                     Rebuild();
+                    SyncFromSource();
                     _kindSyncing = false;
                 },
                 kinds: kinds
             );
         }
 
-        private void Rebuild()
+        private class EnumItem
         {
-            if (CurrentModel == null || CurrentProperty == null || _partEnumFields == null)
-                return;
+            public string Name { get; }
+            public object Value { get; }
 
-            if (!CurrentProperty.Type.IsEnum)
-                return;
-
-            var enumType = CurrentProperty.Type;
-
-            var currentValue = CurrentProperty.GetValue(CurrentModel);
-            var enumValueName = currentValue != null
-                ? Enum.GetName(enumType, currentValue)
-                : null;
-
-            _enumRawFields = Enum.GetNames(enumType);
-
-            var fields = new List<object?>();
-
-            for (int i = 0; i < _enumRawFields.Length; i++)
+            public EnumItem(string name, object value)
             {
-                var field = _enumRawFields[i];
-                var value = Enum.Parse(enumType, field);
-
-                if (TryMatchFieldHeader(i, enumType, value, out var fieldHeader))
-                {
-                    fields.Add(fieldHeader);
-                }
-                else
-                {
-                    fields.Add(field);
-                }
+                Name = name;
+                Value = value;
             }
 
-            _partEnumFields.ItemsSource = fields;
-            _partEnumFields.SelectedIndex = enumValueName != null
-                ? Array.IndexOf(_enumRawFields, enumValueName)
-                : -1;
-        }
-
-        private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-        {
-            if (CurrentModel == null || _partEnumFields == null || _enumRawFields == null || CurrentProperty == null)
-                return;
-
-            var index = _partEnumFields.SelectedIndex;
-            if (index < 0 || index >= _enumRawFields.Length)
-                return;
-
-            var selectedName = _enumRawFields[index];
-
-            var value = Enum.Parse(CurrentProperty.Type, selectedName);
-            CurrentProperty.SetValue(CurrentModel, value);
+            public override string ToString() => Name;
         }
     }
 }

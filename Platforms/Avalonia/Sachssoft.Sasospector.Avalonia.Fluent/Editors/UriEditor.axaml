@@ -4,10 +4,10 @@
 					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
 					x:ClassModifier="internal">
 	
-	<ControlTheme x:Key="{x:Type editors:StringEditor}"
-					  TargetType="editors:StringEditor">
+	<ControlTheme x:Key="{x:Type editors:UriEditor}"
+					  TargetType="editors:UriEditor">
 		<Setter Property="Template">
-			<ControlTemplate TargetType="editors:StringEditor">
+			<ControlTemplate TargetType="editors:UriEditor">
 				<Grid>
 					<TextBox x:Name="PART_TextBox"
 							 Height="{StaticResource InspectorPropertyEditorHeight}" />

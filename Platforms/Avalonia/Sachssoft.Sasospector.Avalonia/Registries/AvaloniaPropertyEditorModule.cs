@@ -11,9 +11,12 @@ namespace Sachssoft.Sasospector.Registries
             registry.RegisterType(typeof(Color),
                 (f) => f.CreateColorEditor(
                     includeAlpha: true,
-                    adapter: new ColorPropertyAdapter()
+                    adapter: new ColorPropertyAdapter<Color>(
+                        toField: s => new Sasospector.Models.Color(s.R, s.G, s.B, s.A),
+                        toSource: f => new Color(f.Alpha, f.Red, f.Green, f.Blue)
+                    )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Avalonia.Vector),
                 f => f.CreateMultipleValueEditor(
@@ -30,7 +33,7 @@ namespace Sachssoft.Sasospector.Registries
                                             y: (double)y[1]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Vector3D),
                 f => f.CreateMultipleValueEditor(
@@ -49,7 +52,7 @@ namespace Sachssoft.Sasospector.Registries
                                             Z: (double)y[2]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Point),
                 f => f.CreateMultipleValueEditor(
@@ -66,7 +69,7 @@ namespace Sachssoft.Sasospector.Registries
                                             y: (double)y[1]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(PixelPoint),
                 f => f.CreateMultipleValueEditor(
@@ -83,7 +86,7 @@ namespace Sachssoft.Sasospector.Registries
                                             y: (int)y[1]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Size),
                 f => f.CreateMultipleValueEditor(
@@ -100,7 +103,7 @@ namespace Sachssoft.Sasospector.Registries
                                             height: (double)y[1]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(PixelSize),
                 f => f.CreateMultipleValueEditor(
@@ -117,7 +120,7 @@ namespace Sachssoft.Sasospector.Registries
                                             height: (int)y[1]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Rect),
                 f => f.CreateMultipleValueEditor(
@@ -138,7 +141,7 @@ namespace Sachssoft.Sasospector.Registries
                                             height: (double)y[3]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(PixelRect),
                 f => f.CreateMultipleValueEditor(
@@ -159,7 +162,7 @@ namespace Sachssoft.Sasospector.Registries
                                             height: (int)y[3]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(CornerRadius),
                 f => f.CreateMultipleValueEditor(
@@ -180,7 +183,7 @@ namespace Sachssoft.Sasospector.Registries
                                             bottomLeft: (double)y[3]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Thickness),
                 f => f.CreateMultipleValueEditor(
@@ -201,7 +204,7 @@ namespace Sachssoft.Sasospector.Registries
                                             bottom: (double)y[3]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Matrix),
                 f => f.CreateMultipleValueEditor(
@@ -232,7 +235,7 @@ namespace Sachssoft.Sasospector.Registries
                                             perspZ: (double)y[8]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             //registry.Register(typeof(RelativePoint),
             //    () => new MultipleValuePropertyEditor

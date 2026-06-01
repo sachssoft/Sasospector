@@ -3,6 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Sachssoft.Sasospector.Schemas;
 using Sachssoft.Sasospector.Views.Fields;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -17,6 +18,7 @@ namespace Sachssoft.Sasospector.Views
         private bool _visualTreeAttached;
         private IInspectorSchema? _resolvedSchema;
         private object? _resolvedModel;
+        private bool _isValueSynchronizing;
 
         public static readonly StyledProperty<IInspectorSchemaSource?> LocalSchemaSourceProperty =
             AvaloniaProperty.Register<InspectorItemBase, IInspectorSchemaSource?>(nameof(LocalSchemaSource));
@@ -77,6 +79,9 @@ namespace Sachssoft.Sasospector.Views
                 o => o._resolvedModel,
                 (o, v) => o._resolvedModel = v,
                 defaultBindingMode: Avalonia.Data.BindingMode.OneWay);
+
+        public static readonly StyledProperty<object?> ValueProperty =
+            AvaloniaProperty.Register<InspectorItemBase, object?>(nameof(Value));
 
         public string? PropertyName
         {
@@ -162,6 +167,14 @@ namespace Sachssoft.Sasospector.Views
             private set => SetAndRaise(ResolvedModelProperty, ref _resolvedModel, value);
         }
 
+        public object? Value
+        {
+            get => GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
+        }
+
+        protected bool IsValueSynchronizing => _isValueSynchronizing;
+
         #region Lifecycle
 
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -203,6 +216,10 @@ namespace Sachssoft.Sasospector.Views
             {
                 UpdateProperty();
             }
+            else if (change.Property == ValueProperty)
+            {
+                SynchronizeFromValue();
+            }
         }
 
         #endregion
@@ -212,16 +229,6 @@ namespace Sachssoft.Sasospector.Views
         public virtual void RefreshProperty() { }
 
         internal protected virtual void OnParentSchemaChanged() { }
-
-        protected virtual void OnSchemaPropertyChanging(PropertyChangingEventArgs e) { }
-
-        protected virtual void OnSchemaPropertyChanged(PropertyChangedEventArgs e) { }
-
-        private void CurrentSchema_PropertyChanging(object? sender, PropertyChangingEventArgs e)
-            => OnSchemaPropertyChanging(e);
-
-        private void CurrentSchema_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-            => OnSchemaPropertyChanged(e);
 
         private void ApplySchema()
         {
@@ -281,11 +288,16 @@ namespace Sachssoft.Sasospector.Views
             if (oldProperty != null)
             {
                 OnUpdatePropertyExit(oldProperty);
+                oldProperty.ValueChanging -= Property_ValueChanging;
+                oldProperty.ValueChanged -= Property_ValueChanged;
             }
 
             if (newProperty != null)
             {
+                SynchronizeToValue();
                 OnUpdatePropertyEnter(newProperty);
+                newProperty.ValueChanging += Property_ValueChanging;
+                newProperty.ValueChanged += Property_ValueChanged;
             }
         }
 
@@ -294,6 +306,41 @@ namespace Sachssoft.Sasospector.Views
 
         protected virtual void OnUpdatePropertyExit(IInspectorPropertyInfo property)
             => System.Diagnostics.Debug.WriteLine($"EXIT: {property?.Name ?? "<null>"}");
+
+        protected virtual void OnPropertyValueChanging(InspectorPropertyChangingEventArgs e) { }
+
+        protected virtual void OnPropertyValueChanged(InspectorPropertyChangedEventArgs e) { }
+
+        private void Property_ValueChanging(object? sender, InspectorPropertyChangingEventArgs e)
+        {
+            OnPropertyValueChanging(e);
+        }
+
+        private void Property_ValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
+        {
+            SynchronizeToValue();
+            OnPropertyValueChanged(e);
+        }
+
+        protected void SynchronizeToValue()
+        {
+            if (_isValueSynchronizing || Property == null || ResolvedModel == null)
+                return;
+
+            _isValueSynchronizing = true;
+            Value = Property.GetValue(ResolvedModel);
+            _isValueSynchronizing = false;
+        }
+
+        protected void SynchronizeFromValue()
+        {
+            if (_isValueSynchronizing || Property == null || ResolvedModel == null)
+                return;
+
+            _isValueSynchronizing = true;
+            Property.SetValue(ResolvedModel, Value);
+            _isValueSynchronizing = false;
+        }
 
         #endregion
 

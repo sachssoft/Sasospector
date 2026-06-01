@@ -1,4 +1,5 @@
 ﻿using Sachssoft.Sasospector.Adapters;
+using Sachssoft.Sasospector.Models;
 using SkiaSharp;
 
 namespace Sachssoft.Sasospector.Registries
@@ -10,23 +11,32 @@ namespace Sachssoft.Sasospector.Registries
             registry.RegisterType(typeof(SKColor),
                 (f) => f.CreateColorEditor(
                     includeAlpha: true,
-                    adapter: new ColorPropertyAdapter()
+                    adapter: new ColorPropertyAdapter<SKColor>(
+                        toField: (s) => new Color(s.Red, s.Green, s.Blue, s.Alpha),
+                        toSource: (f) => new SKColor(f.Red, f.Green, f.Blue, f.Alpha)
+                    )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKColorF),
                 (f) => f.CreateColorEditor(
                     includeAlpha: true,
-                    adapter: new ColorPropertyAdapter()
+                    adapter: new ColorPropertyAdapter<SKColorF>(
+                        toField: (s) => new Color((byte)(s.Red * 255), (byte)(s.Green * 255), (byte)(s.Blue * 255), (byte)(s.Alpha * 255)),
+                        toSource: (f) => new SKColorF(f.Red / 255f, f.Green / 255f, f.Blue / 255f, f.Alpha / 255f)
+                    )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKPMColor),
-                (f) => f.CreateColorEditor(
+                f => f.CreateColorEditor(
                     includeAlpha: true,
-                    adapter: new ColorPropertyAdapter()
+                    adapter: new ColorPropertyAdapter<SKPMColor>(
+                        toField: s => new Color(s.Red, s.Green, s.Blue, s.Alpha),
+                        toSource: f => (SKPMColor)new SKColor(f.Red, f.Green, f.Blue, f.Alpha)
+                    )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKPoint),
                 f => f.CreateMultipleValueEditor(
@@ -43,7 +53,7 @@ namespace Sachssoft.Sasospector.Registries
                                             y: (float)y[1]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKPoint3),
                 f => f.CreateMultipleValueEditor(
@@ -62,7 +72,7 @@ namespace Sachssoft.Sasospector.Registries
                                             z: (float)y[2]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKPointI),
                 f => f.CreateMultipleValueEditor(
@@ -79,7 +89,7 @@ namespace Sachssoft.Sasospector.Registries
                                             y: (int)y[1]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKSize),
                 f => f.CreateMultipleValueEditor(
@@ -96,7 +106,7 @@ namespace Sachssoft.Sasospector.Registries
                                             height: (float)y[1]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKSizeI),
                 f => f.CreateMultipleValueEditor(
@@ -113,7 +123,7 @@ namespace Sachssoft.Sasospector.Registries
                                             height: (int)y[1]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKRect),
                 f => f.CreateMultipleValueEditor(
@@ -134,7 +144,7 @@ namespace Sachssoft.Sasospector.Registries
                                             bottom: (float)y[3]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKRectI),
                 f => f.CreateMultipleValueEditor(
@@ -155,7 +165,7 @@ namespace Sachssoft.Sasospector.Registries
                                             bottom: (int)y[3]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKMatrix),
                 f => f.CreateMultipleValueEditor(
@@ -186,7 +196,7 @@ namespace Sachssoft.Sasospector.Registries
                                             persp2: (float)y[8]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(SKMatrix44),
                 f => f.CreateMultipleValueEditor(
@@ -231,7 +241,7 @@ namespace Sachssoft.Sasospector.Registries
                                             m33: (float)y[15]
                                          )
                     )),
-                priority: 0);
+                isFallback: true);
         }
     }
 }

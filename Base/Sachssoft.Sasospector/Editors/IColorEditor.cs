@@ -4,7 +4,7 @@ namespace Sachssoft.Sasospector.Editors
 {
     public interface IColorEditor : IPropertyEditor
     {
-        ColorPropertyAdapter? Adapter { get; set; }
+        ColorPropertyAdapterBase Adapter { get; set; }
 
         bool IncludeAlpha { get; set; }
     }

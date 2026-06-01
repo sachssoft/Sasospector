@@ -4,7 +4,7 @@ namespace Sachssoft.Sasospector.Adapters
 {
     public interface IInspectorPropertyAdapter
     {
-        bool SupportsField(Type fieldType);
+        //bool SupportsField(Type fieldType);
 
         object? ToField(object? sourceValue);
 

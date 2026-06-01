@@ -1,22 +1,38 @@
-﻿using System;
+﻿using Sachssoft.Sasospector.Models;
+using System;
 
 namespace Sachssoft.Sasospector.Adapters
 {
-    public class ColorPropertyAdapter : IInspectorPropertyAdapter
+    public sealed class ColorPropertyAdapter<T> : ColorPropertyAdapterBase
     {
-        public bool SupportsField(Type type)
+        private readonly Func<T?, Color> _toField;
+        private readonly Func<Color, T?> _toSource;
+
+        public ColorPropertyAdapter(
+            Func<T?, Color> toField,
+            Func<Color, T?> toSource)
         {
-            throw new NotImplementedException();
+            _toField = toField ?? throw new ArgumentNullException(nameof(toField));
+            _toSource = toSource ?? throw new ArgumentNullException(nameof(toSource));
         }
 
-        object? IInspectorPropertyAdapter.ToSource(object? adapterValue)
+        private protected override Type SourceType => typeof(T);
+
+        protected override Color ToFieldOverride(object? sourceValue)
         {
-            throw new NotImplementedException();
+            if (sourceValue is null)
+                return default;
+
+            if (sourceValue is not T typed)
+                throw new InvalidCastException(
+                    $"ColorAdapter: Expected {typeof(T).Name}, got {sourceValue.GetType().Name}");
+
+            return _toField(typed);
         }
 
-        object? IInspectorPropertyAdapter.ToField(object? sourceValue)
+        protected override object? ToSourceOverride(Color adapterValue)
         {
-            throw new NotImplementedException();
+            return _toSource(adapterValue);
         }
     }
 }

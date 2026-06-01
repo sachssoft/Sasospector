@@ -1,8 +1,10 @@
 ﻿using Sachssoft.Sasospector.Adapters;
 using Sachssoft.Sasospector.Constraints;
 using Sachssoft.Sasospector.Editors;
+using Sachssoft.Sasospector.Purposes;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Sachssoft.Sasospector.Registries
@@ -16,6 +18,7 @@ namespace Sachssoft.Sasospector.Registries
         {
             RegisterPrimitiveTypes(registry);
             RegisterPlatformDependencyTypes(registry);
+            RegisterFileSystemTypes(registry);
             RegisterCommonTypes(registry);
             RegisterDataTimeTypes(registry);
             RegisterNumericMathTypes(registry);
@@ -29,8 +32,7 @@ namespace Sachssoft.Sasospector.Registries
             // Unterstützt auch Command Selection
             registry.RegisterRule(
                 type => IsEnumerableOfDelegate(type),
-                (pi, f) => f.CreateDelegateSelector(),
-                priority: 0);
+                (pi, f) => f.CreateDelegateSelector());
         }
 
         private static bool IsEnumerableOfDelegate(Type t)
@@ -52,13 +54,11 @@ namespace Sachssoft.Sasospector.Registries
             // Enum
             registry.RegisterRule(
                 type => type.IsEnum && !type.IsDefined(typeof(FlagsAttribute), false),
-                (pi, f) => f.CreateEnumEditor(selectionMode: EnumSelectionMode.Single),
-                priority: 0);
+                (pi, f) => f.CreateEnumEditor(selectionMode: EnumSelectionMode.Single));
 
             registry.RegisterRule(
                 type => type.IsEnum && type.IsDefined(typeof(FlagsAttribute), false),
-                (pi, f) => f.CreateEnumEditor(selectionMode: EnumSelectionMode.Multiple),
-                priority: 0);
+                (pi, f) => f.CreateEnumEditor(selectionMode: EnumSelectionMode.Multiple));
 
             // NULLABLE
             registry.RegisterRedirection(
@@ -75,8 +75,7 @@ namespace Sachssoft.Sasospector.Registries
                 type =>
                     typeof(System.Collections.IList).IsAssignableFrom(type) ||
                     typeof(System.Collections.Generic.IList<>).IsAssignableFrom(type),
-                (pi, f) => f.CreateListEditor(),
-                priority: 0);
+                (pi, f) => f.CreateListEditor());
 
             registry.RegisterRule(
                 match: type =>
@@ -86,16 +85,14 @@ namespace Sachssoft.Sasospector.Registries
                     !typeof(System.Collections.IEnumerable).IsAssignableFrom(type),
                 factory: (pi, f) => f.CreateInstanceSelector(
                         allowNullSelection: true
-                    ),
-                constraintMatch: (c) => c is IInstanceSelectionConstraint,
-                priority: 0);
+                    ));
         }
 
         private void RegisterPrimitiveTypes(InspectorPropertyEditorRegistryBase registry)
         {
             registry.RegisterType(typeof(bool),
                 (f) => f.CreateEditor(typeof(IBooleanEditor)),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(sbyte),
                 (f) => f.CreateMultipleValueEditor(
@@ -106,7 +103,7 @@ namespace Sachssoft.Sasospector.Registries
                         castFrom: y => (sbyte)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(short),
                 f => f.CreateMultipleValueEditor(
@@ -117,7 +114,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (short)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(int),
                 f => f.CreateMultipleValueEditor(
@@ -128,7 +125,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (int)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(long),
                 f => f.CreateMultipleValueEditor(
@@ -139,7 +136,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (long)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Int128),
                 f => f.CreateMultipleValueEditor(
@@ -150,7 +147,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (Int128)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(byte),
                 f => f.CreateMultipleValueEditor(
@@ -161,7 +158,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (byte)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(ushort),
                 f => f.CreateMultipleValueEditor(
@@ -172,7 +169,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (ushort)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(uint),
                 f => f.CreateMultipleValueEditor(
@@ -183,7 +180,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (uint)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(ulong),
                 f => f.CreateMultipleValueEditor(
@@ -194,7 +191,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (ulong)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Half),
                 f => f.CreateMultipleValueEditor(
@@ -205,7 +202,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (Half)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(float),
                 f => f.CreateMultipleValueEditor(
@@ -216,7 +213,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (float)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(double),
                 f => f.CreateMultipleValueEditor(
@@ -227,7 +224,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (double)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(decimal),
                 f => f.CreateMultipleValueEditor(
@@ -238,7 +235,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (decimal)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
         }
 
         private void RegisterPlatformDependencyTypes(InspectorPropertyEditorRegistryBase registry)
@@ -252,7 +249,7 @@ namespace Sachssoft.Sasospector.Registries
                         y => (nint)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(nuint),
                 f => f.CreateMultipleValueEditor(
@@ -263,40 +260,67 @@ namespace Sachssoft.Sasospector.Registries
                         y => (nuint)y[0]
                     )
                 ),
-                priority: 0);
+                isFallback: true);
+        }
+
+        private void RegisterFileSystemTypes(InspectorPropertyEditorRegistryBase registry)
+        {
+            registry.RegisterType(typeof(FileInfo),
+                (f) => f.CreateFileSystemEditor(
+                    mode: FileSystemMode.File
+                ),
+                isFallback: true);
+
+            registry.RegisterType(typeof(DirectoryInfo),
+                (f) => f.CreateFileSystemEditor(
+                    mode: FileSystemMode.Directory
+                ),
+                isFallback: true);
+
+            registry.RegisterType(typeof(string),
+                (f) => f.CreateFileSystemEditor(
+                    mode: FileSystemMode.File
+                ),
+                purpose: new FileSystemPurpose
+                {
+                    Mode = FileSystemMode.File
+                });
+
+            registry.RegisterType(typeof(string),
+                (f) => f.CreateFileSystemEditor(
+                    mode: FileSystemMode.Directory
+                ),
+                purpose: new FileSystemPurpose
+                {
+                    Mode = FileSystemMode.Directory
+                });
         }
 
         private void RegisterCommonTypes(InspectorPropertyEditorRegistryBase registry)
         {
             registry.RegisterType(typeof(string),
-                (f) => f.CreateStringEditor(),
-                priority: 0);
-
-            registry.RegisterType(typeof(string),
-                (f) => f.CreateFileSystemEditor(),
-                (c) => c.Any(x => x is FileSystemConstraint),
-                priority: 0);
-
-            registry.RegisterType(typeof(string),
                 (f) => f.CreateUriEditor(),
-                (c) => c.Any(x => x is UriConstraint),
-                priority: 0);
+                purpose: new UriPurpose());
+
+            registry.RegisterType(typeof(string),
+                (f) => f.CreateStringEditor(),
+                isFallback: true);
 
             registry.RegisterType(typeof(Uri),
                 (f) => f.CreateUriEditor(),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(char),
                 (f) => f.CreateStringEditor(),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Version),
                 (f) => f.CreateVersionEditor(),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(Guid),
                 (f) => f.CreateGuidEditor(),
-                priority: 0);
+                isFallback: true);
         }
 
         private void RegisterDataTimeTypes(InspectorPropertyEditorRegistryBase registry)
@@ -306,35 +330,35 @@ namespace Sachssoft.Sasospector.Registries
                     parts: DateTimeEditorParts.DateTime,
                     adapter: null
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(DateTimeOffset),
                 (f) => f.CreateDateTimeEditor(
                     parts: DateTimeEditorParts.DateTime,
                     adapter: null
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(TimeSpan),
                 (f) => f.CreateDateTimeEditor(
                     parts: DateTimeEditorParts.Time,
                     adapter: null
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(TimeOnly),
                 (f) => f.CreateDateTimeEditor(
                     parts: DateTimeEditorParts.Time,
                     adapter: null
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(DateOnly),
                 (f) => f.CreateDateTimeEditor(
                     parts: DateTimeEditorParts.Date,
                     adapter: null
                 ),
-                priority: 0);
+                isFallback: true);
         }
 
         private void RegisterNumericMathTypes(InspectorPropertyEditorRegistryBase registry)
@@ -359,7 +383,7 @@ namespace Sachssoft.Sasospector.Registries
                               new(nameof(System.Numerics.Vector2.Y))
                             ]
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(System.Numerics.Vector3),
                 f => f.CreateMultipleValueEditor(
@@ -384,7 +408,7 @@ namespace Sachssoft.Sasospector.Registries
                               new(nameof(System.Numerics.Vector3.Z))
                             ]
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(System.Numerics.Vector4),
                 f => f.CreateMultipleValueEditor(
@@ -412,7 +436,7 @@ namespace Sachssoft.Sasospector.Registries
                               new(nameof(System.Numerics.Vector4.W))
                             ]
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(System.Numerics.Matrix3x2),
                 f => f.CreateMultipleValueEditor(
@@ -446,7 +470,7 @@ namespace Sachssoft.Sasospector.Registries
                               new(nameof(System.Numerics.Matrix3x2.M32))
                             ]
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(System.Numerics.Matrix4x4),
                 f => f.CreateMultipleValueEditor(
@@ -510,7 +534,7 @@ namespace Sachssoft.Sasospector.Registries
                               new(nameof(System.Numerics.Matrix4x4.M44))
                             ]
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(System.Numerics.Quaternion),
                 f => f.CreateMultipleValueEditor(
@@ -538,7 +562,7 @@ namespace Sachssoft.Sasospector.Registries
                               new(nameof(System.Numerics.Quaternion.W))
                             ]
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(System.Numerics.Plane),
                 f => f.CreateMultipleValueEditor(
@@ -566,7 +590,7 @@ namespace Sachssoft.Sasospector.Registries
                               new(nameof(System.Numerics.Plane.D))
                             ]
                 ),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(System.Numerics.BigInteger),
                 f => f.CreateMultipleValueEditor(
@@ -576,7 +600,7 @@ namespace Sachssoft.Sasospector.Registries
                         x => [new UnboundedValue<System.Numerics.BigInteger>(x)],
                         y => (System.Numerics.BigInteger)y[0]
                     )),
-                priority: 0);
+                isFallback: true);
 
             registry.RegisterType(typeof(System.Numerics.Complex),
                 f => f.CreateMultipleValueEditor(
@@ -598,7 +622,7 @@ namespace Sachssoft.Sasospector.Registries
                               new(nameof(System.Numerics.Complex.Imaginary))
                             ]
                 ),
-                priority: 0);
+                isFallback: true);
         }
     }
 }

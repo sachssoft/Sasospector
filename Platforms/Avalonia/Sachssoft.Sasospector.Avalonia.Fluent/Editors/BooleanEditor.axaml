@@ -8,20 +8,20 @@
 				  TargetType="editors:BooleanEditor">
 		<Setter Property="Template">
 			<ControlTemplate TargetType="editors:BooleanEditor">
-				<ToggleSwitch IsChecked="{TemplateBinding Value, Mode=TwoWay}" />
+				<ToggleSwitch x:Name="PART_Toggle" />
 			</ControlTemplate>
 		</Setter>
 		<Style Selector="^[PreferredKind=CheckBox]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
-					<CheckBox IsChecked="{TemplateBinding Value, Mode=TwoWay}" />
+					<CheckBox x:Name="PART_Toggle" />
 				</ControlTemplate>
 			</Setter>
 		</Style>
 		<Style Selector="^[PreferredKind=Toggle]">
 			<Setter Property="Template">
 				<ControlTemplate TargetType="editors:BooleanEditor">
-					<ToggleButton IsChecked="{TemplateBinding Value, Mode=TwoWay}" />
+					<ToggleButton x:Name="PART_Toggle" />
 				</ControlTemplate>
 			</Setter>
 		</Style>

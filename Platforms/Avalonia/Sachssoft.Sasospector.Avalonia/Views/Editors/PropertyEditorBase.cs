@@ -78,7 +78,8 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         public CultureInfo EffectiveCulture => _effectiveCulture;
 
-        public IInspectorPropertyInfo? CurrentProperty
+        [AllowNull]
+        public IInspectorPropertyInfo CurrentProperty
         {
             get => _currentProperty;
             internal set
