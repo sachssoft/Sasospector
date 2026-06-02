@@ -11,7 +11,7 @@
 					  TargetType="editors:ColorEditor">
 		<Setter Property="Template">
 			<ControlTemplate TargetType="editors:ColorEditor">
-				<Grid ColumnDefinitions="Auto,*,Auto">
+				<Grid ColumnDefinitions="Auto,*,Auto,Auto">
 					<Border Grid.Column="0"
 							HorizontalAlignment="Stretch"
 							Width="{StaticResource InspectorPropertyEditorWidth}"
@@ -25,7 +25,10 @@
 							 Text="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=editors:ColorEditor}, Converter={StaticResource ColorToHexConverter}, Mode=TwoWay}"
 							 HorizontalAlignment="Stretch"
 							 Grid.Column="1"/>
-					<Button x:Name="PART_BrowseButton"
+					<Button x:Name="PART_PickButton"
+							Command="{Binding PickAction.Command, RelativeSource={RelativeSource TemplatedParent}}"
+							CommandParameter="{Binding PickAction.CommandParameter, RelativeSource={RelativeSource TemplatedParent}}"
+							Tag="{Binding PickAction, RelativeSource={RelativeSource TemplatedParent}}"
 							Grid.Column="2"
 							HorizontalAlignment="Stretch"
 							HorizontalContentAlignment="Center"
@@ -35,7 +38,23 @@
 								 Height="{StaticResource IconViewboxHeight}"
 								 HorizontalAlignment="Center"
 								 VerticalAlignment="Center">
-							<ContentPresenter Content="{Binding Action.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+							<ContentPresenter Content="{Binding PickAction.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+						</Viewbox>
+					</Button>
+					<Button x:Name="PART_CaptureButton"
+							Command="{Binding CaptureAction.Command, RelativeSource={RelativeSource TemplatedParent}}"
+							CommandParameter="{Binding CaptureAction.CommandParameter, RelativeSource={RelativeSource TemplatedParent}}"
+							Tag="{Binding CaptureAction, RelativeSource={RelativeSource TemplatedParent}}"
+							Grid.Column="3"
+							HorizontalAlignment="Stretch"
+							HorizontalContentAlignment="Center"
+							Width="{StaticResource InspectorPropertyEditorWidth}"
+							Height="{StaticResource InspectorPropertyEditorHeight}">
+						<Viewbox Width="{StaticResource IconViewboxWidth}"
+								 Height="{StaticResource IconViewboxHeight}"
+								 HorizontalAlignment="Center"
+								 VerticalAlignment="Center">
+							<ContentPresenter Content="{Binding CaptureAction.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
 						</Viewbox>
 					</Button>
 				</Grid>

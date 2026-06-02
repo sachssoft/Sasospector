@@ -2,6 +2,7 @@
 {
     public static class ColorEditorActions
     {
-        public static readonly string Select = nameof(Select);
+        public static readonly string Pick = nameof(Pick);
+        public static readonly string Capture = nameof(Capture);
     }
 }

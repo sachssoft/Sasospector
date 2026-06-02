@@ -4,16 +4,16 @@
 					xmlns:converters="using:Sachssoft.Sasospector.Views.Converters"
 					x:ClassModifier="internal">
 
-	<ControlTheme x:Key="{x:Type views:OptionalPropertyViewItem}"
-				  TargetType="views:OptionalPropertyViewItem">
+	<ControlTheme x:Key="{x:Type views:CheckBoxPropertyViewItem}"
+				  TargetType="views:CheckBoxPropertyViewItem">
 
 		<Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
 		<Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
 		<Setter Property="Padding" Value="10"/>
 		<Setter Property="IsHeaderVisible" Value="True"/>
 		<Setter Property="Template">
-			<ControlTemplate TargetType="views:OptionalPropertyViewItem"
-							 x:DataType="views:OptionalPropertyViewItem">
+			<ControlTemplate TargetType="views:CheckBoxPropertyViewItem"
+							 x:DataType="views:CheckBoxPropertyViewItem">
 				<StackPanel Orientation="Vertical">
 					<Grid ColumnDefinitions="Auto,5,*">
 						<Grid IsVisible="{TemplateBinding IsHeaderVisible}"
@@ -27,7 +27,7 @@
 								   HorizontalContentAlignment="Right"
 								   Padding="5 5 5 0"/>
 							<CheckBox Grid.Column="1"
-								      IsChecked="{TemplateBinding HasValue}"
+								      IsChecked="{TemplateBinding IsChecked, Mode=TwoWay}"
 								      HorizontalAlignment="Right"/>
 						</Grid>
 						<GridSplitter Grid.Column="1"
@@ -47,6 +47,16 @@
 				</StackPanel>
 			</ControlTemplate>
 		</Setter>
+		<Style Selector="^[CheckBehavior=Enable]">
+			<Style Selector="^[IsChecked=False] /template/ ContentControl#PART_EditorContent">
+				<Setter Property="IsEnabled" Value="False"/>
+			</Style>
+		</Style>
+		<Style Selector="^[CheckBehavior=Enable]">
+			<Style Selector="^[IsChecked=True] /template/ ContentControl#PART_EditorContent">
+				<Setter Property="IsEnabled" Value="True"/>
+			</Style>
+		</Style>
 	</ControlTheme>
 
 </ResourceDictionary>
