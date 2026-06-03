@@ -2,6 +2,11 @@
 
 **Sachssoft Sasospector** is an inspector UI system. It works like a PropertyGrid, but is always extensible and controllable. It uses a schema system to define specific properties. It also supports reflection, so schemas can be generated automatically via reflection. The goal is to reduce the amount of boilerplate code required in many applications. A key focus is AOT support so that mobile platforms are supported as well. Reflection is only used when needed.
 
+### ⚠️ Note
+The inspector is primarily intended for MVVM systems. It acts as a layer between the Model and the ViewModel.
+
+The schema is based on a model to register and describe its properties. This allows the UI (View) to read the properties in a structured way and automatically select appropriate editor components for rendering.
+
 ---
 
 ## ✨ Current Status
