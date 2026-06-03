@@ -48,7 +48,8 @@ Sasospector is designed to help developers:
 | Platform | Status | Minimum .NET Version | NuGet |
 |----------|--------|----------------------|------|
 | Skia | Coming soon | 8.0 | |
-| Sasogine | Coming soon | 8.0 | |
+| Monogame | Coming soon | 8.0 | |
+| FNA | Coming soon | 8.0 | |
 
 ---
 
