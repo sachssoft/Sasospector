@@ -3,9 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Sachssoft.Sasospector.Schemas;
 using Sachssoft.Sasospector.Views.Fields;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Sachssoft.Sasospector.Views
 {

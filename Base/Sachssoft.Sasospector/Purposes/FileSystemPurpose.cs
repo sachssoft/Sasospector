@@ -1,5 +1,4 @@
-﻿using Sachssoft.Sasospector.Purposes;
-using Sachssoft.Sasospector.Editors;
+﻿using Sachssoft.Sasospector.Editors;
 using System;
 using System.IO;
 
@@ -15,7 +14,7 @@ namespace Sachssoft.Sasospector.Purposes
                 || propertyType == typeof(FileInfo)
                 || propertyType == typeof(DirectoryInfo);
         }
-        
+
         public bool IsEquivalentTo(IInspectorPropertyPurpose? other)
         {
             if (other is not FileSystemPurpose otherPurpose)

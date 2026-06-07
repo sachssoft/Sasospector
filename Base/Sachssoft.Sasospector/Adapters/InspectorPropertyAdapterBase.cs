@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Sachssoft.Sasospector.Adapters
+﻿namespace Sachssoft.Sasospector.Adapters
 {
     public interface IInspectorPropertyAdapter
     {

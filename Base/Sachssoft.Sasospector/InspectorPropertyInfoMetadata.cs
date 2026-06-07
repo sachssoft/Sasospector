@@ -1,5 +1,5 @@
-﻿using Sachssoft.Sasospector.Purposes;
-using Sachssoft.Sasospector.Constraints;
+﻿using Sachssoft.Sasospector.Constraints;
+using Sachssoft.Sasospector.Purposes;
 using System;
 using System.Collections.Generic;
 
@@ -29,7 +29,7 @@ namespace Sachssoft.Sasospector
         // Wenn z.B. Typ String hat mehrere Zwecke z.B. Dateipfad, Url, usw...
         // Ohne Zweck weiß der Inspektor nicht.
         // Beim Reflection wird es anhand der Attribute Purpose erkennen
-        public IInspectorPropertyPurpose? Purpose { get; init; } 
+        public IInspectorPropertyPurpose? Purpose { get; init; }
 
         public string? CategoryName { get; init; }
 

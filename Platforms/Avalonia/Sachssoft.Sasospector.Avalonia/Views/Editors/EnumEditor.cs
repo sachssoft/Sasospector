@@ -2,11 +2,10 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Interactivity;
+using Sachssoft.Sasospector.Editors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sachssoft.Sasospector.Editors;
 
 namespace Sachssoft.Sasospector.Views.Editors
 {

@@ -2,7 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Data;
 using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Registries;
 using Sachssoft.Sasospector.Views.Editors;
@@ -11,18 +10,14 @@ using System;
 namespace Sachssoft.Sasospector.Views
 {
     [TemplatePart(PART_EditorContent, typeof(ContentControl))]
-    [TemplatePart(PART_Container, typeof(ContentControl))]
     public class PropertyViewItem : InspectorItemBase
     {
         private const string PART_EditorContent = nameof(PART_EditorContent);
-        private const string PART_Container = nameof(PART_Container);
 
-        private bool? _propertyFound;
         private InspectorControl? _control;
         private InspectorPropertyEditorRegistryBase? _editorRegistry;
         private PropertyEditorBase? _editor;
         private ContentControl? _partEditorContent;
-        private ContentControl? _partContainer;
 
         public static readonly StyledProperty<Type?> TargetTypeProperty =
             AvaloniaProperty.Register<PropertyViewItem, Type?>(nameof(TargetType));
@@ -32,6 +27,9 @@ namespace Sachssoft.Sasospector.Views
 
         public static readonly StyledProperty<PropertyEditorBase?> CustomEditorProperty =
             AvaloniaProperty.Register<PropertyViewItem, PropertyEditorBase?>(nameof(CustomEditor));
+
+        public static readonly StyledProperty<object?> FooterProperty =
+            AvaloniaProperty.Register<PropertyViewItem, object?>(nameof(Footer), defaultValue: null);
 
         protected override Type StyleKeyOverride => typeof(PropertyViewItem);
 
@@ -51,6 +49,12 @@ namespace Sachssoft.Sasospector.Views
         {
             get => GetValue(CustomEditorProperty);
             set => SetValue(CustomEditorProperty, value);
+        }
+
+        public object? Footer
+        {
+            get => GetValue(FooterProperty);
+            set => SetValue(FooterProperty, value);
         }
 
         public InspectorContainerTemplates ContainerTemplates { get; } = new InspectorContainerTemplates();
@@ -79,7 +83,6 @@ namespace Sachssoft.Sasospector.Views
             base.OnApplyTemplate(e);
 
             _partEditorContent = e.NameScope.Get<ContentControl>(PART_EditorContent);
-            _partContainer = e.NameScope.Get<ContentControl>(PART_Container);
 
             UpdateProperty();
         }

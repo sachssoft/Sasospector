@@ -4,6 +4,8 @@
 					xmlns:converters="using:Sachssoft.Sasospector.Views.Converters"
 					x:ClassModifier="internal">
 
+	<converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+
 	<ControlTheme x:Key="{x:Type views:PropertyViewItem}"
 				  TargetType="views:PropertyViewItem">
 
@@ -15,10 +17,12 @@
 			<ControlTemplate TargetType="views:PropertyViewItem"
 							 x:DataType="views:PropertyViewItem">
 				<StackPanel Orientation="Vertical">
-					<Grid ColumnDefinitions="Auto,5,*">
+					<Grid ColumnDefinitions="Auto,5,*"
+						  RowDefinitions="Auto,Auto">
 						<Grid IsVisible="{TemplateBinding IsHeaderVisible}">
 							<Label Content="{TemplateBinding Header}"
 								   Grid.Column="0"
+								   Grid.Row="1"
 								   Width="{Binding $parent[views:InspectorControl].HeaderWidth}"
 								   HorizontalAlignment="Stretch"
 								   VerticalAlignment="Stretch"
@@ -27,6 +31,7 @@
 								   Padding="5 5 5 0"/>
 						</Grid>
 						<GridSplitter Grid.Column="1"
+									  Grid.Row="0"
 									  Width="5"
 									  HorizontalAlignment="Stretch"
 									  VerticalAlignment="Stretch"
@@ -34,12 +39,23 @@
 									  Background="Transparent"
 									  IsVisible="{TemplateBinding IsHeaderVisible}"/>
 						<ContentControl Grid.Column="2"
+										Grid.Row="0"
 										x:Name="PART_EditorContent"
 										HorizontalAlignment="Stretch"
 										VerticalAlignment="Stretch"/>
-
+						<ContentControl Grid.ColumnSpan="3"
+										Grid.Column="0"
+										Grid.Row="1"
+										x:Name="FooterContent"
+										IsVisible="{TemplateBinding Footer, Converter={StaticResource NullToBoolConverter}}"
+										Content="{TemplateBinding Footer}"
+										HorizontalAlignment="Stretch"
+										VerticalAlignment="Stretch"
+										TextBlock.TextWrapping="WrapWithOverflow"
+										Padding="{DynamicResource InspectorDescriptionPadding}"
+										FontSize="{DynamicResource InspectorDescriptionFontSize}"
+										Foreground="{DynamicResource InspectorDescriptionForeground}"/>
 					</Grid>
-					<ContentControl x:Name="PART_Container" />
 				</StackPanel>
 			</ControlTemplate>
 		</Setter>

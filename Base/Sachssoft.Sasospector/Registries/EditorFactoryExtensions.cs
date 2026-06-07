@@ -110,7 +110,7 @@ namespace Sachssoft.Sasospector.Registries
             FileSystemMode mode)
         {
             var editor = ((IFileSystemEditor)f.CreateEditor(typeof(IFileSystemEditor)));
-            
+
             editor.Mode = mode;
 
             return editor;

@@ -1,11 +1,9 @@
 ﻿using Sachssoft.Sasospector.Adapters;
-using Sachssoft.Sasospector.Constraints;
 using Sachssoft.Sasospector.Editors;
 using Sachssoft.Sasospector.Purposes;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Sachssoft.Sasospector.Registries
 {

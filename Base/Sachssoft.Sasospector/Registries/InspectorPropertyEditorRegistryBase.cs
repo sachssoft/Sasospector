@@ -1,5 +1,4 @@
 ﻿using Sachssoft.Sasospector.Purposes;
-using Sachssoft.Sasospector.Constraints;
 using System;
 using System.Collections.Generic;
 using System.Linq;

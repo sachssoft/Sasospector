@@ -12,7 +12,8 @@
 		<Setter Property="Template">
 			<ControlTemplate TargetType="views:SectionView">
 				<Expander Theme="{StaticResource InspectorSectionViewExpanderTheme}"
-						  Header="{TemplateBinding Header}">
+						  Header="{TemplateBinding Header}"
+						  IsExpanded="{TemplateBinding IsExpanded}">
 					<ItemsControl ItemsSource="{Binding $parent[views:SectionView].Items}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
@@ -24,5 +25,11 @@
 				</Expander>
 			</ControlTemplate>
 		</Setter>
+		<Style Selector="^[IsExpandable=False] /template/ Expander">
+			<Setter Property="IsExpanded" Value="True"/>
+		</Style>
+		<!--<Style Selector="^[IsExpandable=False] /template/ Expander /template/ ToggleButton#ExpanderHeader">
+			<Setter Property="IsVisible" Value="False"/>
+		</Style>-->
 	</ControlTheme>
 </ResourceDictionary>

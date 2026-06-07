@@ -11,6 +11,12 @@ namespace Sachssoft.Sasospector.Views
         public static readonly StyledProperty<int?> DisplayOrderProperty =
             AvaloniaProperty.Register<SectionView, int?>(nameof(DisplayOrder));
 
+        public static readonly StyledProperty<bool> IsExpandedProperty =
+            AvaloniaProperty.Register<SectionView, bool>(nameof(IsExpanded));
+
+        public static readonly StyledProperty<bool> IsExpandableProperty =
+            AvaloniaProperty.Register<SectionView, bool>(nameof(IsExpandable));
+
         protected override Type StyleKeyOverride { get; } = typeof(SectionView);
 
         public string? CategoryName
@@ -23,6 +29,18 @@ namespace Sachssoft.Sasospector.Views
         {
             get => GetValue(DisplayOrderProperty);
             set => SetValue(DisplayOrderProperty, value);
+        }
+
+        public bool IsExpanded
+        {
+            get => GetValue(IsExpandedProperty);
+            set => SetValue(IsExpandedProperty, value);
+        }
+
+        public bool IsExpandable
+        {
+            get => GetValue(IsExpandableProperty);
+            set => SetValue(IsExpandableProperty, value);
         }
 
         public InspectorActions Actions { get; } = new InspectorActions();
