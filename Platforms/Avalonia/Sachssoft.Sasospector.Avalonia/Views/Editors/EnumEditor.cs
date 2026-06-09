@@ -61,7 +61,7 @@ namespace Sachssoft.Sasospector.Views.Editors
                 _partEnumFields.SelectionChanged -= OnSelectionChanged;
         }
 
-        protected override void OnPropertySourceValueChanged()
+        protected override void OnPropertySourceValueChanged(InspectorPropertyChangedEventArgs e)
         {
             _sourceSyncing = true;
             SyncFromSource();

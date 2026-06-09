@@ -139,9 +139,9 @@ namespace Sachssoft.Sasospector.Views.Editors
             System.Diagnostics.Debug.WriteLine($"Source Event PropertyChanged: {e.Property}");
         }
 
-        protected override void OnPropertySourceValueChanged()
+        protected override void OnPropertySourceValueChanged(InspectorPropertyChangedEventArgs e)
         {
-            base.OnPropertySourceValueChanged();
+            base.OnPropertySourceValueChanged(e);
 
             _sourceSyncing = true;
 

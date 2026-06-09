@@ -11,8 +11,7 @@ namespace Sachssoft.Sasospector.Schemas
 
         private bool _disposed;
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        public event PropertyChangingEventHandler? PropertyChanging;
+        public event EventHandler<InspectorSchemaSynchronizedEventArgs>? Synchronized;
 
         public InspectorSchema(IEnumerable<IInspectorPropertyInfo> properties)
         {
@@ -33,8 +32,7 @@ namespace Sachssoft.Sasospector.Schemas
                 if (!dict.TryAdd(name, property))
                     throw new InvalidOperationException($"Duplicate property '{name}'.");
 
-                property.ValueChanging += Property_ValueChanging;
-                property.ValueChanged += Property_ValueChanged;
+                property.ValueChanged += OnPropertyValueChanged;
             }
 
             _properties = dict;
@@ -53,8 +51,7 @@ namespace Sachssoft.Sasospector.Schemas
 
                 dict[name] = property;
 
-                property.ValueChanging += Property_ValueChanging;
-                property.ValueChanged += Property_ValueChanged;
+                property.ValueChanged += OnPropertyValueChanged;
             }
 
             _properties = dict;
@@ -84,6 +81,13 @@ namespace Sachssoft.Sasospector.Schemas
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
+        // Bei Änderungen am Model muss das Schema benachrichtigt werden,
+        // damit es seine Daten synchronisieren kann.
+        public void RequestSynchronize(string propertyName)
+        {
+            Synchronized?.Invoke(this, new InspectorSchemaSynchronizedEventArgs(propertyName));
+        }
+
         public void Dispose()
         {
             if (_disposed)
@@ -91,24 +95,17 @@ namespace Sachssoft.Sasospector.Schemas
 
             foreach (var property in _properties.Values)
             {
-                property.ValueChanging -= Property_ValueChanging;
-                property.ValueChanged -= Property_ValueChanged;
+                property.ValueChanged -= OnPropertyValueChanged;
             }
 
-            PropertyChanged = null;
-            PropertyChanging = null;
+            Synchronized = null;
 
             _disposed = true;
         }
 
-        private void Property_ValueChanging(object? sender, InspectorPropertyChangingEventArgs e)
+        private void OnPropertyValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
         {
-            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(e.Property.Name));
-        }
-
-        private void Property_ValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(e.Property.Name));
+            Synchronized?.Invoke(this, new InspectorSchemaSynchronizedEventArgs(e.Property.Name));
         }
     }
 }

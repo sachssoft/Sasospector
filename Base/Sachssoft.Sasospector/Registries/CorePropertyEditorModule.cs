@@ -75,15 +75,27 @@ namespace Sachssoft.Sasospector.Registries
                     typeof(System.Collections.Generic.IList<>).IsAssignableFrom(type),
                 (pi, f) => f.CreateListEditor());
 
+            // Object Picker
             registry.RegisterRule(
-                match: type =>
-                    type != typeof(string) &&
-                    !type.IsValueType &&
-                    !type.IsArray &&
-                    !typeof(System.Collections.IEnumerable).IsAssignableFrom(type),
+                match: type => IsObjectType(type),
+                factory: (pi, f) => f.CreateObjectPicker(),
+                purpose: new ObjectPickerPurpose()
+                );
+
+            // Instance Selector
+            registry.RegisterRule(
+                match: type => IsObjectType(type),
                 factory: (pi, f) => f.CreateInstanceSelector(
                         allowNullSelection: true
                     ));
+        }
+
+        private static bool IsObjectType(Type type)
+        {
+            return type != typeof(string) &&
+                    !type.IsValueType &&
+                    !type.IsArray &&
+                    !typeof(System.Collections.IEnumerable).IsAssignableFrom(type);
         }
 
         private void RegisterPrimitiveTypes(InspectorPropertyEditorRegistryBase registry)

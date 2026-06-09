@@ -92,9 +92,9 @@ namespace Sachssoft.Sasospector.Views.Editors
                 _partRemoveButton.Click += _partRemoveButton_Click;
         }
 
-        protected override void OnPropertySourceValueChanged()
+        protected override void OnPropertySourceValueChanged(InspectorPropertyChangedEventArgs e)
         {
-            base.OnPropertySourceValueChanged();
+            base.OnPropertySourceValueChanged(e);
             SynchronizeToObservable();
         }
 

@@ -13,8 +13,14 @@
 	<SolidColorBrush x:Key="InspectorContainerBackground">#404040</SolidColorBrush>
 	<SolidColorBrush x:Key="InspectorContainerBackground2">#323232</SolidColorBrush>
 	
-	<sys:Double x:Key="IconViewboxWidth">12</sys:Double>
-	<sys:Double x:Key="IconViewboxHeight">12</sys:Double>
+	<!-- Property Field -->
+	<SolidColorBrush x:Key="InspectorFieldBorderBrush">#a0a0a0</SolidColorBrush>
+	<Thickness x:Key="InspectorFieldBorderThickness">1</Thickness>
+	<Thickness x:Key="InspectorFieldPadding">5</Thickness>
+	<CornerRadius x:Key="InspectorFieldCornerRadius">4</CornerRadius>
+	
+	<sys:Double x:Key="IconViewboxWidth">16</sys:Double>
+	<sys:Double x:Key="IconViewboxHeight">16</sys:Double>
 
 	<sys:Double x:Key="InspectorSectionSpacing">5</sys:Double>
 	<sys:Double x:Key="InspectorPropertySpacing">5</sys:Double>

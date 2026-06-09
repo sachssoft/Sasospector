@@ -33,6 +33,10 @@ namespace Sachssoft.Sasospector.Views
         public static readonly StyledProperty<object?> HeaderProperty =
             AvaloniaProperty.Register<InspectorItemBase, object?>(nameof(Header));
 
+        public static readonly StyledProperty<InspectorHeaderLayout> HeaderLayoutProperty =
+            AvaloniaProperty.Register<InspectorItemBase, InspectorHeaderLayout>(nameof(HeaderLayout),
+                defaultValue: InspectorHeaderLayout.Inline);
+
         public static readonly StyledProperty<bool> IsHeaderVisibleProperty =
             AvaloniaProperty.Register<InspectorItemBase, bool>(nameof(IsHeaderVisible));
 
@@ -115,6 +119,12 @@ namespace Sachssoft.Sasospector.Views
         {
             get => GetValue(HeaderProperty);
             set => SetValue(HeaderProperty, value);
+        }
+
+        public InspectorHeaderLayout HeaderLayout
+        {
+            get => GetValue(HeaderLayoutProperty);
+            set => SetValue(HeaderLayoutProperty, value);
         }
 
         public bool IsHeaderVisible

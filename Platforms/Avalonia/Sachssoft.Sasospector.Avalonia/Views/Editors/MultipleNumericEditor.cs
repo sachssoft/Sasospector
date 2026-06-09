@@ -103,7 +103,7 @@ namespace Sachssoft.Sasospector.Views.Editors
             //}
         }
 
-        protected override void OnPropertySourceValueChanged()
+        protected override void OnPropertySourceValueChanged(InspectorPropertyChangedEventArgs e)
         {
             if (_sourceSyncing || Adapter == null || CurrentProperty == null)
                 return;

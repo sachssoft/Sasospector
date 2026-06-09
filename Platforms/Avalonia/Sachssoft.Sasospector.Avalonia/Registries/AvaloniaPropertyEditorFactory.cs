@@ -1,4 +1,5 @@
-﻿using Sachssoft.Sasospector.Views.Editors;
+﻿using Sachssoft.Sasospector.Editors;
+using Sachssoft.Sasospector.Views.Editors;
 using System;
 using System.Collections.Generic;
 
@@ -63,6 +64,7 @@ namespace Sachssoft.Sasospector.Registries
             Register(typeof(UriEditor), () => new UriEditor());
             Register(typeof(StringEditor), () => new StringEditor());
             Register(typeof(VersionEditor), () => new VersionEditor());
+            Register(typeof(ObjectPicker), () => new ObjectPicker());
             Register(typeof(InstanceSelector), () => new InstanceSelector());
             Register(typeof(ListEditor), () => new ListEditor());
             Register(typeof(DelegateSelector), () => new DelegateSelector());

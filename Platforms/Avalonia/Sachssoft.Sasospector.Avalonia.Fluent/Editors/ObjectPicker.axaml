@@ -1,0 +1,39 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:views="using:Sachssoft.Sasospector.Views"
+					xmlns:editors="using:Sachssoft.Sasospector.Views.Editors"
+					x:ClassModifier="internal">
+
+	<ControlTheme x:Key="{x:Type editors:ObjectPicker}"
+					  TargetType="editors:ObjectPicker">
+		<Setter Property="Template">
+			<ControlTemplate TargetType="editors:ObjectPicker">
+				<Grid ColumnDefinitions="*,Auto">
+					<Border Height="{StaticResource InspectorPropertyEditorHeight}"
+							Grid.Column="0"
+							BorderBrush="{DynamicResource InspectorFieldBorderBrush}"
+							BorderThickness="{DynamicResource InspectorFieldBorderThickness}"
+							CornerRadius="{DynamicResource InspectorFieldCornerRadius}"
+							Padding="{DynamicResource InspectorFieldPadding}">
+						<ContentControl x:Name="PART_DisplayContent" />
+					</Border>
+					<Button x:Name="PART_BrowseButton"
+							Command="{Binding Action.Command, RelativeSource={RelativeSource TemplatedParent}}"
+							CommandParameter="{Binding Action.CommandParameter, RelativeSource={RelativeSource TemplatedParent}}"
+							Tag="{Binding Action, RelativeSource={RelativeSource TemplatedParent}}"
+							Grid.Column="2"
+							HorizontalAlignment="Stretch"
+							HorizontalContentAlignment="Center"
+							Width="{StaticResource InspectorPropertyEditorWidth}"
+							Height="{StaticResource InspectorPropertyEditorHeight}">
+						<Viewbox Width="{StaticResource IconViewboxWidth}"
+								 Height="{StaticResource IconViewboxHeight}">
+							<ContentPresenter Content="{Binding Action.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+						</Viewbox>
+					</Button>
+				</Grid>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+
+</ResourceDictionary>

@@ -1,11 +1,15 @@
 ﻿using Avalonia;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Interactivity;
+using Sachssoft.Sasospector.Schemas;
 using Sachssoft.Sasospector.Views.Fields;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Net.Sockets;
 using System.Windows.Input;
 
 namespace Sachssoft.Sasospector.Views.Editors
@@ -18,6 +22,7 @@ namespace Sachssoft.Sasospector.Views.Editors
         private IReadOnlyList<FieldHeaderBase>? _fieldHeaders;
         private InspectorItemBase? _container;
         private InspectorActions _actions;
+        private IDataTemplate? _displayOverrideTemplate;
 
         public static readonly DirectProperty<PropertyEditorBase, InspectorItemBase?> ContainerProperty =
             AvaloniaProperty.RegisterDirect<PropertyEditorBase, InspectorItemBase?>(
@@ -55,6 +60,12 @@ namespace Sachssoft.Sasospector.Views.Editors
                 o => o.FieldHeaders,
                 (o, v) => o.FieldHeaders = v);
 
+        public static readonly DirectProperty<PropertyEditorBase, IDataTemplate?> DisplayOverrideTemplateProperty =
+            AvaloniaProperty.RegisterDirect<PropertyEditorBase, IDataTemplate?>(
+                nameof(DisplayOverrideTemplate),
+                o => o.DisplayOverrideTemplate,
+                (o, v) => o.DisplayOverrideTemplate = v);
+
         // null = CurrentCultureUI
         public CultureInfo? Culture
         {
@@ -88,7 +99,8 @@ namespace Sachssoft.Sasospector.Views.Editors
 
                 if (_currentProperty != null)
                 {
-                    _currentProperty.ValueChanged += SourceValueChanged;
+                    _currentProperty.Schema.Synchronized += OnSchemaSynchronized;
+                    _currentProperty.ValueChanged += OnSourceValueChanged;
                 }
             }
         }
@@ -106,6 +118,12 @@ namespace Sachssoft.Sasospector.Views.Editors
         {
             get => _fieldHeaders;
             internal set => SetAndRaise(FieldHeadersProperty, ref _fieldHeaders, value);
+        }
+
+        public IDataTemplate? DisplayOverrideTemplate
+        {
+            get => _displayOverrideTemplate;
+            internal set => SetAndRaise(DisplayOverrideTemplateProperty, ref _displayOverrideTemplate, value);
         }
 
         public InspectorItemBase? Container
@@ -181,6 +199,7 @@ namespace Sachssoft.Sasospector.Views.Editors
                         if (item is PropertyViewItem pvi)
                         {
                             _actions = pvi.Actions;
+                            DisplayOverrideTemplate = pvi.DisplayOverrideTemplate;
                         }
 
                         if (this is IItemTemplateProvider itp)
@@ -220,7 +239,11 @@ namespace Sachssoft.Sasospector.Views.Editors
 
         protected virtual void OnContainerExit() { }
 
-        protected virtual void OnPropertySourceValueChanged()
+        protected virtual void OnSchemaSynchronized(InspectorSchemaSynchronizedEventArgs e)
+        {
+        }
+
+        protected virtual void OnPropertySourceValueChanged(InspectorPropertyChangedEventArgs e)
         {
         }
 
@@ -238,15 +261,20 @@ namespace Sachssoft.Sasospector.Views.Editors
         {
             if (_currentProperty != null)
             {
-                _currentProperty.ValueChanged -= SourceValueChanged;
+                _currentProperty.ValueChanged -= OnSourceValueChanged;
             }
 
             base.OnUnloaded(e);
         }
 
-        private void SourceValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
+        private void OnSchemaSynchronized(object? sender, InspectorSchemaSynchronizedEventArgs e)
         {
-            OnPropertySourceValueChanged();
+            OnSchemaSynchronized(e);
+        }
+
+        private void OnSourceValueChanged(object? sender, InspectorPropertyChangedEventArgs e)
+        {
+            OnPropertySourceValueChanged(e);
         }
     }
 }

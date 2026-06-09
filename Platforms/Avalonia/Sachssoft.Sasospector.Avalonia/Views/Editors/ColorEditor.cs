@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Sachssoft.Sasospector.Adapters;
 using Sachssoft.Sasospector.Editors;
+using Sachssoft.Sasospector.Schemas;
 using System;
 
 namespace Sachssoft.Sasospector.Views.Editors
@@ -153,7 +154,16 @@ namespace Sachssoft.Sasospector.Views.Editors
             }
         }
 
-        protected override void OnPropertySourceValueChanged()
+        protected override void OnSchemaSynchronized(InspectorSchemaSynchronizedEventArgs e)
+        {
+            base.OnSchemaSynchronized(e);
+
+            _sourceSyncing = true;
+            SyncFromSource();
+            _sourceSyncing = false;
+        }
+
+        protected override void OnPropertySourceValueChanged(InspectorPropertyChangedEventArgs e)
         {
             _sourceSyncing = true;
             SyncFromSource();

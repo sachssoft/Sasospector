@@ -20,6 +20,37 @@ namespace Sachssoft.Sasospector.Schemas
             }
         }
 
+        public void RequestSynchronize(T? model, string propertyName)
+        {
+            if (model is null)
+                return;
+
+            foreach (var factory in _factories)
+            {
+                if (!factory.IsMatch(model))
+                    continue;
+
+                var provider = factory.Create(model)
+                    ?? throw new InvalidOperationException(
+                        $"Factory '{factory.GetType().FullName}' returned null.");
+
+                provider.RequestSynchronize(model, propertyName);
+                return;
+            }
+        }
+
+        void IInspectorSchemaSource.RequestSynchronize(object? model, string propertyName)
+        {
+            if (model is null)
+                return;
+
+            if (model is not T typed)
+                throw new InvalidCastException(
+                    $"Expected model of type '{typeof(T).FullName}', but got '{model.GetType().FullName}'.");
+
+            RequestSynchronize(typed, propertyName);
+        }
+
         public IInspectorSchema Resolve(T? model)
         {
             if (model is null)

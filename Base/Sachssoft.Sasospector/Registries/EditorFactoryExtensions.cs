@@ -8,6 +8,14 @@ namespace Sachssoft.Sasospector.Registries
 {
     public static class EditorFactoryExtensions
     {
+        public static IPropertyEditor CreateObjectPicker(
+            this IInspectorEditorPlatformFactory f)
+        {
+            var editor = ((IObjectPicker)f.CreateEditor(typeof(IObjectPicker)));
+
+            return editor;
+        }
+
         public static IPropertyEditor CreateDelegateSelector(
             this IInspectorEditorPlatformFactory f)
         {

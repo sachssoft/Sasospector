@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -11,13 +12,7 @@ namespace Sachssoft.Sasospector.Schemas
 
         public static readonly EmptyInspectorSchema Instance = new();
 
-        event PropertyChangedEventHandler? INotifyPropertyChanged.PropertyChanged
-        {
-            add { }
-            remove { }
-        }
-
-        event PropertyChangingEventHandler? INotifyPropertyChanging.PropertyChanging
+        event EventHandler<InspectorSchemaSynchronizedEventArgs> IInspectorSchema.Synchronized
         {
             add { }
             remove { }
@@ -37,5 +32,10 @@ namespace Sachssoft.Sasospector.Schemas
 
         IEnumerator<IInspectorPropertyInfo> IEnumerable<IInspectorPropertyInfo>.GetEnumerator()
             => EmptyProperties.Values.GetEnumerator();
+
+        void IInspectorSchema.RequestSynchronize(string propertyName)
+        {
+            // Leer
+        }
     }
 }

@@ -2,8 +2,10 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Registries;
+using Sachssoft.Sasospector.Schemas;
 using Sachssoft.Sasospector.Views.Editors;
 using System;
 
@@ -31,6 +33,9 @@ namespace Sachssoft.Sasospector.Views
         public static readonly StyledProperty<object?> FooterProperty =
             AvaloniaProperty.Register<PropertyViewItem, object?>(nameof(Footer), defaultValue: null);
 
+        public static readonly StyledProperty<IDataTemplate?> DisplayOverrideTemplateProperty =
+            AvaloniaProperty.Register<PropertyViewItem, IDataTemplate?>(nameof(DisplayOverrideTemplate), defaultValue: null);
+
         protected override Type StyleKeyOverride => typeof(PropertyViewItem);
 
         public Type? TargetType
@@ -55,6 +60,12 @@ namespace Sachssoft.Sasospector.Views
         {
             get => GetValue(FooterProperty);
             set => SetValue(FooterProperty, value);
+        }
+
+        public IDataTemplate? DisplayOverrideTemplate
+        {
+            get => GetValue(DisplayOverrideTemplateProperty);
+            set => SetValue(DisplayOverrideTemplateProperty, value);
         }
 
         public InspectorContainerTemplates ContainerTemplates { get; } = new InspectorContainerTemplates();
