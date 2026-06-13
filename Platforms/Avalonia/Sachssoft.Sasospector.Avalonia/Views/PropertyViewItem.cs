@@ -98,6 +98,12 @@ namespace Sachssoft.Sasospector.Views
             UpdateProperty();
         }
 
+        protected internal override void OnParentSchemaChanged()
+        {
+            base.OnParentSchemaChanged();
+            UpdateProperty();
+        }
+
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);

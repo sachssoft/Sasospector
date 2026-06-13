@@ -236,7 +236,11 @@ namespace Sachssoft.Sasospector.Views
 
         public virtual void RefreshProperty() { }
 
-        internal protected virtual void OnParentSchemaChanged() { }
+        internal protected virtual void OnParentSchemaChanged()
+        {
+            ApplySchema();
+            UpdateSchema();
+        }
 
         private void ApplySchema()
         {

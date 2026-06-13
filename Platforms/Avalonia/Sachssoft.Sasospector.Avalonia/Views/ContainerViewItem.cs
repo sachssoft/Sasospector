@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Metadata;
+using Avalonia.VisualTree;
 using Sachssoft.Sasospector.Schemas;
 using System;
 
@@ -71,11 +72,22 @@ namespace Sachssoft.Sasospector.Views
 
         private void NotifyChildrenSchemaChanged()
         {
-            foreach (var child in LogicalChildren)
+            if (!IsLoaded)
+                return;
+
+            NotifyRecursive(this);
+        }
+
+        private void NotifyRecursive(ContainerViewItem current)
+        {
+            foreach (var item in current.Items)
             {
-                if (child is InspectorItemBase item)
+                item.OnParentSchemaChanged();
+
+                // continue recursion
+                if (item is ContainerViewItem container)
                 {
-                    item.OnParentSchemaChanged();
+                    NotifyRecursive(container);
                 }
             }
         }
