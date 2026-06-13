@@ -21,7 +21,7 @@ namespace Sachssoft.Sasospector.Registries
                 f => f.CreateMultipleValueEditor(
                     defaultDecimalPlaces: null,
                     adapter: new IndexedFieldPropertyAdapter<Vector2>(
-                        uniformFieldType: typeof(double),
+                        uniformFieldType: typeof(float),
                         fieldCount: 2,
                         castTo: x => [
                                         new BoundedValue<float>(x.X, float.MinValue, float.MaxValue),
